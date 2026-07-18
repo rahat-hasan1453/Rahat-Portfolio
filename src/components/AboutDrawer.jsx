@@ -361,7 +361,7 @@ export default function AboutDrawer({ onClose }) {
               {/* let's connect */}
               <div className="flex w-full flex-col items-start gap-[20px] pt-[24px]">
                 <div className="flex flex-col items-start gap-[8px] [word-break:break-word]">
-                  <p className="font-serif-display w-full text-[32px] not-italic leading-[40px] tracking-[1.28px] text-white">
+                  <p className="font-serif-display w-full text-[24px] not-italic leading-[40px] tracking-[1.28px] text-white">
                     Let’s Connect!
                   </p>
                   <p className="font-jakarta w-full text-[20px] font-medium leading-[24px] tracking-[0.8px] text-grey">
@@ -375,7 +375,7 @@ export default function AboutDrawer({ onClose }) {
                   className="group relative flex cursor-pointer items-center gap-[16px] overflow-hidden rounded-[4px] px-[20px] py-[16px]"
                 >
                   <span className="absolute inset-0 -translate-x-full bg-gradient-to-l from-[#f16767] to-[red] transition-transform duration-500 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-0" />
-                  <span className="font-serif-display relative z-10 whitespace-nowrap text-[28px] not-italic leading-[32px] tracking-[1.12px] text-white">
+                  <span className="font-serif-display relative z-10 whitespace-nowrap text-[20px] not-italic leading-[32px] tracking-[1.12px] text-white">
                     Contact
                   </span>
                   <span className="relative z-10 block size-[24px] shrink-0 transition-transform duration-300 group-hover:translate-x-[4px]">
