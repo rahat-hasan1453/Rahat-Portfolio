@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "EightiesComeback";
+  src: url("/fonts/EightiesComeback-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "EightiesComeback It";
+  src: url("/fonts/EightiesComeback-It-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+@theme {
+  --font-serif-display: "EightiesComeback", serif;
+  --font-serif-display-it: "EightiesComeback It", serif;
+  --font-jakarta: "Plus Jakarta Sans", sans-serif;
+  --font-urbanist: "Urbanist", sans-serif;
+  --color-ink: #12110d;
+  --color-grey: #808080;
+}
+
+html,
+body {
+  background: #12110d;
+  overflow-x: clip;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+::selection {
+  background: #f16767;
+  color: #fff;
+}
+
+/* red → coral gradient used across the design */
+.accent-gradient {
+  background-image: linear-gradient(to left, #f16767, red);
+}
+
+.accent-gradient-text {
+  background-image: linear-gradient(to left, #f16767, red);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
