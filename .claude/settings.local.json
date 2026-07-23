@@ -51,7 +51,22 @@
       "Bash(git rm *)",
       "Bash(git commit -q -m 'Initial commit: Rahat Hasan portfolio \\(Vite + React\\) *)",
       "Bash(git remote *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "mcp__c6ddfed8-4e83-4c2b-aa7e-ddd8365b6445__whoami",
+      "mcp__c6ddfed8-4e83-4c2b-aa7e-ddd8365b6445__get_metadata",
+      "mcp__c6ddfed8-4e83-4c2b-aa7e-ddd8365b6445__get_screenshot",
+      "Bash(curl -sL -o about_full.png \"https://www.figma.com/api/mcp/asset/0c9a40ff-d16f-4655-9e85-b95f32ab4730\")",
+      "mcp__c6ddfed8-4e83-4c2b-aa7e-ddd8365b6445__get_variable_defs",
+      "mcp__c6ddfed8-4e83-4c2b-aa7e-ddd8365b6445__get_design_context",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:50478/)",
+      "Bash(curl -sL -o \"/private/tmp/claude-501/-Users-rahat-Documents-Rahat---Portfolio/dd0c9365-bb62-4f8d-8dd7-4da3a882e7c5/scratchpad/figma-423-3578.png\" \"https://www.figma.com/api/mcp/asset/79e9d139-b0c5-4729-985c-d52b655b631d\")",
+      "Read(//Users/rahat/.claude/**)",
+      "Read(//Users/rahat/.claude/plugins/**)",
+      "WebFetch(domain:github.com)",
+      "Bash(curl -sL -o \"/private/tmp/claude-501/-Users-rahat-Documents-Rahat---Portfolio/dd0c9365-bb62-4f8d-8dd7-4da3a882e7c5/scratchpad/hover-426.png\" \"https://www.figma.com/api/mcp/asset/5b0e09d9-59ab-4f90-8ee4-b64f2655b4ca\")",
+      "Bash(curl -sL -o \"hero-portrait.png\" \"https://www.figma.com/api/mcp/asset/1a277d87-af8e-4b7c-9183-b4a58ea9c6cc\")",
+      "Bash(python3 -c \"from PIL import Image; im=Image.open\\('hero-portrait.png'\\); print\\('size', im.size, 'mode', im.mode\\)\")",
+      "Bash(sips -g hasAlpha -g pixelWidth -g pixelHeight hero-portrait.png)"
     ]
   }
 }

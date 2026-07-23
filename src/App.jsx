@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { AnimatePresence } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
@@ -11,7 +10,7 @@ import CaseStudy from "./components/CaseStudy.jsx";
 import AngleMarque from "./components/AngleMarque.jsx";
 import Footer from "./components/Footer.jsx";
 import CaseStudies from "./components/CaseStudies.jsx";
-import AboutDrawer from "./components/AboutDrawer.jsx";
+import AboutPage from "./components/AboutPage.jsx";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -47,10 +46,20 @@ export default function App() {
   const isCaseStudies = route === "#case-studies";
   const isAbout = route === "#about";
 
+  // land at the top whenever we switch into a full-page route
+  useEffect(() => {
+    if (isAbout || isCaseStudies) {
+      window.__lenis?.scrollTo(0, { immediate: true });
+      window.scrollTo(0, 0);
+    }
+  }, [isAbout, isCaseStudies]);
+
   return (
     <main className="bg-ink min-w-[1440px]">
       <Menu />
-      {isCaseStudies ? (
+      {isAbout ? (
+        <AboutPage />
+      ) : isCaseStudies ? (
         <CaseStudies />
       ) : (
         <>
@@ -62,10 +71,6 @@ export default function App() {
           <Footer />
         </>
       )}
-      {/* About page — bottom drawer over the current view */}
-      <AnimatePresence>
-        {isAbout && <AboutDrawer key="about-drawer" onClose={() => (window.location.hash = "")} />}
-      </AnimatePresence>
     </main>
   );
 }

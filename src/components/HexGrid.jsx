@@ -7,7 +7,7 @@ import { useEffect, useRef } from "react";
 // very tall sections (e.g. Case Study at ~5600px) cost one screen of
 // pixels instead of a full-height buffer.
 const HEX = "0123456789ABCDEF";
-const CELL_W = 92;
+const CELL_W = 66;
 const CELL_H = 26;
 const RADIUS = 280;
 
@@ -80,7 +80,7 @@ export default function HexGrid() {
           const t = 1 - d / RADIUS;
           // values shuffle while lit, decoding-style
           if (Math.random() < 0.025 * t) cells[i] = randHex();
-          ctx.fillStyle = `rgba(241, 103, 103, ${t * t * 0.55 * intensity})`;
+          ctx.fillStyle = `rgba(241, 103, 103, ${t * t * 0.3 * intensity})`;
           ctx.fillText(cells[i], x, y);
         }
       }

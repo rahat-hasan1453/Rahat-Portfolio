@@ -4,10 +4,11 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import HexGrid from "./HexGrid.jsx";
+import HeroDotPortrait from "./HeroDotPortrait.jsx";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-const imgPortrait = "/assets/rahat-silhouette.png";
+const imgPortrait = "/assets/hero-portrait.png";
 const imgRectangle10 = "/assets/9968fb9396a3e91e66388b046266dfaa2cc3b597.png";
 const imgFrame71 = "/assets/491e854ca3659a4c78c80564001a653f9d1ae089.png";
 const imgAvatar = "/assets/3bc4ade8f1fdaf67a5e466972e77f4465f7121f1.png";
@@ -181,41 +182,32 @@ export default function Hero() {
   );
 
   return (
-    <section ref={sectionRef} className="bg-ink relative h-[990px] overflow-hidden" data-name="Hero Section">
+    <section ref={sectionRef} className="bg-ink relative h-[1099px] overflow-hidden" data-name="Hero Section">
       {/* mouse-reactive hex-code background (fin.com style, accent red) */}
       <HexGrid />
 
-      {/* right-side portrait — silhouette, kept deliberately abstract rather than a sharp photo */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.55 }}
-        transition={{ duration: 1.4, ease: "easeOut", delay: 0.3 }}
-        className="absolute right-[144px] top-0 flex h-[990px] w-[784px] items-center justify-center"
-      >
-        <div className="relative h-[990px] w-[784px]">
-          <div className="pointer-events-none absolute inset-0 overflow-hidden">
-            <img
-              alt=""
-              className="absolute inset-0 size-full max-w-none object-cover"
-              style={{ mixBlendMode: "multiply", filter: "blur(1px) grayscale(1)" }}
-              src={imgPortrait}
-            />
-          </div>
-        </div>
-      </motion.div>
-
-      {/* bottom gradient band */}
-      <div className="absolute left-0 top-[706px] h-[284px] w-full">
-        <img alt="" className="pointer-events-none absolute inset-0 size-full max-w-none object-cover" src={imgRectangle10} />
-      </div>
-
       {/* vertical grid lines */}
-      <div className="absolute left-1/2 top-0 h-[990px] w-[1440px] -translate-x-1/2">
+      <div className="pointer-events-none absolute left-1/2 top-0 z-[4] h-[1099px] w-[1440px] -translate-x-1/2">
         <img alt="" className="absolute inset-0 block size-full max-w-none" src={imgLines} />
       </div>
 
+      {/* bottom gradient band */}
+      <div className="absolute left-0 top-[815px] z-[2] h-[284px] w-full">
+        <img alt="" className="pointer-events-none absolute inset-0 size-full max-w-none object-cover" src={imgRectangle10} />
+      </div>
+
+      {/* right-side interactive halftone portrait (dragonfly-style, reacts to the cursor) */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1.4, ease: "easeOut", delay: 0.2 }}
+        className="absolute bottom-0 right-0 z-[3] h-[920px] w-[920px]"
+      >
+        <HeroDotPortrait src={imgPortrait} className="size-full" />
+      </motion.div>
+
       {/* main content — top offset gives a 120px gap below the nav bar (menu pill bottom is at 114px) */}
-      <div className="absolute left-1/2 top-[234px] flex h-[634.5px] w-[1440px] -translate-x-1/2 flex-col items-end gap-[40px] px-[20px]">
+      <div className="absolute left-1/2 top-[234px] z-[5] flex h-[837px] w-[1440px] -translate-x-1/2 flex-col items-end gap-[16px] px-[20px]">
         <div className="flex w-full shrink-0 flex-col items-start gap-[40px]">
           <h1 className="font-serif-display relative w-[790px] whitespace-pre-wrap text-white not-italic tracking-[3.36px] [word-break:break-word]">
             {/* GSAP animates these wrappers so it never fights framer-motion's entry tweens */}
@@ -248,18 +240,12 @@ export default function Hero() {
               </motion.span>
             </span>
           </h1>
-          <motion.div
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ duration: 1.2, ease: easeOut, delay: 0.6 }}
-            className="accent-gradient h-px w-full shrink-0 origin-left rounded-[9px]"
-          />
         </div>
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: easeOut, delay: 0.8 }}
-          className="flex w-full shrink-0 items-end gap-[48px]"
+          className="mt-auto flex w-full shrink-0 items-end gap-[48px]"
         >
           <div className="flex w-[134px] shrink-0 flex-col items-start">
             <div className="flex w-full shrink-0 items-center gap-[8px]">
@@ -274,8 +260,8 @@ export default function Hero() {
               </div>
             </div>
           </div>
-          <div className="flex min-w-px flex-[1_0_0] items-end justify-end gap-[17.524px]">
-            <p className="font-jakarta relative w-[238px] shrink-0 text-right text-[16px] font-normal leading-[normal] text-white [word-break:break-word]">
+          <div className="flex min-w-px flex-[1_0_0] flex-col items-end justify-end gap-[20px]">
+            <p className="font-jakarta relative w-[200px] shrink-0 text-right text-[20px] font-medium leading-[24px] tracking-[0.8px] text-white [word-break:break-word]">
               Great design connects people, thrives on collaboration, and inspires deep emotion
             </p>
             {/* rotating social profile card: LinkedIn → Dribbble → Behance */}

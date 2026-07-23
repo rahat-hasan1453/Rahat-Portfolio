@@ -4,6 +4,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import HexGrid from "./HexGrid.jsx";
+import { getPills, CardPills } from "./SkillsGrid.jsx";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -22,6 +23,12 @@ const BOTTOM_H = FOOTER_H - TOP_H; // 1138
 const CAL_TOP = 937;
 const RIGHTS_H = 44; // all-rights-reserved bar below the design frame
 
+// compact mode (About page): no "Building Better Experiences" section — just a
+// black bridge space, the cal widget crossing into the gradient, then the footer.
+const COMPACT_TOP_SPACE = 340; // black space above the cal
+const COMPACT_BODY_H = COMPACT_TOP_SPACE + BOTTOM_H; // 1478
+const COMPACT_CAL_TOP = COMPACT_TOP_SPACE - 263; // keep the 263px-on-black / 226px-on-gradient split
+
 const SOCIAL_LINKS = [
   { label: "linkedin", href: "https://www.linkedin.com/in/rahatuxd/" },
   { label: "facebook", href: null },
@@ -36,15 +43,23 @@ const ROW_A = [
   null, "Mobile\nApp", null, "Design\nSystem", null, "Saas\nProducts",
 ];
 const ROW_B = ["Storytelling", "OOUX", "Collaboration", "Minimalism", "Empathy", "Adaptability"];
-const ROW_C = ["Problem\nSolving", null, "Cognitive\nPsychology", null, "Cognitive\nPsychology", null];
+const ROW_C = ["Problem\nSolving", null, "Cognitive\nPsychology", null, "Information\nArchitecture", null];
 
-function Bubble({ label, size = "size-[144px]" }) {
+// Original bubble — UNCHANGED look/layout. Only addition: on hover it reveals
+// its 3 helper pills, released from the card center and shown IN FRONT.
+// showPills=false for the dense small-tile row (pills would crowd it).
+function Bubble({ label, size = "size-[144px]", showPills = true }) {
+  const [active, setActive] = useState(false);
+  const pills = label && showPills ? getPills(label) : [];
+
   const lines = (label || "UX Audit").split("\n").map((line, i) => (
     <p key={i} className="leading-none">{line}</p>
   ));
   return (
     <div
-      className={`footer-reveal group relative flex shrink-0 items-center justify-center rounded-[40px] border border-solid border-[#131313] bg-[#1c1c1c] px-[16px] py-[10px] ${label ? "cursor-pointer" : ""} ${size}`}
+      onMouseEnter={() => setActive(true)}
+      onMouseLeave={() => setActive(false)}
+      className={`footer-reveal group relative flex shrink-0 items-center justify-center rounded-[40px] border border-solid border-[#131313] bg-[#1c1c1c] px-[16px] py-[10px] ${label ? "cursor-pointer" : ""} ${active ? "z-30" : ""} ${size}`}
     >
       {/* hover shuttles the label out the top, back in from below */}
       <div className={`relative shrink-0 overflow-hidden ${label ? "" : "opacity-0"}`}>
@@ -55,6 +70,8 @@ function Bubble({ label, size = "size-[144px]" }) {
           {lines}
         </div>
       </div>
+      {/* helper pills — pinned to the card edges, revealed IN FRONT on hover */}
+      <CardPills pills={pills} active={active} />
     </div>
   );
 }
@@ -72,7 +89,7 @@ function SocialPill({ children, href }) {
   return <div className={cls}>{children}</div>;
 }
 
-export default function Footer() {
+export default function Footer({ compact = false }) {
   const containerRef = useRef(null);
   const [calVisible, setCalVisible] = useState(false);
 
@@ -86,28 +103,30 @@ export default function Footer() {
 
   useGSAP(
     () => {
-      gsap.fromTo(
-        ".footer-fade",
-        { opacity: 0, y: 40 },
-        {
-          opacity: 1,
-          y: 0,
-          ease: "none",
-          scrollTrigger: { trigger: ".footer-top", start: "top 95%", end: "top 70%", scrub: 0.3 },
-        }
-      );
+      if (!compact) {
+        gsap.fromTo(
+          ".footer-fade",
+          { opacity: 0, y: 40 },
+          {
+            opacity: 1,
+            y: 0,
+            ease: "none",
+            scrollTrigger: { trigger: ".footer-top", start: "top 95%", end: "top 70%", scrub: 0.3 },
+          }
+        );
 
-      gsap.fromTo(
-        ".footer-reveal",
-        { opacity: 0, scale: 0.6 },
-        {
-          opacity: 1,
-          scale: 1,
-          ease: "none",
-          stagger: 0.02,
-          scrollTrigger: { trigger: ".skills-grid", start: "top 95%", end: "top 55%", scrub: 0.3 },
-        }
-      );
+        gsap.fromTo(
+          ".footer-reveal",
+          { opacity: 0, scale: 0.6 },
+          {
+            opacity: 1,
+            scale: 1,
+            ease: "none",
+            stagger: 0.02,
+            scrollTrigger: { trigger: ".skills-grid", start: "top 95%", end: "top 55%", scrub: 0.3 },
+          }
+        );
+      }
 
       ScrollTrigger.create({
         trigger: ".cal-bridge",
@@ -119,6 +138,112 @@ export default function Footer() {
     { scope: containerRef }
   );
 
+  // shared cal.com widget — floats across a section boundary
+  const calWidget = (top) => (
+    <div className="cal-bridge absolute left-1/2 z-30 h-[489px] w-[1040px] -translate-x-1/2" style={{ top }}>
+      <div className="h-full w-full overflow-hidden rounded-[8px] bg-[#101010]">
+        {calVisible && (
+          <Cal
+            namespace="15min"
+            calLink="rahat-akash-4sxje8/15min"
+            style={{ width: "100%", height: "100%", overflow: "auto" }}
+            config={{ layout: "month_view", theme: "dark" }}
+          />
+        )}
+      </div>
+    </div>
+  );
+
+  // shared bottom section — dark-red gradient + "Let's Work Together" content
+  const bottomSection = (
+    <section className="relative w-full" style={{ height: BOTTOM_H }} data-section="bottom">
+      {/* blurred gradient backdrop — image 63, h 1130, 8px black strip at the very bottom */}
+      <div className="absolute left-0 top-0 h-[1130px] w-full blur-[22.95px]">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <img alt="" className="absolute left-[-0.94%] top-[-5.18%] h-[102.93%] w-[100.94%] max-w-none" src={imgImage63} />
+        </div>
+      </div>
+
+      {/* footer content — anchored to the bottom, 1440 wide, centered */}
+      <div className="absolute bottom-0 left-1/2 flex w-[1440px] -translate-x-1/2 flex-col items-start gap-[10px] px-[20px]">
+        <div className="relative flex w-full shrink-0 flex-col items-center pt-[100px]">
+          <div className="relative flex w-full shrink-0 items-start justify-between">
+            {/* left column */}
+            <div className="relative flex w-[320px] shrink-0 flex-col items-start gap-[48px]">
+              <div className="relative flex w-full shrink-0 flex-col items-start gap-[24px]">
+                <div className="footer-fade font-urbanist relative w-full shrink-0 text-[32px] font-bold text-white [word-break:break-word]">
+                  <p className="mb-0 leading-[40px]">Let’s</p>
+                  <p className="leading-[40px]">Work Together</p>
+                </div>
+                <div className="relative flex w-full shrink-0 flex-wrap content-center items-center gap-[8px]">
+                  {SOCIAL_LINKS.map(({ label, href }) => (
+                    <SocialPill key={label} href={href}>
+                      <p className="font-urbanist relative shrink-0 whitespace-nowrap text-right text-[24px] font-medium leading-none text-white [word-break:break-word]">
+                        {label}
+                      </p>
+                    </SocialPill>
+                  ))}
+                  <SocialPill href={RESUME_URL}>
+                    <p className="font-urbanist relative shrink-0 whitespace-nowrap text-right text-[24px] font-medium leading-[24px] text-white [word-break:break-word]">
+                      resume
+                    </p>
+                    <div className="relative size-[24px] shrink-0">
+                      <img alt="" className="absolute inset-0 block size-full max-w-none" src={imgDownload} />
+                    </div>
+                  </SocialPill>
+                </div>
+              </div>
+              <div className="footer-fade font-urbanist relative flex w-[302px] shrink-0 flex-col items-start gap-[16px] text-[24px] font-medium text-white [word-break:break-word]">
+                <p className="leading-[24px]">+880 1777280571</p>
+                <p className="leading-[24px]">rahat.akash1453@gmail.com</p>
+              </div>
+            </div>
+            {/* right column */}
+            <div className="relative flex w-[800.403px] shrink-0 flex-col items-end gap-[100px]">
+              <div className="footer-fade relative h-[243px] w-[260.204px] shrink-0">
+                <img alt="r." className="absolute inset-0 block size-full max-w-none" src={imgGroup47} />
+              </div>
+              <div className="footer-fade relative h-[367.998px] w-[800px] shrink-0">
+                <img alt="RAHAT HASAN" className="absolute inset-0 block size-full max-w-none" src={imgRahatHasan} />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="absolute bottom-0 right-0 size-[8px] bg-[rgba(255,0,0,0.1)]" />
+      </div>
+    </section>
+  );
+
+  const rightsBar = (
+    <div className="relative flex w-full items-center justify-center" style={{ height: RIGHTS_H }}>
+      <p className="font-jakarta text-[13px] font-medium leading-[16px] tracking-[0.52px] text-grey">
+        © {new Date().getFullYear()} Rahat Hasan — All rights reserved.
+      </p>
+    </div>
+  );
+
+  // ===================== COMPACT (About page) =====================
+  if (compact) {
+    return (
+      <div ref={containerRef} className="relative bg-[#12110d]" style={{ height: COMPACT_BODY_H + RIGHTS_H }} data-name="Footer">
+        {/* black bridge space — the cal widget's upper half lives here */}
+        <div style={{ height: COMPACT_TOP_SPACE }} />
+        {bottomSection}
+        {rightsBar}
+
+        {/* side rails only — continue the page's inner grid rails (x 188 / 1250)
+            down to the gradient boundary so they meet it seamlessly */}
+        <div className="pointer-events-none absolute left-1/2 top-0 z-10 w-[1440px] -translate-x-1/2" style={{ height: COMPACT_TOP_SPACE }}>
+          <span className="absolute top-0 h-full w-px bg-white/[0.05]" style={{ left: 188 }} />
+          <span className="absolute top-0 h-full w-px bg-white/[0.05]" style={{ left: 1250 }} />
+        </div>
+
+        {calWidget(COMPACT_CAL_TOP)}
+      </div>
+    );
+  }
+
+  // ===================== FULL (homepage) =====================
   return (
     <div ref={containerRef} className="relative bg-[#12110d]" style={{ height: FOOTER_H + RIGHTS_H }} data-name="Footer">
       {/* ===== TOP SECTION: Building Better Experiences (independent, black) ===== */}
@@ -128,69 +253,10 @@ export default function Footer() {
       </section>
 
       {/* ===== BOTTOM SECTION: Main Footer (independent, dark red gradient) ===== */}
-      <section className="relative w-full" style={{ height: BOTTOM_H }} data-section="bottom">
-        {/* blurred gradient backdrop — image 63, h 1130, 8px black strip at the very bottom */}
-        <div className="absolute left-0 top-0 h-[1130px] w-full blur-[22.95px]">
-          <div className="pointer-events-none absolute inset-0 overflow-hidden">
-            <img alt="" className="absolute left-[-0.94%] top-[-5.18%] h-[102.93%] w-[100.94%] max-w-none" src={imgImage63} />
-          </div>
-        </div>
-
-        {/* footer content — anchored to the bottom, 1440 wide, centered */}
-        <div className="absolute bottom-0 left-1/2 flex w-[1440px] -translate-x-1/2 flex-col items-start gap-[10px] px-[20px]">
-          <div className="relative flex w-full shrink-0 flex-col items-center pt-[100px]">
-            <div className="relative flex w-full shrink-0 items-start justify-between">
-              {/* left column */}
-              <div className="relative flex w-[320px] shrink-0 flex-col items-start gap-[48px]">
-                <div className="relative flex w-full shrink-0 flex-col items-start gap-[24px]">
-                  <div className="footer-fade font-urbanist relative w-full shrink-0 text-[32px] font-bold text-white [word-break:break-word]">
-                    <p className="mb-0 leading-[40px]">Let’s</p>
-                    <p className="leading-[40px]">Work Together</p>
-                  </div>
-                  <div className="relative flex w-full shrink-0 flex-wrap content-center items-center gap-[8px]">
-                    {SOCIAL_LINKS.map(({ label, href }) => (
-                      <SocialPill key={label} href={href}>
-                        <p className="font-urbanist relative shrink-0 whitespace-nowrap text-right text-[24px] font-medium leading-none text-white [word-break:break-word]">
-                          {label}
-                        </p>
-                      </SocialPill>
-                    ))}
-                    <SocialPill href={RESUME_URL}>
-                      <p className="font-urbanist relative shrink-0 whitespace-nowrap text-right text-[24px] font-medium leading-[24px] text-white [word-break:break-word]">
-                        resume
-                      </p>
-                      <div className="relative size-[24px] shrink-0">
-                        <img alt="" className="absolute inset-0 block size-full max-w-none" src={imgDownload} />
-                      </div>
-                    </SocialPill>
-                  </div>
-                </div>
-                <div className="footer-fade font-urbanist relative flex w-[302px] shrink-0 flex-col items-start gap-[16px] text-[24px] font-medium text-white [word-break:break-word]">
-                  <p className="leading-[24px]">+880 1777280571</p>
-                  <p className="leading-[24px]">rahat.akash1453@gmail.com</p>
-                </div>
-              </div>
-              {/* right column */}
-              <div className="relative flex w-[800.403px] shrink-0 flex-col items-end gap-[100px]">
-                <div className="footer-fade relative h-[243px] w-[260.204px] shrink-0">
-                  <img alt="r." className="absolute inset-0 block size-full max-w-none" src={imgGroup47} />
-                </div>
-                <div className="footer-fade relative h-[367.998px] w-[800px] shrink-0">
-                  <img alt="RAHAT HASAN" className="absolute inset-0 block size-full max-w-none" src={imgRahatHasan} />
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="absolute bottom-0 right-0 size-[8px] bg-[rgba(255,0,0,0.1)]" />
-        </div>
-      </section>
+      {bottomSection}
 
       {/* ===== ALL RIGHTS RESERVED ===== */}
-      <div className="relative flex w-full items-center justify-center" style={{ height: RIGHTS_H }}>
-        <p className="font-jakarta text-[13px] font-medium leading-[16px] tracking-[0.52px] text-grey">
-          © {new Date().getFullYear()} Rahat Hasan — All rights reserved.
-        </p>
-      </div>
+      {rightsBar}
 
       {/* ===== GRID LINES: span both sections (full 2338px) ===== */}
       <div className="pointer-events-none absolute left-1/2 top-0 z-10 w-[1440px] -translate-x-1/2" style={{ height: FOOTER_H }}>
@@ -212,7 +278,7 @@ export default function Footer() {
               </div>
               <div className="relative flex h-[69px] w-full shrink-0 items-center">
                 {ROW_B.map((label, i) => (
-                  <Bubble key={i} label={label} size="h-full" />
+                  <Bubble key={i} label={label} size="h-full" showPills={false} />
                 ))}
               </div>
               <div className="relative flex w-full shrink-0 items-center">
@@ -229,21 +295,7 @@ export default function Footer() {
       </div>
 
       {/* ===== CAL.COM WIDGET: floating bridge across the section boundary ===== */}
-      <div
-        className="cal-bridge absolute left-1/2 z-30 h-[489px] w-[1040px] -translate-x-1/2"
-        style={{ top: CAL_TOP }}
-      >
-        <div className="h-full w-full overflow-hidden rounded-[8px] bg-[#101010]">
-          {calVisible && (
-            <Cal
-              namespace="15min"
-              calLink="rahat-akash-4sxje8/15min"
-              style={{ width: "100%", height: "100%", overflow: "auto" }}
-              config={{ layout: "month_view", theme: "dark" }}
-            />
-          )}
-        </div>
-      </div>
+      {calWidget(CAL_TOP)}
     </div>
   );
 }

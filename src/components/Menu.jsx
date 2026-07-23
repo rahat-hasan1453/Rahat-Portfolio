@@ -429,19 +429,41 @@ export default function Menu() {
                 <AnimatePresence mode="wait" initial={false}>
                   <motion.div
                     key={quoteIdx}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.35, ease: easeShuttle }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0, y: -8, transition: { duration: 0.25, ease: "easeIn" } }}
+                    transition={{ duration: 0.2 }}
                     className="relative flex w-full flex-1 flex-col items-start justify-between gap-[16px] font-medium [word-break:break-word]"
                   >
-                    <p className="font-jakarta relative w-full shrink-0 text-[16px] font-normal leading-[19px] tracking-[0.56px] text-white">
-                      {QUOTES[quoteIdx].text}
-                    </p>
-                    <div className="font-urbanist relative w-full shrink-0 whitespace-pre-wrap text-[14px] text-grey">
+                    {/* word-by-word blur-up reveal */}
+                    <motion.p
+                      className="font-jakarta relative w-full shrink-0 text-[16px] font-normal leading-[19px] tracking-[0.56px] text-white"
+                      initial="hidden"
+                      animate="show"
+                      variants={{ show: { transition: { staggerChildren: 0.03, delayChildren: 0.12 } } }}
+                    >
+                      {QUOTES[quoteIdx].text.split(" ").map((word, i) => (
+                        <motion.span
+                          key={i}
+                          className="mr-[0.26em] inline-block"
+                          variants={{
+                            hidden: { opacity: 0, y: 9, filter: "blur(4px)" },
+                            show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.45, ease: easeShuttle } },
+                          }}
+                        >
+                          {word}
+                        </motion.span>
+                      ))}
+                    </motion.p>
+                    <motion.div
+                      className="font-urbanist relative w-full shrink-0 whitespace-pre-wrap text-[14px] text-grey"
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, ease: easeShuttle, delay: 0.12 + QUOTES[quoteIdx].text.split(" ").length * 0.03 + 0.1 }}
+                    >
                       <p className="mb-0 leading-[1.3]">{"_ "}</p>
                       <p className="leading-[1.3]">{QUOTES[quoteIdx].author}</p>
-                    </div>
+                    </motion.div>
                   </motion.div>
                 </AnimatePresence>
               </div>
