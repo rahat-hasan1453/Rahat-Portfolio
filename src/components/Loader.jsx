@@ -12,7 +12,7 @@ import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 
 const EASE = [0.16, 1, 0.3, 1];
 const PANELS = 5; // vertical reveal columns
-const FONT_PX = 56; // counter font-size (drives the reel's per-digit height)
+const FONT_PX = 120; // counter font-size (drives the reel's per-digit height)
 
 // duration = time on screen before the reveal; hold = pause after; wordStep/
 // wordDur pace the quote; exitStagger/exitDur pace the panel reveal. The page
@@ -22,8 +22,8 @@ export const LOADERS = {
     quote: "Be an amateur, that’s all any of us are: We didn’t live long enough to be anything else.",
     by: "Sir Charles Spencer Chaplin",
     counter: true,
-    duration: 1400,
-    hold: 120,
+    duration: 2000,
+    hold: 150,
     wordStep: 0.05,
     wordDur: 0.55,
     exitStagger: 0.06,

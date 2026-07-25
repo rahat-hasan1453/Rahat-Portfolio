@@ -21,6 +21,35 @@ const imgDivider = "/assets/d6b9f02c4491ac4a2168656adfefa6ca940f6b7d.svg";
 
 const EASE = [0.16, 1, 0.3, 1];
 
+/* floating hero shots — x in the 1440 frame, y designed on the 990-tall
+   artboard (rendered as % so the hero can flex). First 9 spots are the Figma
+   positions (580:6530); the rest fill the gaps around the centred text.
+   Images are the real project mockups (~/Documents/Mockups, resized). */
+const FLOATS = [
+  { src: "/assets/cs-shot-1.png", x: 110, y: 173, w: 156, h: 147 },
+  { src: "/assets/cs-shot-2.png", x: 520, y: 160, w: 118, h: 112 },
+  { src: "/assets/cs-shot-3.png", x: 792, y: 256, w: 118, h: 112 },
+  { src: "/assets/cs-shot-4.png", x: 1030, y: 182, w: 156, h: 147 },
+  { src: "/assets/cs-shot-5.png", x: 1345, y: 423, w: 161, h: 151 },
+  { src: "/assets/cs-shot-6.png", x: 1094, y: 746, w: 118, h: 111 },
+  { src: "/assets/cs-shot-7.png", x: 625, y: 746, w: 161, h: 151 },
+  { src: "/assets/cs-shot-8.png", x: 13, y: 781, w: 161, h: 151 },
+  { src: "/assets/cs-shot-9.png", x: -54, y: 448, w: 135, h: 126 },
+  { src: "/assets/cs-shot-10.png", x: 300, y: 48, w: 135, h: 126 },
+  { src: "/assets/cs-shot-11.png", x: 690, y: 56, w: 118, h: 112 },
+  { src: "/assets/cs-shot-12.png", x: 1240, y: 72, w: 135, h: 126 },
+  { src: "/assets/cs-shot-13.png", x: 36, y: 292, w: 118, h: 112 },
+  { src: "/assets/cs-shot-14.png", x: 1180, y: 288, w: 118, h: 112 },
+  { src: "/assets/cs-shot-15.png", x: 306, y: 766, w: 135, h: 126 },
+  { src: "/assets/cs-shot-16.png", x: 890, y: 760, w: 135, h: 126 },
+  { src: "/assets/cs-shot-17.png", x: 1330, y: 640, w: 118, h: 112 },
+  { src: "/assets/cs-shot-18.png", x: 452, y: 848, w: 118, h: 112 },
+  { src: "/assets/cs-shot-19.png", x: 168, y: 560, w: 118, h: 112 },
+  { src: "/assets/cs-shot-20.png", x: 1210, y: 500, w: 135, h: 126 },
+  { src: "/assets/cs-shot-21.png", x: 830, y: 60, w: 118, h: 112 },
+];
+const ART_H = 990; // Figma artboard height the y values are designed on
+
 const CASES = [
   {
     img: "/assets/01b079747853473476a56c1110e5349c011b0407.png",
@@ -165,21 +194,78 @@ export default function CaseStudies() {
       // keep the smooth-scroller running on this normal vertical page
       window.__lenis?.start();
 
-      // hero — drifts up and softens as you scroll away (parallax)
-      gsap.to(".hero-inner", {
-        yPercent: -22,
-        opacity: 0.75,
-        ease: "none",
-        scrollTrigger: { trigger: heroRef.current, start: "top top", end: "bottom top", scrub: true },
+      const hero = heroRef.current;
+
+      // idle "circulating" cycle (trionn.com/work): each shot drifts slowly,
+      // melts away mid-drift, teleports, and re-emerges somewhere else —
+      // forever. repeatRefresh re-rolls every random value each cycle.
+      const idleTls = [];
+      gsap.utils.toArray(".cs-float-img").forEach((im, i) => {
+        gsap.fromTo(im, { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.8, ease: "power3.out", delay: 0.15 + i * 0.07 });
+        const cyc = gsap.timeline({ repeat: -1, repeatRefresh: true, delay: gsap.utils.random(3, 9) });
+        cyc
+          // drift around the current spot for a good while…
+          .to(im, { x: "+=random(-40, 40)", y: "+=random(-30, 30)", rotation: "random(-4, 4)", duration: "random(5, 8)", ease: "sine.inOut" })
+          .to(im, { x: "+=random(-40, 40)", y: "+=random(-30, 30)", rotation: "random(-3, 3)", duration: "random(4, 6)", ease: "sine.inOut" })
+          // …fade out mid-motion…
+          .to(im, { opacity: 0, scale: 0.7, duration: 0.8, ease: "power2.in" })
+          // …teleport to a fresh spot around its home…
+          .set(im, { x: "random(-230, 230)", y: "random(-150, 150)", rotation: "random(-5, 5)", scale: 0.75 })
+          // …and re-emerge, drifting again
+          .to(im, { opacity: 1, scale: 1, duration: 0.9, ease: "power2.out" })
+          .to(im, { x: "+=random(-40, 40)", y: "+=random(-30, 30)", duration: "random(5, 8)", ease: "sine.inOut" });
+        idleTls.push(cyc);
       });
+      let idlePaused = false;
+
+      // trionn-style: pin the hero; scrolling sends every shot into the centre
+      // of the screen (shrinking + fading, lightly staggered). Only after all
+      // have vanished does the page scroll on to the cards.
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: hero,
+          start: "top top",
+          end: "+=130%",
+          pin: true,
+          scrub: 1,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+          // freeze the idle cycle while the shots converge; resume on scroll-back
+          onUpdate: (self) => {
+            const busy = self.progress > 0.03;
+            if (busy && !idlePaused) {
+              idleTls.forEach((t) => t.pause());
+              idlePaused = true;
+            } else if (!busy && idlePaused) {
+              idleTls.forEach((t) => t.resume());
+              idlePaused = false;
+            }
+          },
+        },
+      });
+      gsap.utils.toArray(".cs-float").forEach((el, i) => {
+        tl.to(
+          el,
+          {
+            x: () => hero.clientWidth / 2 - (el.offsetLeft + el.offsetWidth / 2),
+            y: () => hero.clientHeight / 2 - (el.offsetTop + el.offsetHeight / 2),
+            scale: 0.08,
+            opacity: 0,
+            ease: "power1.in",
+            duration: 0.72,
+          },
+          i * 0.04
+        );
+      });
+      tl.to({}, { duration: 0.22 }); // a beat after the last one vanishes
 
       // each image drifts within its frame — classic vertical parallax
       gsap.utils.toArray(".case-parallax").forEach((layer) => {
         gsap.fromTo(
           layer,
-          { yPercent: -8 },
+          { yPercent: -12 },
           {
-            yPercent: 8,
+            yPercent: 12,
             ease: "none",
             scrollTrigger: {
               trigger: layer.closest(".case-card"),
@@ -191,14 +277,14 @@ export default function CaseStudies() {
         );
       });
 
-      // cards rise + fade in as they enter
+      // cards fade in from scale 0.9 → 1 as they enter
       gsap.utils.toArray(".case-card").forEach((card) => {
         gsap.from(card, {
           opacity: 0,
-          y: 64,
-          duration: 1,
+          scale: 0.9,
+          duration: 0.9,
           ease: "power3.out",
-          scrollTrigger: { trigger: card, start: "top 88%" },
+          scrollTrigger: { trigger: card, start: "top 85%" },
         });
       });
     },
@@ -211,11 +297,12 @@ export default function CaseStudies() {
       <div className="relative">
         <Rails />
 
-        {/* ===================== HERO ===================== */}
-        <section ref={heroRef} className="relative flex h-[847px] items-center overflow-hidden">
-          {/* centred, nudged down 86.5px (Figma); inner child carries the parallax */}
-          <div className="absolute left-1/2 w-[1062px] -translate-x-1/2 -translate-y-1/2" style={{ top: "calc(50% + 86.5px)" }}>
-            <div className="hero-inner will-change-transform">
+        {/* ===================== HERO (pinned) ===================== */}
+        <section ref={heroRef} className="relative h-screen max-h-[990px] min-h-[760px] overflow-hidden">
+          {/* centred text block, nudged down 78px (Figma 580:6584) — sits ABOVE
+              the floats so wandering shots slide behind the copy (trionn) */}
+          <div className="absolute left-1/2 z-30 w-[1062px] -translate-x-1/2 -translate-y-1/2" style={{ top: "calc(50% + 78px)" }}>
+            <div className="hero-inner">
               <div className="flex items-end gap-[20px]">
                 {/* short horizontal line off the left rail */}
                 <div className="mb-[10px] h-px w-[124px] shrink-0 bg-white/40" />
@@ -242,6 +329,24 @@ export default function CaseStudies() {
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* floating project shots — idle drift, then converge to centre on scroll */}
+          <div className="pointer-events-none absolute inset-0 z-20">
+            {FLOATS.map((f, i) => (
+              <div
+                key={i}
+                className="cs-float absolute will-change-transform"
+                style={{ left: f.x, top: `${(f.y / ART_H) * 100}%`, width: f.w, height: f.h }}
+              >
+                <img
+                  alt=""
+                  src={f.src}
+                  draggable="false"
+                  className="cs-float-img block size-full max-w-none rounded-[8px] object-cover opacity-0"
+                />
+              </div>
+            ))}
           </div>
         </section>
 
