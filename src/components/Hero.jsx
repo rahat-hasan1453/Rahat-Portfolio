@@ -182,17 +182,17 @@ export default function Hero() {
   );
 
   return (
-    <section ref={sectionRef} className="bg-ink relative h-[1099px] overflow-hidden" data-name="Hero Section">
+    <section ref={sectionRef} className="bg-ink relative h-screen max-h-[1099px] min-h-[820px] overflow-hidden" data-name="Hero Section">
       {/* mouse-reactive hex-code background (fin.com style, accent red) */}
       <HexGrid />
 
       {/* vertical grid lines */}
-      <div className="pointer-events-none absolute left-1/2 top-0 z-[4] h-[1099px] w-[1440px] -translate-x-1/2">
+      <div className="pointer-events-none absolute inset-y-0 left-1/2 z-[4] w-[1440px] -translate-x-1/2">
         <img alt="" className="absolute inset-0 block size-full max-w-none" src={imgLines} />
       </div>
 
       {/* bottom gradient band */}
-      <div className="absolute left-0 top-[815px] z-[2] h-[284px] w-full">
+      <div className="absolute bottom-0 left-0 z-[2] h-[284px] w-full">
         <img alt="" className="pointer-events-none absolute inset-0 size-full max-w-none object-cover" src={imgRectangle10} />
       </div>
 
@@ -201,13 +201,14 @@ export default function Hero() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1.4, ease: "easeOut", delay: 0.2 }}
-        className="absolute bottom-0 right-0 z-[3] h-[920px] w-[920px]"
+        className="absolute bottom-0 right-0 z-[3] h-[86%] w-[820px]"
       >
         <HeroDotPortrait src={imgPortrait} className="size-full" />
       </motion.div>
 
-      {/* main content — top offset gives a 120px gap below the nav bar (menu pill bottom is at 114px) */}
-      <div className="absolute left-1/2 top-[234px] z-[5] flex h-[837px] w-[1440px] -translate-x-1/2 flex-col items-end gap-[16px] px-[20px]">
+      {/* main content — fills the viewport: headline at the top, info row pinned to the
+          bottom, so the whole hero (incl. the social card) is visible on first load */}
+      <div className="absolute bottom-[36px] left-1/2 top-[140px] z-[5] flex w-[1440px] -translate-x-1/2 flex-col items-end justify-between gap-[16px] px-[20px]">
         <div className="flex w-full shrink-0 flex-col items-start gap-[40px]">
           <h1 className="font-serif-display relative w-[790px] whitespace-pre-wrap text-white not-italic tracking-[3.36px] [word-break:break-word]">
             {/* GSAP animates these wrappers so it never fights framer-motion's entry tweens */}
@@ -216,7 +217,7 @@ export default function Hero() {
                 initial={{ opacity: 0, y: 60 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, ease: easeOut, delay: 0.1 }}
-                className="block text-[84px] leading-[92px]"
+                className="block text-[84px] leading-[84px]"
               >
                 Designing Solutions
               </motion.span>
@@ -224,7 +225,7 @@ export default function Hero() {
                 initial={{ opacity: 0, y: 60 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, ease: easeOut, delay: 0.25 }}
-                className="block text-[84px] leading-[92px]"
+                className="block text-[84px] leading-[84px]"
               >
                 {"to Complex Problems Through Seamless "}
               </motion.span>
@@ -234,7 +235,7 @@ export default function Hero() {
                 initial={{ opacity: 0, y: 60 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, ease: easeOut, delay: 0.4 }}
-                className="font-serif-display-it accent-gradient-text block text-[84px] italic leading-[94px]"
+                className="font-serif-display-it accent-gradient-text block text-[84px] italic leading-[92px]"
               >
                 User Experiences
               </motion.span>
@@ -245,7 +246,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: easeOut, delay: 0.8 }}
-          className="mt-auto flex w-full shrink-0 items-end gap-[48px]"
+          className="flex w-full shrink-0 items-end gap-[48px]"
         >
           <div className="flex w-[134px] shrink-0 flex-col items-start">
             <div className="flex w-full shrink-0 items-center gap-[8px]">

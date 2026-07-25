@@ -77,13 +77,23 @@ const EXPERIENCE = [
   { role: "Jr. UI & Graphic Designer", meta: ["Full time", "Onsite", "Dhaka, Bangladesh"], company: "Techplato.inc", url: "https://techplato.com", period: "Jul ’22 - Sep’23" },
 ];
 
-/* hero marquee set — 0.8× the Figma card sizes */
+/* hero marquee set — full Figma card sizes (node 546:5743) */
 const HERO_SET = [
-  { src: imgR7, w: 177, h: 226 },
-  { src: imgR6, w: 177, h: 313 },
-  { src: imgR5, w: 177, h: 226 },
-  { src: imgR4, w: 177, h: 226 },
+  { src: imgR7, w: 221, h: 283 },
+  { src: imgR6, w: 221, h: 392 },
+  { src: imgR5, w: 221, h: 283 },
+  { src: imgR4, w: 221, h: 283 },
 ];
+
+/* hero section height — grew for the centred title + full-size portraits.
+   Sections below are offset from it so the tuned inter-section gaps stay put. */
+const HERO_H = 1140;
+
+/* dashed inner rail (Figma frame SVGs: white/0.2, 0.5px, dash 10-10) */
+const DASH = {
+  backgroundImage: "linear-gradient(to bottom, rgba(255,255,255,0.2) 0 10px, transparent 10px 20px)",
+  backgroundSize: "1px 20px",
+};
 
 /* "Selise Digital Platform" reads as an external link wherever it appears in copy */
 const SELISE_NAME = "Selise Digital Platform";
@@ -152,11 +162,11 @@ function ToolTile({ icon, height = 144 }) {
 
 function HeroTickerSet() {
   return (
-    <div className="flex shrink-0 items-center gap-[14px] pr-[14px]">
+    <div className="flex shrink-0 items-center gap-[18px] pr-[18px]">
       {HERO_SET.map((im, i) => (
         <div
           key={i}
-          className="relative shrink-0 overflow-hidden rounded-[14px] bg-[#1c1c1c] opacity-40 transition-opacity duration-500 hover:opacity-100"
+          className="relative shrink-0 overflow-hidden rounded-[17.687px] bg-[#1c1c1c] opacity-40 transition-opacity duration-500 hover:opacity-100"
           style={{ width: im.w, height: im.h }}
         >
           <img alt="Rahat Hasan" src={im.src} className="absolute inset-0 size-full max-w-none object-cover" draggable="false" />
@@ -240,51 +250,64 @@ export default function AboutPage() {
 
   return (
     <div ref={rootRef} className="bg-ink relative mx-auto w-[1440px]" data-name="About Page">
-      <div className="relative h-[4250px] w-full overflow-hidden">
-        {/* vertical grid rails — two per side, per Figma */}
-        {[0, 188, 1250, 1439].map((x) => (
-          <span key={x} className="pointer-events-none absolute top-0 z-0 h-full w-px bg-white/[0.05]" style={{ left: x }} />
-        ))}
+      <div className="relative w-full overflow-hidden" style={{ height: HERO_H + 3350 }}>
+        {/* vertical grid rails — solid white/0.4 at the outer edges, dashed
+            white/0.2 (10-10) at the inner gutters (Figma rail SVGs) */}
+        <div className="pointer-events-none absolute inset-0 z-0">
+          <span className="absolute inset-y-0 w-px bg-white/40" style={{ left: 0 }} />
+          <span className="absolute inset-y-0 w-px" style={{ left: 188, ...DASH }} />
+          <span className="absolute inset-y-0 w-px" style={{ left: 1250, ...DASH }} />
+          <span className="absolute inset-y-0 w-px bg-white/40" style={{ left: 1439 }} />
+        </div>
 
         {/* ===================== HERO — Journey to Design (top 0) ===================== */}
-        <section className="absolute left-0 top-0 z-10 h-[900px] w-full">
-          {/* px/pb + negative margins keep glyph overhangs inside the bg-clip-text paint area */}
-          <motion.h1
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, ease: easeShuttle }}
-            className="font-serif-display absolute text-[84px] leading-[92px] tracking-[3.36px]"
-            style={{ left: 260, top: 140 }}
-          >
-            <span className="accent-gradient-text -mx-[20px] -my-[14px] block px-[20px] py-[14px]">Journey</span>
-            <span className="accent-gradient-text -mx-[20px] -my-[14px] block px-[20px] py-[14px]">to Design</span>
-          </motion.h1>
+        <section className="absolute left-0 top-0 z-10 w-full" style={{ height: HERO_H }}>
+          {/* centred 1020 block: horizontal stub + title + intro, then portraits */}
+          <div className="absolute left-1/2 top-[128px] w-[1020px] -translate-x-1/2">
+            <div className="flex items-end gap-[20px]">
+              {/* short horizontal line off the left rail */}
+              <div className="hero-appear h-px w-[124px] shrink-0 bg-white/40" />
 
-          <Body className="hero-appear absolute" style={{ left: 260, top: 372, width: 920 }}>
-            {copyWithLink(ABOUT_FULL + ABOUT_FULL)}
-          </Body>
+              <div className="flex w-[876px] flex-col items-start gap-[48px]">
+                {/* negative margins keep glyph overhangs inside the bg-clip-text paint area */}
+                <motion.h1
+                  initial={{ opacity: 0, y: 40 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.9, ease: easeShuttle }}
+                  className="font-serif-display text-[84px] leading-[92px] tracking-[3.36px]"
+                >
+                  <span className="accent-gradient-text -mx-[20px] -my-[14px] block px-[20px] py-[14px]">Journey</span>
+                  <span className="accent-gradient-text -mx-[20px] -my-[14px] block px-[20px] py-[14px]">to Design</span>
+                </motion.h1>
 
-          {/* portrait marquee — Figma 402:853 scaled 0.8, ink fade on both edges */}
-          <div className="hero-appear absolute overflow-hidden" style={{ left: 230, top: 580, width: 980, height: 313 }}>
-            <div ref={heroTickerRef} className="flex h-full w-max items-center">
-              <HeroTickerSet />
-              <HeroTickerSet />
-              <HeroTickerSet />
-              <HeroTickerSet />
+                <p className="hero-appear font-jakarta w-full text-[20px] font-medium leading-[24px] tracking-[0.8px] text-[#B3B3B3] [word-break:break-word]">
+                  {copyWithLink(ABOUT_FULL + ABOUT_FULL)}
+                </p>
+              </div>
             </div>
-            <div
-              className="pointer-events-none absolute inset-y-0 left-0"
-              style={{ width: 114, background: "linear-gradient(to right, #12110d, rgba(18,17,13,0))" }}
-            />
-            <div
-              className="pointer-events-none absolute inset-y-0 right-0"
-              style={{ width: 160, background: "linear-gradient(to left, #12110d, rgba(18,17,13,0))" }}
-            />
+
+            {/* portrait marquee — full-size cards (Figma 546:5743), ink fade both edges */}
+            <div className="hero-appear relative mt-[84px] w-full overflow-hidden" style={{ height: 392 }}>
+              <div ref={heroTickerRef} className="flex h-full w-max items-center">
+                <HeroTickerSet />
+                <HeroTickerSet />
+                <HeroTickerSet />
+                <HeroTickerSet />
+              </div>
+              <div
+                className="pointer-events-none absolute inset-y-0 left-0"
+                style={{ width: 114, background: "linear-gradient(to right, #12110d, rgba(18,17,13,0))" }}
+              />
+              <div
+                className="pointer-events-none absolute inset-y-0 right-0"
+                style={{ width: 160, background: "linear-gradient(to left, #12110d, rgba(18,17,13,0))" }}
+              />
+            </div>
           </div>
         </section>
 
-        {/* ===================== DESIGNING @SELISE (top 900) ===================== */}
-        <section className="absolute left-0 z-10 h-[990px] w-full" style={{ top: 900 }}>
+        {/* ===================== DESIGNING @SELISE ===================== */}
+        <section className="absolute left-0 z-10 h-[990px] w-full" style={{ top: HERO_H }}>
           <SectionLabel top={156}>Designing @Selise</SectionLabel>
 
           <Body className="reveal-up absolute" style={{ left: 330, top: 237, width: 473 }}>
@@ -310,8 +333,8 @@ export default function AboutPage() {
           </p>
         </section>
 
-        {/* ===================== WORK STACKS (top 1890) ===================== */}
-        <section className="absolute left-0 z-10 h-[1720px] w-full" style={{ top: 1890 }}>
+        {/* ===================== WORK STACKS ===================== */}
+        <section className="absolute left-0 z-10 h-[1720px] w-full" style={{ top: HERO_H + 990 }}>
           <SectionLabel top={140} lineW={146} italic>Work stacks</SectionLabel>
 
           {/* block 1 — copy + tool grid */}
@@ -371,8 +394,8 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* ===================== WORK EXPERIENCE (top 3610) ===================== */}
-        <section className="absolute left-0 z-10 h-[640px] w-full" style={{ top: 3610 }}>
+        {/* ===================== WORK EXPERIENCE ===================== */}
+        <section className="absolute left-0 z-10 h-[640px] w-full" style={{ top: HERO_H + 2710 }}>
           <SectionLabel top={156} italic>Work Experience</SectionLabel>
           <div className="exp-list absolute" style={{ left: 330, top: 237, width: 880 }}>
             {EXPERIENCE.map((job, i) => (

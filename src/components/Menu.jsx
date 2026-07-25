@@ -235,7 +235,20 @@ export default function Menu() {
     setOpen(false);
   };
 
-  const boxTransition = { duration: open ? 0.65 : 0.5, ease: easeShuttle };
+  // neko-style morph: a soft (over-damped → no bounce) opening, snappier close
+  const boxTransition = open
+    ? { type: "spring", stiffness: 210, damping: 30, mass: 0.9 }
+    : { type: "spring", stiffness: 340, damping: 36 };
+
+  // panel body reveals as a staggered cascade (and reverses on close)
+  const panelStagger = {
+    open: { transition: { staggerChildren: 0.05, delayChildren: 0.09 } },
+    closed: { transition: { staggerChildren: 0.03, staggerDirection: -1 } },
+  };
+  const rise = {
+    open: { opacity: 1, y: 0, transition: { duration: 0.5, ease: easeShuttle } },
+    closed: { opacity: 0, y: 8, transition: { duration: 0.22, ease: "easeIn" } },
+  };
 
   return (
     <div ref={rootRef} data-name="Menu">
@@ -267,18 +280,17 @@ export default function Menu() {
           transition={boxTransition}
           className="relative w-full overflow-clip rounded-[16px] bg-[#2C2A26]"
         >
-          <DashedBorder radius={16} />
+          {/* dashed border only in the default (pill) state — fades out on open */}
           <motion.div
             initial={false}
-            animate={{
-              paddingTop: open ? 24 : 10,
-              paddingBottom: open ? 24 : 10,
-              paddingLeft: open ? 24 : 10,
-              paddingRight: open ? 24 : 10,
-            }}
-            transition={boxTransition}
-            className="flex w-full flex-col items-start"
+            animate={{ opacity: open ? 0 : 1 }}
+            transition={{ duration: open ? 0.2 : 0.3, ease: easeShuttle }}
+            className="pointer-events-none absolute inset-0"
           >
+            <DashedBorder radius={16} />
+          </motion.div>
+          {/* constant padding → header never shifts; panel revealed by height/clip + fades (no reflow) */}
+          <div className="flex w-full flex-col items-start px-[20px] pb-[24px] pt-[10px]">
             {/* header row */}
             <div className="relative flex h-[36px] w-full shrink-0 items-center justify-between">
               <Brand />
@@ -324,46 +336,52 @@ export default function Menu() {
             {/* body — always mounted, crossfaded; clipping does the rest */}
             <motion.div
               initial={false}
-              animate={{ opacity: open ? 1 : 0, y: open ? 0 : -10 }}
-              transition={{ duration: open ? 0.5 : 0.3, ease: easeShuttle, delay: open ? 0.12 : 0 }}
+              variants={panelStagger}
+              animate={open ? "open" : "closed"}
               className="relative w-full"
               aria-hidden={!open}
             >
               {/* image ticker — Figma gap 10 below header */}
-              <div className="relative mt-[10px] w-full overflow-hidden">
+              <motion.div variants={rise} className="relative mt-[10px] w-full overflow-hidden">
                 <div ref={tickerRef} className="flex w-max items-center">
                   <TickerSet />
                   <TickerSet />
                 </div>
-              </div>
+              </motion.div>
 
               {/* nav links */}
-              <div className="relative mt-[32px] flex flex-col items-start gap-[12px]">
-                <button
+              <motion.div variants={panelStagger} className="relative mt-[32px] flex flex-col items-start gap-[12px]">
+                <motion.button
+                  variants={rise}
+                  whileHover={{ x: 4 }}
                   type="button"
                   tabIndex={open ? 0 : -1}
                   onClick={() => {
                     window.location.hash = "about";
                     setOpen(false);
                   }}
-                  className="font-jakarta relative shrink-0 cursor-pointer whitespace-nowrap text-[20px] font-medium leading-[24px] tracking-[0.8px] text-[#f0ebdb] transition-all duration-300 [word-break:break-word] hover:translate-x-[4px] hover:text-[#f16767]"
+                  className="font-jakarta relative shrink-0 cursor-pointer whitespace-nowrap text-[20px] font-medium leading-[24px] tracking-[0.8px] text-[#f0ebdb] transition-colors duration-300 [word-break:break-word] hover:text-[#f16767]"
                 >
                   About
-                </button>
-                <button
+                </motion.button>
+                <motion.button
+                  variants={rise}
+                  whileHover={{ x: 4 }}
                   type="button"
                   tabIndex={open ? 0 : -1}
                   onClick={openCaseStudies}
-                  className="font-jakarta relative shrink-0 cursor-pointer whitespace-nowrap text-[20px] font-medium leading-[24px] tracking-[0.8px] text-[#f0ebdb] transition-all duration-300 [word-break:break-word] hover:translate-x-[4px] hover:text-[#f16767]"
+                  className="font-jakarta relative shrink-0 cursor-pointer whitespace-nowrap text-[20px] font-medium leading-[24px] tracking-[0.8px] text-[#f0ebdb] transition-colors duration-300 [word-break:break-word] hover:text-[#f16767]"
                 >
                   Case Studies
-                </button>
-                <a
+                </motion.button>
+                <motion.a
+                  variants={rise}
+                  whileHover={{ x: 4 }}
                   href={RESUME_URL}
                   target="_blank"
                   rel="noreferrer noopener"
                   tabIndex={open ? 0 : -1}
-                  className="group/resume relative flex shrink-0 cursor-pointer items-start gap-[8px] transition-transform duration-300 hover:translate-x-[4px]"
+                  className="group/resume relative flex shrink-0 cursor-pointer items-start gap-[8px]"
                 >
                   <p className="font-jakarta relative shrink-0 whitespace-nowrap text-[20px] font-medium leading-[24px] tracking-[0.8px] text-[#f0ebdb] transition-colors duration-300 [word-break:break-word] group-hover/resume:text-[#f16767]">
                     Resume
@@ -380,11 +398,11 @@ export default function Menu() {
                       WebkitMaskRepeat: "no-repeat",
                     }}
                   />
-                </a>
-              </div>
+                </motion.a>
+              </motion.div>
 
               {/* socials */}
-              <div className="relative mt-[20px] flex h-[40px] w-full items-center justify-center gap-[39px]">
+              <motion.div variants={rise} className="relative mt-[20px] flex h-[40px] w-full items-center justify-center gap-[39px]">
                 {SOCIALS.map((s) =>
                   s.href ? (
                     <a
@@ -407,9 +425,9 @@ export default function Menu() {
                     </div>
                   )
                 )}
-              </div>
+              </motion.div>
             </motion.div>
-          </motion.div>
+          </div>
         </motion.div>
 
         {/* bottom cards — clock + quote */}

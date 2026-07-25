@@ -231,11 +231,19 @@ export default function Footer({ compact = false }) {
         {bottomSection}
         {rightsBar}
 
-        {/* side rails only — continue the page's inner grid rails (x 188 / 1250)
+        {/* side rails — continue the page's grid rails (solid outer / dashed inner)
             down to the gradient boundary so they meet it seamlessly */}
         <div className="pointer-events-none absolute left-1/2 top-0 z-10 w-[1440px] -translate-x-1/2" style={{ height: COMPACT_TOP_SPACE }}>
-          <span className="absolute top-0 h-full w-px bg-white/[0.05]" style={{ left: 188 }} />
-          <span className="absolute top-0 h-full w-px bg-white/[0.05]" style={{ left: 1250 }} />
+          <span className="absolute top-0 h-full w-px bg-white/40" style={{ left: 0 }} />
+          <span
+            className="absolute top-0 h-full w-px"
+            style={{ left: 188, backgroundImage: "linear-gradient(to bottom, rgba(255,255,255,0.2) 0 10px, transparent 10px 20px)", backgroundSize: "1px 20px" }}
+          />
+          <span
+            className="absolute top-0 h-full w-px"
+            style={{ left: 1250, backgroundImage: "linear-gradient(to bottom, rgba(255,255,255,0.2) 0 10px, transparent 10px 20px)", backgroundSize: "1px 20px" }}
+          />
+          <span className="absolute top-0 h-full w-px bg-white/40" style={{ left: 1439 }} />
         </div>
 
         {calWidget(COMPACT_CAL_TOP)}

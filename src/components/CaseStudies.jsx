@@ -1,159 +1,262 @@
-import { useEffect, useRef } from "react";
-import HexGrid from "./HexGrid.jsx";
+import { useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
+import { motion } from "framer-motion";
+import Footer from "./Footer.jsx";
 
-// meech213.com-style horizontal showcase: a wide field of tilted case-study
-// cards driven by wheel/drag with lerped inertia; velocity skews the cards
-// while the field is moving and they settle upright as it stops.
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-const imgRiqsWeb = "/assets/01b079747853473476a56c1110e5349c011b0407.png";
-const imgRiqsMobile = "/assets/0b19b6ba52627fe4db5c413523518e7d4390e4ae.png";
-const imgMetro = "/assets/bf6e07a7c2c0d1b3324cf94624a8454cb84c6b0d.png";
-const imgAiChat = "/assets/b0191a30584e4ed37ce1640236532481efa0be4e.png";
-const imgCalendar = "/assets/b815200441007cae19fe209e699ac4e8f2481020.png";
-const imgVoid = "/assets/5b7d0ae6d4a1055465bb974756e8c4fa70f10d5e.png";
-const imgQuotes = "/assets/4583dd520e0a8771b47d3b7187a1b151c258995c.png";
-const imgBreathing = "/assets/7650c3b8ff96600e8c34feec39558dbc7adb9018.png";
-const imgCrmzoo = "/assets/0cd21a053806287e63d372fd804878164d4dce04.png";
-const imgDiscover = "/assets/3a153bdae32318c674896aafac82bf3f43f4beae.png";
-const imgNinja = "/assets/664f92d3f7e23a196fa99748074ef3af791931cf.png";
-const imgBulkflow = "/assets/15f31c724ab23f5c12da0e0aa9d375e1b62452d5.png";
+/* =========================================================================
+   Case Studies page — Figma node 541:5303.
+   Hero (horizontal line + gradient "Case Studies" + intro) → a vertical list
+   of five full-width case cards (image + title/desc + meta pills) → shared
+   Footer. Four vertical rails frame the page: solid white/0.4 at the outer
+   edges, dashed white/0.2 (10-10) at the inner gutter lines (Figma rail SVGs).
+   Parallax on scroll + an inner-zoom on image hover keep the page alive.
+   ========================================================================= */
 
-// x in track px, y as % of viewport height; rot = resting angle, speed = parallax factor
-const ITEMS = [
-  { img: imgQuotes, title: "Quotify/ Mobile App", desc: "Daily inspiration with a swipe — a minimal quote experience.", x: 30, y: 30, w: 320, rot: -6, speed: 1.05 },
-  { img: imgRiqsMobile, title: "RiQS Mobile App/ Revamp (2025)", desc: "Field-ready day planning, absence and checklist flows.", x: 430, y: 4, w: 300, rot: 4, speed: 0.9 },
-  { img: imgVoid, title: "Void Widget/ iOS Widgets", desc: "Minimal home & lock screen widgets that stand out.", x: 820, y: 12, w: 300, rot: -3, speed: 1.15 },
-  { img: imgMetro, title: "Dhaka Metro/ Ticket App", desc: "Buy metro tickets online — plan journeys with zero queueing.", x: 1220, y: 26, w: 330, rot: 5, speed: 0.95 },
-  { img: imgCalendar, title: "Meeting Calendar/ Mobile App", desc: "Today's meetings, one glance — scheduling without friction.", x: 1650, y: 6, w: 310, rot: -5, speed: 1.1 },
-  { img: imgAiChat, title: "AI Companion/ Mobile App", desc: "A calm space to ask anything, designed for focus.", x: 1720, y: 56, w: 290, rot: 3, speed: 0.9 },
-  { img: imgCrmzoo, title: "CRMZoo/ Web Platform", desc: "Boost sales and simplify workflows with an all-in-one CRM.", x: 2130, y: 24, w: 380, rot: -4, speed: 1.05 },
-  { img: imgBreathing, title: "Breathing Stats/ Wellness", desc: "Sessions, streaks and progress — mindfulness made measurable.", x: 2620, y: 5, w: 310, rot: 6, speed: 0.95 },
-  { img: imgNinja, title: "Ninja AI/ Mobile App", desc: "One assistant for images, video and song generation.", x: 2700, y: 58, w: 330, rot: -6, speed: 1.12 },
-  { img: imgDiscover, title: "Discover/ AI Explorer", desc: "Point, scan and understand anything around you.", x: 3130, y: 22, w: 350, rot: 4, speed: 0.9 },
-  { img: imgBulkflow, title: "BulkFlow/ Banking Web", desc: "Open 10,000 accounts in minutes — bulk banking automation.", x: 3580, y: 10, w: 400, rot: -3, speed: 1.05 },
-  { img: imgRiqsWeb, title: "RiQS Praxis Monitor/ Web Application", desc: "Organize shifts, leave schedules and checklists at scale.", x: 3680, y: 60, w: 360, rot: 5, speed: 0.95 },
+const imgLogo = "/assets/0826edbc3e6fd14f58cf0e0a65d4ad80ec15da69.svg";
+const imgDivider = "/assets/d6b9f02c4491ac4a2168656adfefa6ca940f6b7d.svg";
+
+const EASE = [0.16, 1, 0.3, 1];
+
+const CASES = [
+  {
+    img: "/assets/01b079747853473476a56c1110e5349c011b0407.png",
+    title: "RiQS Praxis Monitor/ Web Application",
+    desc: "Monitor your daily steps effortlessly with RiQS Praxis Monitor. Stay inspired and on track as you progress toward your fitness milestones. This intuitive web app helps you maintain motivation.",
+    tags: ["UX Audit", "Improve UX", "User Journey"],
+    cats: ["Medical", "Human Resource"],
+  },
+  {
+    img: "/assets/0b19b6ba52627fe4db5c413523518e7d4390e4ae.png",
+    title: "FitTrack Pro / Mobile App",
+    desc: "Track your fitness journey in real-time with FitTrack Pro. This mobile app provides personalized workouts and nutrition advice to help you achieve your health goals.",
+    tags: ["Feature Enhancement", "Boost Engagement", "User Feedback"],
+    cats: ["Fitness", "Health Tech"],
+  },
+  {
+    img: "/assets/bf6e07a7c2c0d1b3324cf94624a8454cb84c6b0d.png",
+    title: "NutriGuide / Web Application",
+    desc: "Discover healthy recipes and meal plans tailored to your dietary preferences with NutriGuide. Empower your eating habits with easy-to-follow guidance.",
+    tags: ["Design Refresh", "Enhance Usability", "User Testing"],
+    cats: ["Nutrition", "Wellness"],
+  },
+  {
+    img: "/assets/0cd21a053806287e63d372fd804878164d4dce04.png",
+    title: "SleepSync / Mobile Application",
+    desc: "Optimize your sleep with SleepSync, an app that analyzes your sleep patterns and provides tailored recommendations for better rest.",
+    tags: ["User Interface Overhaul", "Increase User Retention", "A/B Testing"],
+    cats: ["Sleep Health", "Tech"],
+  },
+  {
+    img: "/assets/664f92d3f7e23a196fa99748074ef3af791931cf.png",
+    title: "Wellness Hub / Web Platform",
+    desc: "Connect with wellness experts and resources through Wellness Hub. This platform offers workshops, coaching, and community support to enhance your well-being.",
+    tags: ["Content Strategy", "Expand Offering", "Customer Insights"],
+    cats: ["General Wellness", "Community"],
+  },
 ];
 
-const TRACK_W = 4300;
+/* ---- vertical rails (Figma frame SVGs, redrawn as crisp CSS) ---- */
+const DASH = {
+  backgroundImage: "linear-gradient(to bottom, rgba(255,255,255,0.2) 0 10px, transparent 10px 20px)",
+  backgroundSize: "1px 20px",
+};
+function Rails() {
+  return (
+    <div className="pointer-events-none absolute inset-0 z-0">
+      <span className="absolute inset-y-0 w-px bg-white/40" style={{ left: 0 }} />
+      <span className="absolute inset-y-0 w-px" style={{ left: 188, ...DASH }} />
+      <span className="absolute inset-y-0 w-px" style={{ left: 1250, ...DASH }} />
+      <span className="absolute inset-y-0 w-px bg-white/40" style={{ left: 1439 }} />
+    </div>
+  );
+}
 
-const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+/* ---- meta pills (reuses the connected-chip pattern) ---- */
+function Chip({ children, rounded = "rounded-[20px]", filled = true }) {
+  return (
+    <div className={`relative flex h-[31px] shrink-0 items-center justify-center p-[10px] ${filled ? "bg-[rgba(128,128,128,0.2)]" : ""} ${rounded}`}>
+      <p className="font-jakarta relative shrink-0 whitespace-nowrap text-[16px] font-medium leading-[24px] tracking-[0.64px] text-white [word-break:break-word]">
+        {children}
+      </p>
+    </div>
+  );
+}
+
+function TagDivider() {
+  return (
+    <div className="flex flex-row items-center self-stretch">
+      <div className="relative h-full w-0 shrink-0">
+        <div className="absolute inset-[0_-0.5px]">
+          <img alt="" className="block size-full max-w-none" src={imgDivider} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Meta({ data }) {
+  return (
+    <div className="flex shrink-0 flex-col items-end gap-[8px]">
+      {/* logo + year */}
+      <div className="flex shrink-0 items-center gap-[20px]">
+        <div className="relative h-[18px] w-[84px] shrink-0">
+          <img alt="RiQS" className="absolute inset-0 block size-full max-w-none" src={imgLogo} />
+        </div>
+        <Chip filled={false}>2025/26</Chip>
+      </div>
+      {/* three connected tag pills */}
+      <div className="flex shrink-0 items-center">
+        <Chip rounded="rounded-l-[20px]">{data.tags[0]}</Chip>
+        <TagDivider />
+        <Chip rounded="rounded-none">{data.tags[1]}</Chip>
+        <TagDivider />
+        <Chip rounded="rounded-r-[20px]">{data.tags[2]}</Chip>
+      </div>
+      {/* two category pills */}
+      <div className="flex shrink-0 items-start gap-[8px]">
+        <Chip>{data.cats[0]}</Chip>
+        <Chip>{data.cats[1]}</Chip>
+      </div>
+    </div>
+  );
+}
+
+/* ---- one case study: parallax image + hover inner-zoom, then info row ---- */
+function Card({ data }) {
+  return (
+    <div className="case-card flex w-full flex-col gap-[14px]">
+      <div className="group relative w-full overflow-hidden rounded-[8px] bg-[#1c1c1c]" style={{ height: 615 }}>
+        {/* parallax layer overfills the frame so the drift never reveals an edge */}
+        <div className="case-parallax absolute inset-x-0 -top-[10%] h-[120%] will-change-transform">
+          <img
+            alt={data.title}
+            src={data.img}
+            draggable="false"
+            className="size-full max-w-none object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.08]"
+          />
+        </div>
+      </div>
+
+      <div className="flex w-full items-start justify-between">
+        <div className="flex w-[412px] shrink-0 flex-col items-start gap-[8px]">
+          <p className="font-serif-display text-[24px] not-italic leading-[24px] tracking-[0.96px] text-white [word-break:break-word]">
+            {data.title}
+          </p>
+          <p className="font-jakarta text-[16px] font-medium leading-[24px] tracking-[0.64px] text-[#b3b3b3] [word-break:break-word]">
+            {data.desc}
+          </p>
+        </div>
+        <Meta data={data} />
+      </div>
+    </div>
+  );
+}
 
 export default function CaseStudies() {
   const rootRef = useRef(null);
-  const itemRefs = useRef([]);
+  const heroRef = useRef(null);
 
-  useEffect(() => {
-    // the homepage smooth-scroller must not fight the horizontal field
-    window.__lenis?.stop();
-    const root = rootRef.current;
-    const st = { target: 0, current: 0, vel: 0, dragging: false, lastX: 0 };
-    let raf;
-
-    const max = () => TRACK_W - window.innerWidth + 120;
-
-    const onWheel = (e) => {
-      e.preventDefault();
-      const delta = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
-      st.target = clamp(st.target + delta * 1.4, 0, max());
-    };
-    const onDown = (e) => {
-      st.dragging = true;
-      st.lastX = e.clientX;
-      root.classList.add("cursor-grabbing");
-    };
-    const onMove = (e) => {
-      if (!st.dragging) return;
-      st.target = clamp(st.target - (e.clientX - st.lastX) * 1.8, 0, max());
-      st.lastX = e.clientX;
-    };
-    const onUp = () => {
-      st.dragging = false;
-      root.classList.remove("cursor-grabbing");
-    };
-
-    const tick = () => {
-      raf = requestAnimationFrame(tick);
-      const prev = st.current;
-      st.current += (st.target - st.current) * 0.075; // meech-style inertia
-      st.vel += (st.current - prev - st.vel) * 0.2; // smoothed velocity
-      const skew = clamp(st.vel * 0.35, -10, 10);
-      itemRefs.current.forEach((el) => {
-        if (!el) return;
-        const speed = parseFloat(el.dataset.speed);
-        const rot = parseFloat(el.dataset.rot);
-        el.style.transform = `translate3d(${-st.current * speed}px, 0, 0) rotate(${rot + skew * 0.25}deg) skewX(${skew}deg)`;
-      });
-    };
-    tick();
-
-    root.addEventListener("wheel", onWheel, { passive: false });
-    root.addEventListener("pointerdown", onDown);
-    window.addEventListener("pointermove", onMove);
-    window.addEventListener("pointerup", onUp);
-    return () => {
-      cancelAnimationFrame(raf);
-      root.removeEventListener("wheel", onWheel);
-      root.removeEventListener("pointerdown", onDown);
-      window.removeEventListener("pointermove", onMove);
-      window.removeEventListener("pointerup", onUp);
+  useGSAP(
+    () => {
+      // keep the smooth-scroller running on this normal vertical page
       window.__lenis?.start();
-    };
-  }, []);
+
+      // hero — drifts up and softens as you scroll away (parallax)
+      gsap.to(".hero-inner", {
+        yPercent: -22,
+        opacity: 0.75,
+        ease: "none",
+        scrollTrigger: { trigger: heroRef.current, start: "top top", end: "bottom top", scrub: true },
+      });
+
+      // each image drifts within its frame — classic vertical parallax
+      gsap.utils.toArray(".case-parallax").forEach((layer) => {
+        gsap.fromTo(
+          layer,
+          { yPercent: -8 },
+          {
+            yPercent: 8,
+            ease: "none",
+            scrollTrigger: {
+              trigger: layer.closest(".case-card"),
+              start: "top bottom",
+              end: "bottom top",
+              scrub: true,
+            },
+          }
+        );
+      });
+
+      // cards rise + fade in as they enter
+      gsap.utils.toArray(".case-card").forEach((card) => {
+        gsap.from(card, {
+          opacity: 0,
+          y: 64,
+          duration: 1,
+          ease: "power3.out",
+          scrollTrigger: { trigger: card, start: "top 88%" },
+        });
+      });
+    },
+    { scope: rootRef }
+  );
 
   return (
-    <section
-      ref={rootRef}
-      className="bg-ink relative h-screen w-full cursor-grab select-none overflow-hidden"
-      data-name="Case Studies Page"
-    >
-      {/* mouse-reactive hex background */}
-      <HexGrid />
+    <div ref={rootRef} className="bg-ink relative mx-auto w-[1440px]" data-name="Case Studies Page">
+      {/* hero + card list share the four vertical rails */}
+      <div className="relative">
+        <Rails />
 
-      {/* intro text — travels with the field */}
-      <div
-        ref={(el) => (itemRefs.current[ITEMS.length] = el)}
-        data-speed="1"
-        data-rot="0"
-        className="absolute left-[560px] top-[58%] z-10 will-change-transform"
-      >
-        <p className="font-serif-display-it accent-gradient-text text-[64px] italic leading-[64px] tracking-[2.56px]">
-          Case
-          <br />
-          Studies
-        </p>
-        <p className="font-serif-display mt-[8px] pl-[48px] text-[56px] not-italic leading-[62px] tracking-[2.24px] text-white">
-          Process.
-          <br />
-          Purpose. Impact
-        </p>
+        {/* ===================== HERO ===================== */}
+        <section ref={heroRef} className="relative flex h-[847px] items-center overflow-hidden">
+          {/* centred, nudged down 86.5px (Figma); inner child carries the parallax */}
+          <div className="absolute left-1/2 w-[1062px] -translate-x-1/2 -translate-y-1/2" style={{ top: "calc(50% + 86.5px)" }}>
+            <div className="hero-inner will-change-transform">
+              <div className="flex items-end gap-[20px]">
+                {/* short horizontal line off the left rail */}
+                <div className="mb-[10px] h-px w-[124px] shrink-0 bg-white/40" />
+
+                <div className="flex flex-1 flex-col items-start gap-[20px]">
+                  <motion.h1
+                    initial={{ opacity: 0, y: 40 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.9, ease: EASE, delay: 0.1 }}
+                    className="font-serif-display text-[84px] leading-[92px] tracking-[3.36px]"
+                  >
+                    <span className="accent-gradient-text -my-[10px] block py-[10px]">Case</span>
+                    <span className="accent-gradient-text -my-[10px] block py-[10px]">Studies</span>
+                  </motion.h1>
+
+                  <motion.p
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.9, ease: EASE, delay: 0.25 }}
+                    className="font-jakarta w-[685px] text-[20px] font-medium leading-[24px] tracking-[0.8px] text-[#b3b3b3] [word-break:break-word]"
+                  >
+                    {"Hello, I’m Rahat — a product-minded designer with nearly 4 years of experience, currently a UX Engineer at Selise Digital Platform. I've grown into a product-focused role, taking end-to-end ownership "}
+                  </motion.p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ===================== CASE LIST ===================== */}
+        <section className="relative z-10 pb-[200px] pt-[128px]">
+          <div className="mx-auto flex w-[1022px] flex-col gap-[100px]">
+            {CASES.map((c) => (
+              <Card key={c.title} data={c} />
+            ))}
+          </div>
+        </section>
       </div>
 
-      {/* scattered case study cards */}
-      {ITEMS.map((item, i) => (
-        <div
-          key={i}
-          ref={(el) => (itemRefs.current[i] = el)}
-          data-speed={item.speed}
-          data-rot={item.rot}
-          className="absolute z-10 will-change-transform"
-          style={{ left: item.x, top: `${item.y}%`, width: item.w }}
-        >
-          <div className="relative w-full overflow-hidden rounded-[8px]" style={{ height: item.w * 0.625 }}>
-            <img alt="" draggable="false" className="pointer-events-none absolute inset-0 size-full max-w-none object-cover" src={item.img} />
-          </div>
-          <p className="font-serif-display mt-[10px] text-[17px] not-italic leading-[20px] tracking-[0.68px] text-white">
-            {item.title}
-          </p>
-          <p className="font-jakarta mt-[4px] text-[12px] font-medium leading-[16px] tracking-[0.48px] text-grey">
-            {item.desc}
-          </p>
-        </div>
-      ))}
-
-      {/* scroll hint */}
-      <p className="font-jakarta absolute bottom-[28px] right-[32px] z-10 text-[12px] font-medium tracking-[1.2px] text-grey">
-        SCROLL / DRAG →
-      </p>
-    </section>
+      {/* ===================== FOOTER (shared) ===================== */}
+      <Footer />
+    </div>
   );
 }
