@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
+import Loader from "./components/Loader.jsx";
 import Menu from "./components/Menu.jsx";
 import Hero from "./components/Hero.jsx";
 import About from "./components/About.jsx";
@@ -45,6 +46,15 @@ export default function App() {
 
   const isCaseStudies = route === "#case-studies";
   const isAbout = route === "#about";
+  const loaderVariant = isCaseStudies ? "casestudies" : isAbout ? "about" : "home";
+
+  // show the route's loading screen on first load and on every navigation
+  const [loading, setLoading] = useState(true);
+  const [loadKey, setLoadKey] = useState(0);
+  useEffect(() => {
+    setLoading(true);
+    setLoadKey((k) => k + 1);
+  }, [route]);
 
   // land at the top whenever we switch into a full-page route
   useEffect(() => {
@@ -56,6 +66,7 @@ export default function App() {
 
   return (
     <main className="bg-ink min-w-[1440px]">
+      {loading && <Loader key={loadKey} variant={loaderVariant} onDone={() => setLoading(false)} />}
       <Menu />
       {isAbout ? (
         <AboutPage />

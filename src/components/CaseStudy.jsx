@@ -11,6 +11,7 @@ const imgRectangle14 = "/assets/0b19b6ba52627fe4db5c413523518e7d4390e4ae.png";
 const imgRectangle15 = "/assets/b0191a30584e4ed37ce1640236532481efa0be4e.png";
 const imgLogo2 = "/assets/0826edbc3e6fd14f58cf0e0a65d4ad80ec15da69.svg";
 const imgVector1 = "/assets/d6b9f02c4491ac4a2168656adfefa6ca940f6b7d.svg";
+const imgLines = "/assets/08c740b47b066a09ddc1385b453b9a2d1b0875a9.svg"; // same grid as the Hero
 
 const CARDS = [
   { img: imgRectangle8, title: "RiQS Praxis Monitor/ Web Application", tags: ["UX Audit", "Improve UX", "User Journey"] },
@@ -193,9 +194,11 @@ export default function CaseStudy() {
   return (
     <section ref={sectionRef} className="bg-ink relative" data-name="Case Study" style={{ paddingBottom: SECTION_GAP }}>
       <div ref={stageRef} className="bg-ink relative h-screen w-full overflow-hidden">
-        {/* vertical rail lines */}
-        <span className="pointer-events-none absolute top-0 z-0 h-full w-px bg-white/[0.06]" style={{ left: GUTTER }} />
-        <span className="pointer-events-none absolute top-0 z-0 h-full w-px bg-white/[0.06]" style={{ right: GUTTER }} />
+        {/* full grid on the centred 1440 box — outer solids (0/1440) + middle
+            dashed (360/720/1080), same SVG as the Hero so the lines run continuously */}
+        <div className="pointer-events-none absolute left-1/2 top-0 z-0 h-full w-[1440px] -translate-x-1/2">
+          <img alt="" className="absolute inset-0 block size-full max-w-none" src={imgLines} />
+        </div>
 
         {/* headline — driven by the timeline (NOT position: sticky) */}
         <div ref={headlineRef} className="absolute z-20" style={{ left: EDGE, top: HEADLINE_TOP, willChange: "transform" }}>

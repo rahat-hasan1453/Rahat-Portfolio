@@ -12,7 +12,6 @@ const imgImage63 = "/assets/95b86c277de98cb05b6c2d8499641f05aee027aa.png";
 const imgDownload = "/assets/efb7f30e6bdeee9d2b528673382bc912677dab80.svg";
 const imgGroup47 = "/assets/189b07984ec2f3ac75a3c8f86a1240f9d77295b1.svg";
 const imgRahatHasan = "/assets/17120c46c73350f30424215b16a49e925eb37ac8.svg";
-const imgLines = "/assets/d3273922281186b9e9028520267ecf0252a8f8b1.svg";
 
 // Figma frame 270:2457 — 1728 × 2338
 // top black area: 0–1200, bottom gradient section: 1200–2338 (h 1138)
@@ -28,6 +27,12 @@ const RIGHTS_H = 44; // all-rights-reserved bar below the design frame
 const COMPACT_TOP_SPACE = 340; // black space above the cal
 const COMPACT_BODY_H = COMPACT_TOP_SPACE + BOTTOM_H; // 1478
 const COMPACT_CAL_TOP = COMPACT_TOP_SPACE - 263; // keep the 263px-on-black / 226px-on-gradient split
+
+// dashed vertical rail (crisp CSS, no vertical fade) at a given alpha
+const dashGrad = (a) => ({
+  backgroundImage: `linear-gradient(to bottom, rgba(255,255,255,${a}) 0 10px, transparent 10px 20px)`,
+  backgroundSize: "1px 20px",
+});
 
 const SOCIAL_LINKS = [
   { label: "linkedin", href: "https://www.linkedin.com/in/rahatuxd/" },
@@ -266,9 +271,15 @@ export default function Footer({ compact = false }) {
       {/* ===== ALL RIGHTS RESERVED ===== */}
       {rightsBar}
 
-      {/* ===== GRID LINES: span both sections (full 2338px) ===== */}
+      {/* ===== GRID LINES: full page grid, crisp CSS so the rails stay visible all
+          the way down (the Figma SVG faded its dashed lines out toward the bottom).
+          solid outer 0/1440, dashed 360/720/1080 — matches the Hero grid ===== */}
       <div className="pointer-events-none absolute left-1/2 top-0 z-10 w-[1440px] -translate-x-1/2" style={{ height: FOOTER_H }}>
-        <img alt="" className="absolute inset-0 block size-full max-w-none" src={imgLines} />
+        <span className="absolute inset-y-0 left-0 w-px bg-white/40" />
+        <span className="absolute inset-y-0 w-px" style={{ left: 360, ...dashGrad(0.2) }} />
+        <span className="absolute inset-y-0 w-px" style={{ left: 720, ...dashGrad(0.1) }} />
+        <span className="absolute inset-y-0 w-px" style={{ left: 1080, ...dashGrad(0.2) }} />
+        <span className="absolute inset-y-0 right-0 w-px bg-white/40" />
       </div>
 
       {/* ===== TOP CONTENT: heading + expertise grid + description ===== */}

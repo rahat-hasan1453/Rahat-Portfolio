@@ -265,8 +265,9 @@ export default function AboutPage() {
           {/* centred 1020 block: horizontal stub + title + intro, then portraits */}
           <div className="absolute left-1/2 top-[128px] w-[1020px] -translate-x-1/2">
             <div className="flex items-end gap-[20px]">
-              {/* short horizontal line off the left rail */}
-              <div className="hero-appear h-px w-[124px] shrink-0 bg-white/40" />
+              {/* short horizontal line — extended 22px left so it touches the
+                  dashed rail (x188) with no gap; right end/text unchanged */}
+              <div className="hero-appear -ml-[22px] h-px w-[146px] shrink-0 bg-white/40" />
 
               <div className="flex w-[876px] flex-col items-start gap-[48px]">
                 {/* negative margins keep glyph overhangs inside the bg-clip-text paint area */}
