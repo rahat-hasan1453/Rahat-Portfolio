@@ -29,6 +29,18 @@ export const LOADERS = {
     exitStagger: 0.06,
     exitDur: 0.45,
   },
+  // returning to the homepage later in the session — quote only, no counter
+  homeReturn: {
+    quote: "Be an amateur, that’s all any of us are: We didn’t live long enough to be anything else.",
+    by: "Sir Charles Spencer Chaplin",
+    counter: false,
+    duration: 700,
+    hold: 80,
+    wordStep: 0.02,
+    wordDur: 0.4,
+    exitStagger: 0.05,
+    exitDur: 0.38,
+  },
   casestudies: {
     quote: "Whitespace is like air: it is necessary for design to breathe.",
     by: "Wojciech Zieliński",
@@ -84,8 +96,16 @@ function NumberReel({ mv }) {
   );
 }
 
+/* the counting intro belongs to the very first site load only. Once a home
+   loader has actually finished, later visits to the homepage (within this
+   page-life) get the shorter quote-only version. Flipped on completion — not
+   on mount — so StrictMode's discarded first mount can't trip it. */
+let homeIntroShown = false;
+
 export default function Loader({ variant = "home", onDone }) {
-  const data = LOADERS[variant] || LOADERS.home;
+  const isHome = variant === "home";
+  const key = isHome && homeIntroShown ? "homeReturn" : variant;
+  const data = LOADERS[key] || LOADERS.home;
   const words = data.quote.split(" ");
   const [phase, setPhase] = useState("loading");
   const mv = useMotionValue(0);
@@ -107,13 +127,16 @@ export default function Loader({ variant = "home", onDone }) {
   useEffect(() => {
     if (phase !== "exiting") return;
     const exitMs = (data.exitStagger * (PANELS - 1) + data.exitDur) * 1000 + 40;
-    const t = setTimeout(() => onDone?.(), exitMs);
+    const t = setTimeout(() => {
+      if (isHome) homeIntroShown = true; // intro is spent — later visits skip the counter
+      onDone?.();
+    }, exitMs);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, onDone]);
 
   return (
-    <div className="fixed inset-0 z-[100] overflow-hidden" data-loader={variant}>
+    <div className="fixed inset-0 z-[100] overflow-hidden" data-loader={key}>
       {/* opaque background made of vertical panels — slide down & off on exit */}
       <motion.div
         className="absolute inset-0"
