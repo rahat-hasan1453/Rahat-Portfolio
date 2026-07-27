@@ -255,7 +255,7 @@ export default function Hero() {
               </div>
               <div className="flex shrink-0 flex-col items-start justify-center">
                 <div className="font-jakarta relative shrink-0 whitespace-nowrap text-[16px] font-normal text-white [word-break:break-word]">
-                  <p className="mb-0 leading-[normal]">Based on Rajshahi,</p>
+                  <p className="mb-0 leading-[normal]">Based on Dhaka,</p>
                   <p className="leading-[normal]">{"Bangladesh "}</p>
                 </div>
               </div>
