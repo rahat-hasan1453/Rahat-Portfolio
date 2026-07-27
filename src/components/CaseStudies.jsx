@@ -53,6 +53,7 @@ const ART_H = 990; // Figma artboard height the y values are designed on
 const CASES = [
   {
     img: "/assets/01b079747853473476a56c1110e5349c011b0407.png",
+    slug: "riqs-praxis-monitor",
     title: "RiQS Praxis Monitor/ Web Application",
     desc: "Monitor your daily steps effortlessly with RiQS Praxis Monitor. Stay inspired and on track as you progress toward your fitness milestones. This intuitive web app helps you maintain motivation.",
     tags: ["UX Audit", "Improve UX", "User Journey"],
@@ -60,6 +61,7 @@ const CASES = [
   },
   {
     img: "/assets/0b19b6ba52627fe4db5c413523518e7d4390e4ae.png",
+    slug: "fittrack-pro",
     title: "FitTrack Pro / Mobile App",
     desc: "Track your fitness journey in real-time with FitTrack Pro. This mobile app provides personalized workouts and nutrition advice to help you achieve your health goals.",
     tags: ["Feature Enhancement", "Boost Engagement", "User Feedback"],
@@ -67,6 +69,7 @@ const CASES = [
   },
   {
     img: "/assets/bf6e07a7c2c0d1b3324cf94624a8454cb84c6b0d.png",
+    slug: "nutriguide",
     title: "NutriGuide / Web Application",
     desc: "Discover healthy recipes and meal plans tailored to your dietary preferences with NutriGuide. Empower your eating habits with easy-to-follow guidance.",
     tags: ["Design Refresh", "Enhance Usability", "User Testing"],
@@ -74,6 +77,7 @@ const CASES = [
   },
   {
     img: "/assets/0cd21a053806287e63d372fd804878164d4dce04.png",
+    slug: "sleepsync",
     title: "SleepSync / Mobile Application",
     desc: "Optimize your sleep with SleepSync, an app that analyzes your sleep patterns and provides tailored recommendations for better rest.",
     tags: ["User Interface Overhaul", "Increase User Retention", "A/B Testing"],
@@ -81,6 +85,7 @@ const CASES = [
   },
   {
     img: "/assets/664f92d3f7e23a196fa99748074ef3af791931cf.png",
+    slug: "wellness-hub",
     title: "Wellness Hub / Web Platform",
     desc: "Connect with wellness experts and resources through Wellness Hub. This platform offers workshops, coaching, and community support to enhance your well-being.",
     tags: ["Content Strategy", "Expand Offering", "Customer Insights"],
@@ -154,10 +159,20 @@ function Meta({ data }) {
   );
 }
 
-/* ---- one case study: parallax image + hover inner-zoom, then info row ---- */
+/* ---- one case study: parallax image + hover inner-zoom, then info row.
+       Clicking opens the details page (#case-study/<slug>). ---- */
 function Card({ data }) {
+  const open = () => {
+    window.location.hash = `case-study/${data.slug}`;
+  };
   return (
-    <div className="case-card flex w-full flex-col gap-[14px]">
+    <div
+      role="link"
+      tabIndex={0}
+      onClick={open}
+      onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), open())}
+      className="case-card flex w-full cursor-pointer flex-col gap-[14px]"
+    >
       <div className="group relative w-full overflow-hidden rounded-[8px] bg-[#1c1c1c]" style={{ height: 615 }}>
         {/* parallax layer overfills the frame so the drift never reveals an edge */}
         <div className="case-parallax absolute inset-x-0 -top-[10%] h-[120%] will-change-transform">

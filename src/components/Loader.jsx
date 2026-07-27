@@ -63,6 +63,17 @@ export const LOADERS = {
     exitStagger: 0.05,
     exitDur: 0.38,
   },
+  casestudydetail: {
+    quote: "Design is not just what it looks like and feels like. Design is how it works.",
+    by: "Steve Jobs",
+    counter: false,
+    duration: 620,
+    hold: 100,
+    wordStep: 0.025,
+    wordDur: 0.4,
+    exitStagger: 0.05,
+    exitDur: 0.38,
+  },
 };
 
 // dashed inner rail that fades out toward the bottom ("blends to bottom")

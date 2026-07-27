@@ -11,6 +11,7 @@ import CaseStudy from "./components/CaseStudy.jsx";
 import AngleMarque from "./components/AngleMarque.jsx";
 import Footer from "./components/Footer.jsx";
 import CaseStudies from "./components/CaseStudies.jsx";
+import CaseStudyDetail from "./components/CaseStudyDetail.jsx";
 import AboutPage from "./components/AboutPage.jsx";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -45,8 +46,15 @@ export default function App() {
   }, []);
 
   const isCaseStudies = route === "#case-studies";
+  const isCaseStudyDetail = route.startsWith("#case-study/");
   const isAbout = route === "#about";
-  const loaderVariant = isCaseStudies ? "casestudies" : isAbout ? "about" : "home";
+  const loaderVariant = isCaseStudyDetail
+    ? "casestudydetail"
+    : isCaseStudies
+      ? "casestudies"
+      : isAbout
+        ? "about"
+        : "home";
 
   // show the route's loading screen on first load and on every navigation
   const [loading, setLoading] = useState(true);
@@ -58,11 +66,11 @@ export default function App() {
 
   // land at the top whenever we switch into a full-page route
   useEffect(() => {
-    if (isAbout || isCaseStudies) {
+    if (isAbout || isCaseStudies || isCaseStudyDetail) {
       window.__lenis?.scrollTo(0, { immediate: true });
       window.scrollTo(0, 0);
     }
-  }, [isAbout, isCaseStudies]);
+  }, [isAbout, isCaseStudies, isCaseStudyDetail]);
 
   return (
     <main className="bg-ink min-w-[1440px]">
@@ -70,6 +78,8 @@ export default function App() {
       <Menu />
       {isAbout ? (
         <AboutPage />
+      ) : isCaseStudyDetail ? (
+        <CaseStudyDetail />
       ) : isCaseStudies ? (
         <CaseStudies />
       ) : (
