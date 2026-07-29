@@ -73,7 +73,7 @@ export default function App() {
   }, [isAbout, isCaseStudies, isCaseStudyDetail]);
 
   return (
-    <main className="bg-ink min-w-[1440px]">
+    <main className="bg-ink w-full overflow-x-clip">
       {loading && <Loader key={loadKey} variant={loaderVariant} onDone={() => setLoading(false)} />}
       <Menu />
       {isAbout ? (

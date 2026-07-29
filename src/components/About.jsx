@@ -75,33 +75,34 @@ export default function About() {
   );
 
   return (
-    <section ref={sectionRef} className="bg-ink relative h-[1309px] overflow-hidden" data-name="About Section">
+    <section ref={sectionRef} className="bg-ink relative overflow-hidden max-lg:h-auto max-lg:pt-[45px] lg:h-[1309px]" data-name="About Section">
       {/* mouse-reactive hex background */}
       <HexGrid />
 
-      {/* vertical grid lines */}
-      <div className="absolute left-1/2 top-[-1px] h-[1311px] w-[1440px] -translate-x-1/2">
+      {/* vertical grid lines — desktop only (the mobile frame 621:178 has none) */}
+      <div className="absolute left-1/2 top-[-1px] h-[1311px] w-[1440px] -translate-x-1/2 max-lg:hidden">
         <img alt="" className="absolute inset-0 block size-full max-w-none" src={imgLines} />
       </div>
 
-      <div className="absolute left-1/2 top-[46px] flex h-[1264px] w-[1440px] -translate-x-1/2 flex-col items-center px-[37px] pt-[100px]">
+      <div className="mx-auto flex w-full max-w-[1440px] flex-col items-center gutter max-lg:relative lg:absolute lg:left-1/2 lg:top-[46px] lg:h-[1264px] lg:-translate-x-1/2 lg:px-[37px] lg:pt-[100px]">
         {/* dashed hairline — same treatment as Logos section: dash 10 / gap 10, 10% opacity */}
         <div
-          className="pointer-events-none absolute inset-x-0 top-0 h-px"
+          className="pointer-events-none absolute inset-x-0 top-0 h-px max-lg:hidden"
           style={{ backgroundImage: "repeating-linear-gradient(to right, rgba(255,255,255,0.1) 0 10px, transparent 10px 20px)" }}
         />
-        <p className="about-copy font-serif-display relative w-[832px] shrink-0 not-italic tracking-[1.92px] [word-break:break-word]">
+        <p className="about-copy font-serif-display relative w-full max-w-[832px] shrink-0 not-italic tracking-[1.92px] max-lg:tracking-[1.28px] [word-break:break-word]">
           {ABOUT_TEXT.split(" ").map((word, i) => (
-            <span key={i} className="about-word text-[48px] leading-[60px] text-[#5f5f5f]">
+            <span key={i} className="about-word text-lead text-[#5f5f5f] max-lg:text-[32px] max-lg:leading-[40px]">
               {word}{" "}
             </span>
           ))}
         </p>
 
-        {/* tilted image ticker, scrolling right → left */}
-        <div className="relative mt-[32px] flex h-[508.483px] w-[1022.144px] shrink-0 items-center justify-center">
-          <div className="-rotate-7 flex-none">
-            <div className="relative w-[981.717px] overflow-clip">
+        {/* tilted image ticker, scrolling right → left. Mobile (Figma 622:236)
+            is the identical rail at 0.526×, still bleeding past both edges. */}
+        <div className="relative flex w-full shrink-0 items-center justify-center max-lg:mt-[43.6px] max-lg:h-[267.5px] lg:mt-[32px] lg:h-[508.483px] lg:w-[1022.144px]">
+          <div className="-rotate-7 flex-none max-lg:scale-[0.526]">
+            <div className="relative w-[981.717px] overflow-clip lg:max-w-[100vw]">
               <div ref={tickerRef} className="flex w-max items-center">
                 <TickerSet />
                 <TickerSet />

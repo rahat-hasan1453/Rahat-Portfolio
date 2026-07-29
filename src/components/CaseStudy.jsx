@@ -32,11 +32,15 @@ const TRACK_TOP = 372;
 const HEADLINE_TOP = 96;
 const INTRO_SCALE = 1.3; // intro headline size (rest = 1)
 const SECTION_GAP = 128; // gap to the next section
+/* mobile (Figma 622:323 + 623:443): the intro headline is centred inside this
+   band, then settles into its rest slot 48px below it — same FLIP, at scale 1.
+   The band is the box's mobile padding-top (M_INTRO_BAND + 48 = 476). */
+const M_INTRO_BAND = 428;
 
 function Chip({ children, rounded = "rounded-[20px]" }) {
   return (
     <div className={`relative flex h-[31px] shrink-0 items-center justify-center bg-[rgba(128,128,128,0.2)] p-[10px] ${rounded}`}>
-      <p className="font-jakarta relative shrink-0 whitespace-nowrap text-[16px] font-medium leading-[24px] tracking-[0.64px] text-white [word-break:break-word]">
+      <p className="font-jakarta relative shrink-0 whitespace-nowrap text-[16px] font-medium leading-[24px] tracking-[0.64px] text-white max-lg:text-[12px] max-lg:tracking-[0.48px] [word-break:break-word]">
         {children}
       </p>
     </div>
@@ -65,47 +69,50 @@ function HCard({ data }) {
       tabIndex={0}
       onClick={open}
       onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), open())}
-      className="hcard group/card relative flex shrink-0 cursor-pointer flex-col gap-[16px]"
-      style={{ width: CARD_W, willChange: "transform" }}
+      className="hcard group/card relative flex w-full shrink-0 cursor-pointer flex-col gap-[16px] max-lg:gap-[20px] lg:w-[720px]"
+      style={{ willChange: "transform" }}
     >
-      <div className="relative w-full shrink-0 overflow-hidden rounded-[8px]" style={{ height: IMG_H }}>
+      <div className="relative aspect-video w-full shrink-0 overflow-hidden rounded-[8px] max-lg:aspect-[350/216] lg:aspect-auto lg:h-[405px]">
         {data.crop ? (
           <img alt="" className="pointer-events-none absolute left-0 top-[-8%] h-[121%] w-full max-w-none" src={data.img} />
         ) : (
           <img alt="" className="pointer-events-none absolute inset-0 size-full max-w-none object-cover" src={data.img} />
         )}
       </div>
-      <div className="relative flex w-full shrink-0 items-start justify-between gap-[20px]">
-        <div className="relative flex flex-col items-start gap-[6px] [word-break:break-word]" style={{ width: 320 }}>
-          <p className="font-serif-display relative shrink-0 text-[20px] not-italic leading-[24px] tracking-[0.8px] text-white">
+      <div className="relative flex w-full shrink-0 items-start justify-between gap-[20px] max-lg:flex-col max-lg:gap-[16px]">
+        <div className="relative flex flex-col items-start gap-[6px] max-lg:w-full max-lg:gap-[8px] lg:w-[320px] [word-break:break-word]">
+          <p className="font-serif-display relative shrink-0 text-[20px] not-italic leading-[24px] tracking-[0.8px] text-white max-lg:text-[24px] max-lg:tracking-[0.96px]">
             {data.title}
           </p>
-          <p className="font-jakarta relative shrink-0 text-[14px] font-medium leading-[20px] tracking-[0.56px] text-grey">
+          <p className="font-jakarta relative shrink-0 text-[14px] font-medium leading-[20px] tracking-[0.56px] text-grey max-lg:text-[16px] max-lg:leading-[24px] max-lg:tracking-[0.64px]">
             Monitor your daily steps effortlessly with RiQS Praxis Monitor. Stay inspired and on track as you progress toward your fitness
             milestones.
           </p>
         </div>
-        <div className="relative flex shrink-0 flex-col items-end gap-[8px]">
-          <div className="relative flex shrink-0 items-center gap-[16px]">
-            <div className="relative h-[16px] w-[76px] shrink-0">
+        {/* mobile stacks the tag rows above the client/year line (Figma 623:452) */}
+        <div className="relative flex shrink-0 flex-col gap-[8px] max-lg:w-full max-lg:items-start lg:items-end">
+          <div className="relative flex shrink-0 items-center gap-[16px] max-lg:order-3 max-lg:gap-[20px]">
+            <div className="relative h-[16px] w-[76px] shrink-0 max-lg:h-[18px] max-lg:w-[84px]">
               <img alt="RiQS" className="absolute inset-0 block size-full max-w-none" src={imgLogo2} />
             </div>
-            <p className="font-jakarta relative shrink-0 whitespace-nowrap text-[14px] font-medium leading-[24px] tracking-[0.56px] text-white">
+            {/* mobile sits the year in a 31px chip box (Figma 623:425 — no fill) */}
+            <p className="font-jakarta relative shrink-0 whitespace-nowrap text-[14px] font-medium leading-[24px] tracking-[0.56px] text-white max-lg:flex max-lg:h-[31px] max-lg:items-center max-lg:px-[10px] max-lg:text-[16px] max-lg:tracking-[0.64px]">
               2025/26
             </p>
           </div>
-          <div className="relative flex shrink-0 items-center">
+          <div className="relative flex shrink-0 items-center max-lg:order-1">
             <Chip rounded="rounded-l-[20px]">{data.tags[0]}</Chip>
             <TagDivider />
             <Chip rounded="rounded-none">{data.tags[1]}</Chip>
             <TagDivider />
             <Chip rounded="rounded-r-[20px]">{data.tags[2]}</Chip>
           </div>
-          <div className="relative flex shrink-0 items-start gap-[8px]">
+          <div className="relative flex shrink-0 items-start gap-[8px] max-lg:order-2">
             <Chip>Medical</Chip>
             <Chip>Human Resource</Chip>
           </div>
-          <p className="font-jakarta relative shrink-0 whitespace-nowrap text-[14px] font-medium leading-[24px] tracking-[0.56px] text-white">
+          {/* the deep-link line is desktop-only in the mobile frame */}
+          <p className="font-jakarta relative shrink-0 whitespace-nowrap text-[14px] font-medium leading-[24px] tracking-[0.56px] text-white max-lg:hidden">
             riqs.com/ login
           </p>
         </div>
@@ -129,6 +136,53 @@ export default function CaseStudy() {
       const box = boxRef.current;
       const headline = headlineRef.current;
       const track = trackRef.current;
+      const mm = gsap.matchMedia();
+
+      // local (unscaled) x of "Portfolio" = width of the "A " prefix, i.e. how
+      // far lines 2-3 sit indented at the start of the FLIP (both breakpoints)
+      const aWidth = () => portfolioRef.current.offsetLeft;
+
+      /* ── below 1024: no pin and no side-scroll (side-scroll fights thumb
+            scroll), but the headline keeps the desktop FLIP — it starts centred
+            inside the 428px intro band with lines 2-3 indented under
+            "Portfolio", then settles into its top-left rest slot at scale 1.
+            Because the travel exactly cancels the page scroll, the headline
+            appears to hold still on screen while it resolves. Cards then rise
+            in one by one as they enter. */
+      mm.add("(max-width: 1023px)", () => {
+        gsap.set(trackRef.current, { clearProps: "all" });
+        const indent = indentRef.current;
+
+        // visual block during the intro is headline + the "A " indent
+        const introX = () => box.offsetWidth / 2 - (headline.offsetWidth + aWidth()) / 2 - headline.offsetLeft;
+        const introY = () => M_INTRO_BAND / 2 - headline.offsetHeight / 2 - headline.offsetTop;
+
+        gsap.set(headline, { transformOrigin: "top left" });
+        const flipTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: stage,
+            start: "top top",
+            end: () => "+=" + Math.abs(introY()),
+            scrub: 1,
+            invalidateOnRefresh: true,
+          },
+        });
+        flipTl.fromTo(headline, { x: introX, y: introY }, { x: 0, y: 0, ease: "power3.out" }, 0);
+        flipTl.fromTo(indent, { x: aWidth }, { x: 0, ease: "power3.out" }, 0);
+
+        gsap.utils.toArray(".hcard").forEach((card) => {
+          gsap.from(card, {
+            opacity: 0,
+            y: 48,
+            duration: 0.8,
+            ease: "power3.out",
+            scrollTrigger: { trigger: card, start: "top 88%" },
+          });
+        });
+      });
+
+      /* ── 1024 and up: the original pinned FLIP + horizontal rail ── */
+      mm.add("(min-width: 1024px)", () => {
 
       // FLIP — offsetLeft/Top/Width/Height are transform-independent, so the
       // centred+large intro is recomputed correctly on every refresh/resize.
@@ -167,8 +221,6 @@ export default function CaseStudy() {
       // ── headline: centre/large → top-left rest; meanwhile lines 2-3 slide
       //    from "indented under Portfolio" to "aligned under A". ──
       const indent = indentRef.current;
-      // local (unscaled) x of "Portfolio" = width of the "A " prefix
-      const aWidth = () => portfolioRef.current.offsetLeft;
 
       gsap.set(headline, { transformOrigin: "top left" });
       const flipTl = gsap.timeline({
@@ -200,45 +252,62 @@ export default function CaseStudy() {
           },
         });
       });
+      }); // end desktop matchMedia
     },
     { scope: sectionRef }
   );
 
   return (
-    <section ref={sectionRef} className="bg-ink relative" data-name="Case Study" style={{ paddingBottom: SECTION_GAP }}>
-      <div ref={stageRef} className="bg-ink relative h-screen w-full overflow-hidden">
+    <section ref={sectionRef} className="bg-ink relative max-lg:pb-[48px] lg:pb-[128px]" data-name="Case Study">
+      <div ref={stageRef} className="bg-ink relative w-full overflow-hidden max-lg:h-auto lg:h-screen">
         {/* full grid on the centred 1440 box — outer solids (0/1440) + middle
-            dashed (360/720/1080), same SVG as the Hero so the lines run continuously */}
-        <div className="pointer-events-none absolute left-1/2 top-0 z-0 h-full w-[1440px] -translate-x-1/2">
+            dashed (360/720/1080), same SVG as the Hero so the lines run continuously.
+            The mobile frames (622:323 / 623:443) carry no rails. */}
+        <div className="pointer-events-none absolute left-1/2 top-0 z-0 h-full w-[1440px] -translate-x-1/2 max-lg:hidden">
           <img alt="" className="absolute inset-0 block size-full max-w-none" src={imgLines} />
         </div>
 
         {/* centred 1440 box — the same box the rails are drawn on, so content
-            keeps a true 20px gap from the lines at every viewport width */}
-        <div ref={boxRef} className="absolute left-1/2 top-0 h-full -translate-x-1/2" style={{ width: BOX_W }}>
-        {/* headline — driven by the timeline (NOT position: sticky) */}
-        <div ref={headlineRef} className="absolute z-20" style={{ left: INSET, top: HEADLINE_TOP, willChange: "transform" }}>
-          <div className="font-serif-display flex flex-col items-start not-italic tracking-[2.88px] text-[72px] leading-[76px] text-white [word-break:break-word]">
-            <p className="whitespace-nowrap">
-              <span>{"A "}</span>
-              <span ref={portfolioRef} className="font-serif-display-it accent-gradient-text italic">Portfolio</span>
-            </p>
-            {/* lines 2–3 start indented under "Portfolio", then slide left to align under "A" */}
-            <div ref={indentRef} className="flex flex-col items-start" style={{ willChange: "transform" }}>
-              <p className="whitespace-nowrap">Build For</p>
-              <p className="whitespace-nowrap">Every Steps</p>
+            keeps a true 20px gap from the lines at every viewport width.
+            On mobile the 476px top padding is the intro band the headline
+            flies out of (428) plus its rest offset (48). */}
+        <div
+          ref={boxRef}
+          className="mx-auto w-full max-w-[1440px] gutter max-lg:relative max-lg:pt-[476px] lg:absolute lg:left-1/2 lg:top-0 lg:h-full lg:-translate-x-1/2 lg:px-0"
+        >
+          {/* headline — timeline-driven FLIP on both breakpoints. w-fit on mobile
+              so the FLIP measures the real text width, not the whole column. */}
+          <div
+            ref={headlineRef}
+            className="z-20 max-lg:relative max-lg:w-fit lg:absolute lg:left-[20px] lg:top-[96px]"
+            style={{ willChange: "transform" }}
+          >
+            <div className="font-serif-display text-h2 flex flex-col items-start not-italic tracking-[2.88px] text-white max-lg:gap-[4px] max-lg:text-[32px] max-lg:leading-[40px] max-lg:tracking-[1.28px] [word-break:break-word] lg:leading-[76px]">
+              <p className="whitespace-nowrap">
+                <span>{"A "}</span>
+                <span ref={portfolioRef} className="font-serif-display-it accent-gradient-text italic">Portfolio</span>
+              </p>
+              {/* lines 2–3 start indented under "Portfolio", then slide left to align under "A" */}
+              <div ref={indentRef} className="flex flex-col items-start" style={{ willChange: "transform" }}>
+                <p className="whitespace-nowrap">Build For</p>
+                <p className="whitespace-nowrap">Every Steps</p>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* content-area clip — nothing crosses the inset lines */}
-        <div className="absolute z-10 overflow-hidden" style={{ left: INSET, right: INSET, top: TRACK_TOP, bottom: 0 }}>
-          <div ref={trackRef} className="absolute left-0 top-0 flex" style={{ gap: GAP, willChange: "transform" }}>
-            {CARDS.map((card, i) => (
-              <HCard key={i} data={card} />
-            ))}
+          {/* desktop: clipped rail that scrolls sideways.
+              mobile: a plain vertical stack — nothing pinned, nothing clipped. */}
+          <div className="z-10 max-lg:relative max-lg:mt-[48px] lg:absolute lg:bottom-0 lg:left-[20px] lg:right-[20px] lg:top-[372px] lg:overflow-hidden">
+            <div
+              ref={trackRef}
+              className="max-lg:flex max-lg:flex-col max-lg:gap-[64px] lg:absolute lg:left-0 lg:top-0 lg:flex"
+              style={{ willChange: "transform" }}
+            >
+              {CARDS.map((card, i) => (
+                <HCard key={i} data={card} />
+              ))}
+            </div>
           </div>
-        </div>
         </div>
       </div>
     </section>

@@ -202,7 +202,21 @@ function Brand() {
   );
 }
 
+// true only on devices with a real pointer — hover effects are gated on this
+function usePointerDevice() {
+  const [canHover, setCanHover] = useState(true);
+  useEffect(() => {
+    const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const sync = () => setCanHover(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+  return canHover;
+}
+
 export default function Menu() {
+  const canHover = usePointerDevice();
   const [open, setOpen] = useState(false);
   const [quoteIdx, setQuoteIdx] = useState(0);
   const tickerRef = useRef(null);
@@ -293,13 +307,15 @@ export default function Menu() {
         )}
       </AnimatePresence>
 
-      <div className="fixed left-1/2 top-[24px] z-[100] w-[360px] -translate-x-1/2">
+      {/* mobile geometry from Figma 621:121 — 350 wide (20px gutter), 20 from the top */}
+      <div className="fixed left-1/2 top-[24px] z-[100] w-[calc(100%-24px)] max-w-[360px] -translate-x-1/2 max-lg:top-[20px] max-lg:w-[calc(100%-40px)] max-lg:max-w-[350px]">
         {/* main box — height shuttles between pill (56) and full panel */}
         <motion.div
           initial={false}
           animate={{ height: open ? "auto" : PILL_H, scale: 1 }}
-          /* hovering the closed pill swells the whole menu block to 1.1× */
-          whileHover={open ? undefined : { scale: 1.1 }}
+          /* hovering the closed pill swells the whole menu block to 1.1×
+             — pointer devices only, so a tap on mobile can't trigger it */
+          whileHover={open || !canHover ? undefined : { scale: 1.1 }}
           transition={boxTransition}
           className="relative w-full overflow-clip rounded-[16px] bg-[#2C2A26]"
         >

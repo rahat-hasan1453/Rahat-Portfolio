@@ -127,24 +127,27 @@ function SocialCardRotator() {
   };
 
   return (
-    <div
-      onClick={open}
-      role="link"
-      aria-label={`Visit my ${name} profile`}
-      data-name="Social Connent"
-      className="relative h-[195.149px] w-[171.253px] shrink-0 cursor-pointer overflow-hidden rounded-[20px] transition-transform duration-300 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.1]"
-    >
-      <AnimatePresence initial={false}>
-        <motion.div
-          key={idx}
-          initial={{ x: "112%", rotate: 5 }}
-          animate={{ x: 0, rotate: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } }}
-          exit={{ x: "-55%", opacity: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } }}
-          className="absolute inset-0"
-        >
-          <Card />
-        </motion.div>
-      </AnimatePresence>
+    // Figma 624:991 — on mobile the identical card is scaled to 78.1 × 89 (0.456×)
+    <div className="relative h-[195.149px] w-[171.253px] shrink-0 max-lg:h-[89.005px] max-lg:w-[78.102px]">
+      <div
+        onClick={open}
+        role="link"
+        aria-label={`Visit my ${name} profile`}
+        data-name="Social Connent"
+        className="absolute left-0 top-0 h-[195.149px] w-[171.253px] cursor-pointer overflow-hidden rounded-[20px] transition-transform duration-300 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.1] max-lg:origin-top-left max-lg:scale-[0.45608] max-lg:rounded-[8.772px] max-lg:hover:scale-[0.45608]"
+      >
+        <AnimatePresence initial={false}>
+          <motion.div
+            key={idx}
+            initial={{ x: "112%", rotate: 5 }}
+            animate={{ x: 0, rotate: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } }}
+            exit={{ x: "-55%", opacity: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } }}
+            className="absolute inset-0"
+          >
+            <Card />
+          </motion.div>
+        </AnimatePresence>
+      </div>
     </div>
   );
 }
@@ -182,42 +185,61 @@ export default function Hero() {
   );
 
   return (
-    <section ref={sectionRef} className="bg-ink relative h-screen max-h-[1099px] min-h-[820px] overflow-hidden" data-name="Hero Section">
+    <section
+      ref={sectionRef}
+      className="bg-ink relative min-h-[640px] overflow-hidden max-lg:h-[100svh] max-lg:min-h-[720px] lg:h-screen lg:max-h-[1099px] lg:min-h-[820px]"
+      data-name="Hero Section"
+    >
       {/* mouse-reactive hex-code background (fin.com style, accent red) */}
       <HexGrid />
 
-      {/* vertical grid lines */}
-      <div className="pointer-events-none absolute inset-y-0 left-1/2 z-[4] w-[1440px] -translate-x-1/2">
+      {/* vertical grid lines — desktop only; the mobile frame (Figma 619:95)
+          carries no rails, just the dashed hairline above its bottom edge */}
+      <div className="pointer-events-none absolute inset-y-0 left-1/2 z-[4] w-[1440px] -translate-x-1/2 max-lg:hidden">
         <img alt="" className="absolute inset-0 block size-full max-w-none" src={imgLines} />
       </div>
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-[19px] z-[4] h-px lg:hidden"
+        style={{ backgroundImage: "repeating-linear-gradient(to right, rgba(255,255,255,0.1) 0 10px, transparent 10px 20px)" }}
+      />
 
-      {/* bottom gradient band */}
-      <div className="absolute bottom-0 left-0 z-[2] h-[284px] w-full">
+      {/* bottom gradient band — desktop only (the mobile frame has none) */}
+      <div className="absolute bottom-0 left-0 z-[2] h-[284px] w-full max-lg:hidden">
         <img alt="" className="pointer-events-none absolute inset-0 size-full max-w-none object-cover" src={imgRectangle10} />
       </div>
 
-      {/* right-side interactive halftone portrait (dragonfly-style, reacts to the cursor) */}
+      {/* interactive halftone portrait — anchored right on desktop; on mobile a
+          full-bleed 369px band whose bottom edge lines up with the info row
+          (Figma 619:97: 390 × 369 at y 422 of an 844 frame) */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1.4, ease: "easeOut", delay: 0.2 }}
-        className="absolute bottom-0 right-0 z-[3] h-[86%] w-[820px]"
+        className="absolute bottom-0 right-0 z-[3] h-[86%] w-[820px] max-lg:hidden"
+      >
+        <HeroDotPortrait src={imgPortrait} className="size-full" />
+      </motion.div>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1.4, ease: "easeOut", delay: 0.2 }}
+        className="absolute inset-x-0 bottom-[52.67px] z-[3] h-[369px] lg:hidden"
       >
         <HeroDotPortrait src={imgPortrait} className="size-full" />
       </motion.div>
 
-      {/* main content — fills the viewport: headline at the top, info row pinned to the
-          bottom, so the whole hero (incl. the social card) is visible on first load */}
-      <div className="absolute bottom-[36px] left-1/2 top-[140px] z-[5] flex w-[1440px] -translate-x-1/2 flex-col items-end justify-between gap-[16px] px-[20px]">
-        <div className="flex w-full shrink-0 flex-col items-start gap-[40px]">
-          <h1 className="font-serif-display relative w-[790px] whitespace-pre-wrap text-white not-italic tracking-[3.36px] [word-break:break-word]">
+      {/* main content — headline top / info row bottom on both breakpoints
+          (mobile: 130 from the top, 52.67 from the bottom of the 844 frame) */}
+      <div className="relative z-[5] mx-auto flex w-full max-w-[1440px] flex-col gap-[16px] gutter max-lg:absolute max-lg:inset-x-0 max-lg:bottom-[52.67px] max-lg:top-[130px] max-lg:items-start max-lg:justify-between max-lg:gap-0 lg:absolute lg:bottom-[36px] lg:left-1/2 lg:top-[140px] lg:h-auto lg:-translate-x-1/2 lg:items-end lg:justify-between">
+        <div className="flex w-full shrink-0 flex-col items-start gap-[40px] max-lg:gap-0">
+          <h1 className="font-serif-display relative w-full max-w-[790px] whitespace-pre-wrap text-white not-italic tracking-[3.36px] max-lg:tracking-[1.6px] [word-break:break-word]">
             {/* GSAP animates these wrappers so it never fights framer-motion's entry tweens */}
             <span className="hero-split-fast block will-change-transform">
               <motion.span
                 initial={{ opacity: 0, y: 60 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, ease: easeOut, delay: 0.1 }}
-                className="block text-[84px] leading-[84px]"
+                className="text-display block max-lg:text-[40px] max-lg:leading-[44px]"
               >
                 Designing Solutions
               </motion.span>
@@ -225,17 +247,17 @@ export default function Hero() {
                 initial={{ opacity: 0, y: 60 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, ease: easeOut, delay: 0.25 }}
-                className="block text-[84px] leading-[84px]"
+                className="text-display block max-lg:text-[40px] max-lg:leading-[44px]"
               >
                 {"to Complex Problems Through Seamless "}
               </motion.span>
             </span>
-            <span className="hero-split-lag block will-change-transform">
+            <span className="hero-split-lag block will-change-transform max-lg:mt-[8px]">
               <motion.span
                 initial={{ opacity: 0, y: 60 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, ease: easeOut, delay: 0.4 }}
-                className="font-serif-display-it accent-gradient-text block text-[84px] italic leading-[92px]"
+                className="font-serif-display-it accent-gradient-text text-display block italic max-lg:text-[40px] max-lg:leading-[44px]"
               >
                 User Experiences
               </motion.span>
@@ -246,7 +268,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: easeOut, delay: 0.8 }}
-          className="flex w-full shrink-0 items-end gap-[48px]"
+          className="flex w-full shrink-0 items-end gap-[48px] max-lg:justify-between max-lg:gap-[16px] max-lg:pr-[14.9px]"
         >
           <div className="flex w-[134px] shrink-0 flex-col items-start">
             <div className="flex w-full shrink-0 items-center gap-[8px]">
@@ -261,8 +283,9 @@ export default function Hero() {
               </div>
             </div>
           </div>
-          <div className="flex min-w-px flex-[1_0_0] flex-col items-end justify-end gap-[20px]">
-            <p className="font-jakarta relative w-[200px] shrink-0 text-right text-[20px] font-medium leading-[24px] tracking-[0.8px] text-white [word-break:break-word]">
+          <div className="flex min-w-px flex-[1_0_0] flex-col items-end justify-end gap-[20px] max-lg:flex-none">
+            {/* the statement line is desktop-only in the mobile frame */}
+            <p className="font-jakarta relative w-[200px] shrink-0 text-right text-[20px] font-medium leading-[24px] tracking-[0.8px] text-white max-lg:hidden [word-break:break-word]">
               Great design connects people, thrives on collaboration, and inspires deep emotion
             </p>
             {/* rotating social profile card: LinkedIn → Dribbble → Behance */}

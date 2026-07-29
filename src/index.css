@@ -23,6 +23,66 @@
   --font-urbanist: "Urbanist", sans-serif;
   --color-ink: #12110d;
   --color-grey: #808080;
+
+  /* ── fluid type scale ──────────────────────────────────────────────
+     Each token lands on its exact Figma size at 1440px and shrinks
+     smoothly below it, so no breakpoint steps are needed per heading.
+     Usage: text-display, text-h2 … (Tailwind's --text-* namespace).   */
+  --text-display: clamp(38px, 5.9vw, 84px); /* Case Studies / Journey to Design */
+  --text-display--line-height: 1.1;
+  --text-h2: clamp(30px, 5vw, 72px); /* Building Better Experiences */
+  --text-h2--line-height: 1.04;
+  --text-h3: clamp(26px, 3.4vw, 48px); /* detail-page title */
+  --text-h3--line-height: 1.18;
+  --text-lead: clamp(24px, 3.4vw, 48px); /* homepage scroll statement */
+  --text-lead--line-height: 1.26;
+  --text-h4: clamp(21px, 2.3vw, 32px); /* case-study captions */
+  --text-h4--line-height: 1.28;
+  --text-h5: clamp(19px, 2vw, 28px); /* section labels, band bodies */
+  --text-h5--line-height: 1.18;
+  --text-t1: clamp(18px, 1.7vw, 24px); /* card titles */
+  --text-t1--line-height: 1.2;
+  --text-b1: clamp(15px, 1.4vw, 20px); /* body 1 */
+  --text-b1--line-height: 1.5;
+}
+
+/* the page gutter: 20px of air between the rails and any content */
+@utility gutter {
+  padding-inline: 20px;
+}
+
+/* horizontal strips that are wider than a phone (logo row, skills rows) stay
+   swipeable but must not show a scrollbar over the artwork */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Footer geometry. The footer is an absolutely-composed block, so its bands
+   are driven by these numbers. Desktop = Figma 270:2457 (1728 × 2338);
+   mobile = Figma 623:603 + 624:809 stacked (860 + 1665 on a 390 frame). */
+:root {
+  --footer-h: 2338px;
+  --footer-top-h: 1200px;
+  --footer-bottom-h: 1138px;
+  --footer-cal-top: 937px;
+  --footer-cal-h: 489px;
+  --footer-compact-space: 340px;
+  --footer-compact-cal-top: 77px;
+}
+@media (max-width: 1023px) {
+  :root {
+    --footer-h: 2525px; /* 1531 black + 994 gradient */
+    --footer-top-h: 1531px; /* skills band 860 + footer black band 671 */
+    --footer-bottom-h: 994px;
+    --footer-cal-top: 888px; /* 860 + 28 */
+    --footer-cal-h: 684px;
+    --footer-compact-space: 300px;
+    --footer-compact-cal-top: 60px;
+  }
 }
 
 html,

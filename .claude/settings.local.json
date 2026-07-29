@@ -75,7 +75,28 @@
       "Bash(curl -sL -o about-full.png \"https://www.figma.com/api/mcp/asset/fafee346-a19f-474a-a01d-c684919c7df9\")",
       "Bash(cp \"/Users/rahat/Documents/Frame 1261157874.svg\" tool-figma.svg)",
       "Bash(cp \"/Users/rahat/Documents/Frame 1261157876.svg\" tool-framer.svg)",
-      "Bash(npx vite *)"
+      "Bash(npx vite *)",
+      "Bash(echo \"BUILD_EXIT=$?\")",
+      "Bash(echo \"EXIT=$?\")",
+      "Bash(curl -sL -o m1.png \"https://www.figma.com/api/mcp/asset/64b16697-6b7c-4d88-912b-ab4110de7437\")",
+      "Bash(curl -sL -o m2.png \"https://www.figma.com/api/mcp/asset/947bb9cb-114d-43d1-b1cb-e00939a4160e\")",
+      "Bash(curl -sL -o m3.png \"https://www.figma.com/api/mcp/asset/bbe3f586-60fe-46d6-be0b-6d9a8788c62c\")",
+      "Bash(curl -sL -o m4.png \"https://www.figma.com/api/mcp/asset/f3257716-08ef-46c7-ae2f-ecf3cc25028a\")",
+      "Bash(curl -sL -o m5.png \"https://www.figma.com/api/mcp/asset/1e5d881f-6fb0-4570-89c2-c2e13772ad80\")",
+      "Bash(curl -sL -o m6.png \"https://www.figma.com/api/mcp/asset/7c3b88e3-099b-48d7-938c-de6134624427\")",
+      "Bash(curl -sL -o m7.png \"https://www.figma.com/api/mcp/asset/3bac7d54-fdbb-4509-a730-062f3b18b4f1\")",
+      "Bash(sips -c 780 361 --cropOffset 620 0 m1.png --out crop1.png)",
+      "Bash(sips -g pixelWidth -g pixelHeight crop1.png)",
+      "Bash(sips --cropToHeightWidth 130 200 --cropOffset 611 149 m1.png --out crop1.png)",
+      "Bash(sips -r 0 -z 390 600 crop1.png --out crop1b.png)",
+      "Bash(sips -g pixelWidth -g pixelHeight crop1b.png)",
+      "Bash(sips -g pixelWidth -g pixelHeight public/assets/hero-portrait.png)",
+      "Bash(grep -c \"/>$\" src/components/Logos.jsx)",
+      "Bash(perl -0pi -e 's|\\(\\\\s+\\)</div>\\\\n\\(\\\\s+\\)</div>\\\\n\\(\\\\s+\\)</div>\\\\n\\(\\\\s+\\)</div>\\\\n\\(\\\\s+\\)</div>\\\\n\\(\\\\s+\\)</div>\\\\n\\(\\\\s+\\)</div>\\\\n\\(\\\\s+\\)</section>|$1</div>\\\\n$2</div>\\\\n$3</motion.div>\\\\n$4</div>\\\\n$5</div>\\\\n$6</div>\\\\n$7</div>\\\\n$8</section>|' src/components/Logos.jsx)",
+      "Bash(perl -0pi -e 's|<LogoCard index=\\\\{\\\\d\\\\}>|<LogoCard>|g' src/components/Logos.jsx)",
+      "Bash(perl -0pi -e 's|^\\(                \\)\\(<LogoCard>|</LogoCard>|<div|</div>|<p|</p>|<img|                      |                        |                    |  \\)|$1  $2|gm' src/components/Logos.jsx)",
+      "Bash(awk 'NR>=70 && NR<=127 {print \" \" $0; next} {print}' src/components/Logos.jsx)",
+      "Bash(mv /tmp/logos.tmp src/components/Logos.jsx)"
     ]
   }
 }

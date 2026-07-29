@@ -13,20 +13,20 @@ const imgDownload = "/assets/efb7f30e6bdeee9d2b528673382bc912677dab80.svg";
 const imgGroup47 = "/assets/189b07984ec2f3ac75a3c8f86a1240f9d77295b1.svg";
 const imgRahatHasan = "/assets/17120c46c73350f30424215b16a49e925eb37ac8.svg";
 
-// Figma frame 270:2457 — 1728 × 2338
-// top black area: 0–1200, bottom gradient section: 1200–2338 (h 1138)
-// cal widget (image 66): 1040 × 489, centered, top 937 → overlaps boundary by 226px
-const FOOTER_H = 2338;
-const TOP_H = 1200;
-const BOTTOM_H = FOOTER_H - TOP_H; // 1138
-const CAL_TOP = 937;
+// Band heights live in index.css as --footer-* so both breakpoints share one
+// source of truth:
+//   desktop — Figma 270:2457 (1728 × 2338): black 0–1200, gradient 1200–2338,
+//     cal 1040 × 489 at top 937 → crosses the boundary by 226px
+//   mobile  — Figma 623:603 + 624:809 (390 frame): black 0–1531 (skills band
+//     860 + 671), gradient 1531–2525, cal 350 × 684 at top 888 → crosses by 41px
 const RIGHTS_H = 44; // all-rights-reserved bar below the design frame
 
 // compact mode (About page): no "Building Better Experiences" section — just a
 // black bridge space, the cal widget crossing into the gradient, then the footer.
-const COMPACT_TOP_SPACE = 340; // black space above the cal
-const COMPACT_BODY_H = COMPACT_TOP_SPACE + BOTTOM_H; // 1478
-const COMPACT_CAL_TOP = COMPACT_TOP_SPACE - 263; // keep the 263px-on-black / 226px-on-gradient split
+// Driven by CSS vars so the mobile band heights come along for the ride.
+const COMPACT_BODY_H = "calc(var(--footer-compact-space) + var(--footer-bottom-h))";
+const COMPACT_TOP_SPACE = "var(--footer-compact-space)";
+const COMPACT_CAL_TOP = "var(--footer-compact-cal-top)";
 
 // dashed vertical rail (crisp CSS, no vertical fade) at a given alpha
 const dashGrad = (a) => ({
@@ -43,35 +43,41 @@ const SOCIAL_LINKS = [
 ];
 const RESUME_URL = "https://drive.google.com/file/d/1BXxqhJTWyF4Av9leQ9pD_2DPEHKQCh1c/view?usp=sharing";
 
-const ROW_A = [
-  "Product\nStrategy", null, "UX Audit", null, "Web\nApplication", null,
-  null, "Mobile\nApp", null, "Design\nSystem", null, "Saas\nProducts",
-];
+/* Bubble rows. Desktop wrapped ROW_A at 6 tiles (12 × 144 in an 864 box), so
+   the two explicit rows below render identically there; on mobile (Figma
+   623:758) the tiles shrink to 96 and every row keeps its 6 slots. */
+const ROW_A1 = ["Product\nStrategy", null, "UX Audit", null, "Web\nApplication", null];
+const ROW_A2 = [null, "Mobile\nApp", null, "Design\nSystem", null, "Saas\nProducts"];
 const ROW_B = ["Storytelling", "OOUX", "Collaboration", "Minimalism", "Empathy", "Adaptability"];
 const ROW_C = ["Problem\nSolving", null, "Cognitive\nPsychology", null, "Information\nArchitecture", null];
 
 // Original bubble — UNCHANGED look/layout. Only addition: on hover it reveals
 // its 3 helper pills, released from the card center and shown IN FRONT.
 // showPills=false for the dense small-tile row (pills would crowd it).
-function Bubble({ label, size = "size-[144px]", showPills = true }) {
+// mobile type for the bubbles (Figma 623:730 / 623:746): Jakarta 16/24 instead
+// of Urbanist 24, and a tighter 28px corner on the square tiles
+const BUBBLE_TEXT =
+  "font-urbanist text-[24px] leading-none max-lg:font-jakarta max-lg:text-[16px] max-lg:leading-[24px] max-lg:tracking-[0.64px]";
+
+function Bubble({ label, size = "size-[144px] max-lg:size-[96px]", radius = "rounded-[40px] max-lg:rounded-[28px]", showPills = true }) {
   const [active, setActive] = useState(false);
   const pills = label && showPills ? getPills(label) : [];
 
   const lines = (label || "UX Audit").split("\n").map((line, i) => (
-    <p key={i} className="leading-none">{line}</p>
+    <p key={i} className="leading-[inherit]">{line}</p>
   ));
   return (
     <div
       onMouseEnter={() => setActive(true)}
       onMouseLeave={() => setActive(false)}
-      className={`footer-reveal group relative flex shrink-0 items-center justify-center rounded-[40px] border border-solid border-[#131313] bg-[#1c1c1c] px-[16px] py-[10px] ${label ? "cursor-pointer" : ""} ${active ? "z-30" : ""} ${size}`}
+      className={`footer-reveal group relative flex shrink-0 items-center justify-center border border-solid border-[#131313] bg-[#1c1c1c] px-[16px] py-[10px] ${radius} ${label ? "cursor-pointer" : ""} ${active ? "z-30" : ""} ${size}`}
     >
       {/* hover shuttles the label out the top, back in from below */}
       <div className={`relative shrink-0 overflow-hidden ${label ? "" : "opacity-0"}`}>
-        <div className="font-urbanist relative whitespace-nowrap text-center text-[24px] font-medium leading-none text-white transition-transform duration-500 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-[130%]">
+        <div className={`${BUBBLE_TEXT} relative whitespace-nowrap text-center font-medium text-white transition-transform duration-500 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-[130%]`}>
           {lines}
         </div>
-        <div className="font-urbanist absolute inset-0 translate-y-[130%] whitespace-nowrap text-center text-[24px] font-medium leading-none text-white transition-transform duration-500 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0">
+        <div className={`${BUBBLE_TEXT} absolute inset-0 translate-y-[130%] whitespace-nowrap text-center font-medium text-white transition-transform duration-500 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0`}>
           {lines}
         </div>
       </div>
@@ -145,7 +151,10 @@ export default function Footer({ compact = false }) {
 
   // shared cal.com widget — floats across a section boundary
   const calWidget = (top) => (
-    <div className="cal-bridge absolute left-1/2 z-30 h-[489px] w-[1040px] -translate-x-1/2" style={{ top }}>
+    <div
+      className="cal-bridge absolute left-1/2 z-30 h-(--footer-cal-h) w-full max-w-[1040px] -translate-x-1/2 gutter lg:px-0"
+      style={{ top }}
+    >
       <div className="h-full w-full overflow-hidden rounded-[8px] bg-[#101010]">
         {calVisible && (
           <Cal
@@ -161,20 +170,21 @@ export default function Footer({ compact = false }) {
 
   // shared bottom section — dark-red gradient + "Let's Work Together" content
   const bottomSection = (
-    <section className="relative w-full" style={{ height: BOTTOM_H }} data-section="bottom">
-      {/* blurred gradient backdrop — image 63, h 1130, 8px black strip at the very bottom */}
-      <div className="absolute left-0 top-0 h-[1130px] w-full blur-[22.95px]">
+    <section className="relative w-full" style={{ height: "var(--footer-bottom-h)" }} data-section="bottom">
+      {/* blurred gradient backdrop — image 63; desktop leaves an 8px black strip
+          at the very bottom, the mobile frame runs it to the edge */}
+      <div className="absolute left-0 top-0 w-full blur-[22.95px] max-lg:h-(--footer-bottom-h) lg:h-[1130px]">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <img alt="" className="absolute left-[-0.94%] top-[-5.18%] h-[102.93%] w-[100.94%] max-w-none" src={imgImage63} />
         </div>
       </div>
 
       {/* footer content — anchored to the bottom, 1440 wide, centered */}
-      <div className="absolute bottom-0 left-1/2 flex w-[1440px] -translate-x-1/2 flex-col items-start gap-[10px] px-[20px]">
-        <div className="relative flex w-full shrink-0 flex-col items-center pt-[100px]">
-          <div className="relative flex w-full shrink-0 items-start justify-between">
+      <div className="absolute bottom-0 left-1/2 flex w-full max-w-[1440px] -translate-x-1/2 flex-col items-start gap-[10px] gutter max-lg:bottom-[62px]">
+        <div className="relative flex w-full shrink-0 flex-col items-center pt-[100px] max-lg:pt-0">
+          <div className="relative flex w-full shrink-0 items-start justify-between max-lg:flex-col max-lg:gap-[56px]">
             {/* left column */}
-            <div className="relative flex w-[320px] shrink-0 flex-col items-start gap-[48px]">
+            <div className="relative flex shrink-0 flex-col items-start gap-[48px] max-lg:w-full lg:w-[320px]">
               <div className="relative flex w-full shrink-0 flex-col items-start gap-[24px]">
                 <div className="footer-fade font-urbanist relative w-full shrink-0 text-[32px] font-bold text-white [word-break:break-word]">
                   <p className="mb-0 leading-[40px]">Let’s</p>
@@ -204,11 +214,11 @@ export default function Footer({ compact = false }) {
               </div>
             </div>
             {/* right column */}
-            <div className="relative flex w-[800.403px] shrink-0 flex-col items-end gap-[100px]">
-              <div className="footer-fade relative h-[243px] w-[260.204px] shrink-0">
+            <div className="relative flex shrink-0 flex-col items-end gap-[100px] max-lg:w-full max-lg:gap-[43.68px] lg:w-[800.403px]">
+              <div className="footer-fade relative shrink-0 max-lg:h-[106.14px] max-lg:w-[113.65px] lg:h-[243px] lg:w-[260.204px]">
                 <img alt="r." className="absolute inset-0 block size-full max-w-none" src={imgGroup47} />
               </div>
-              <div className="footer-fade relative h-[367.998px] w-[800px] shrink-0">
+              <div className="footer-fade relative w-full shrink-0 max-lg:aspect-[800/368] lg:h-[367.998px] lg:w-[800px]">
                 <img alt="RAHAT HASAN" className="absolute inset-0 block size-full max-w-none" src={imgRahatHasan} />
               </div>
             </div>
@@ -230,7 +240,7 @@ export default function Footer({ compact = false }) {
   // ===================== COMPACT (About page) =====================
   if (compact) {
     return (
-      <div ref={containerRef} className="relative bg-[#12110d]" style={{ height: COMPACT_BODY_H + RIGHTS_H }} data-name="Footer">
+      <div ref={containerRef} className="relative bg-[#12110d]" style={{ height: `calc(${COMPACT_BODY_H} + ${RIGHTS_H}px)` }} data-name="Footer">
         {/* black bridge space — the cal widget's upper half lives here */}
         <div style={{ height: COMPACT_TOP_SPACE }} />
         {bottomSection}
@@ -258,9 +268,14 @@ export default function Footer({ compact = false }) {
 
   // ===================== FULL (homepage) =====================
   return (
-    <div ref={containerRef} className="relative bg-[#12110d]" style={{ height: FOOTER_H + RIGHTS_H }} data-name="Footer">
+    <div
+      ref={containerRef}
+      className="relative bg-[#12110d]"
+      style={{ height: `calc(var(--footer-h) + ${RIGHTS_H}px)` }}
+      data-name="Footer"
+    >
       {/* ===== TOP SECTION: Building Better Experiences (independent, black) ===== */}
-      <section className="footer-top relative w-full" style={{ height: TOP_H }} data-section="top">
+      <section className="footer-top relative w-full" style={{ height: "var(--footer-top-h)" }} data-section="top">
         {/* mouse-reactive hex background */}
         <HexGrid />
       </section>
@@ -273,8 +288,12 @@ export default function Footer({ compact = false }) {
 
       {/* ===== GRID LINES: full page grid, crisp CSS so the rails stay visible all
           the way down (the Figma SVG faded its dashed lines out toward the bottom).
-          solid outer 0/1440, dashed 360/720/1080 — matches the Hero grid ===== */}
-      <div className="pointer-events-none absolute left-1/2 top-0 z-10 w-[1440px] -translate-x-1/2" style={{ height: FOOTER_H }}>
+          Desktop: solid outer 0/1440 + dashed 360/720/1080 — matches the Hero grid.
+          The mobile frames carry no rails. ===== */}
+      <div
+        className="pointer-events-none absolute left-1/2 top-0 z-10 w-[1440px] -translate-x-1/2 max-lg:hidden"
+        style={{ height: "var(--footer-h)" }}
+      >
         <span className="absolute inset-y-0 left-0 w-px bg-white/40" />
         <span className="absolute inset-y-0 w-px" style={{ left: 360, ...dashGrad(0.2) }} />
         <span className="absolute inset-y-0 w-px" style={{ left: 720, ...dashGrad(0.1) }} />
@@ -283,30 +302,43 @@ export default function Footer({ compact = false }) {
       </div>
 
       {/* ===== TOP CONTENT: heading + expertise grid + description ===== */}
-      <div className="absolute left-1/2 top-[200px] z-20 flex w-[1400px] -translate-x-1/2 flex-col items-center">
-        <div className="relative flex w-full shrink-0 items-start justify-between">
-          <p className="footer-fade font-serif-display relative w-[455px] shrink-0 text-[72px] not-italic leading-[72px] tracking-[2.88px] text-white [word-break:break-word]">
-            Building Better Experiences
+      <div className="absolute left-1/2 top-[200px] z-20 flex w-full max-w-[1400px] -translate-x-1/2 flex-col items-center gutter max-lg:top-[48px] lg:px-0">
+        <div className="relative flex w-full shrink-0 items-start justify-between max-lg:flex-col max-lg:gap-[48px]">
+          {/* desktop wraps naturally in its 455px column; the mobile frame
+              (623:611) breaks it explicitly onto three 40px lines */}
+          <p className="footer-fade font-serif-display text-h2 relative shrink-0 not-italic tracking-[2.88px] text-white max-lg:w-full max-lg:text-[32px] max-lg:leading-[40px] max-lg:tracking-[1.28px] lg:w-[455px] [word-break:break-word]">
+            <span className="max-lg:block">Building </span>
+            <span className="max-lg:block">Better </span>
+            <span className="max-lg:block">Experiences</span>
           </p>
-          <div className="relative flex w-[864px] shrink-0 flex-col items-start gap-[40px]">
-            <div className="skills-grid relative flex w-full shrink-0 flex-col items-start">
-              <div className="relative flex w-full shrink-0 flex-wrap content-center items-center gap-0">
-                {ROW_A.map((label, i) => (
-                  <Bubble key={i} label={label} />
-                ))}
-              </div>
-              <div className="relative flex h-[69px] w-full shrink-0 items-center">
-                {ROW_B.map((label, i) => (
-                  <Bubble key={i} label={label} size="h-full" showPills={false} />
-                ))}
-              </div>
-              <div className="relative flex w-full shrink-0 items-center">
-                {ROW_C.map((label, i) => (
-                  <Bubble key={i} label={label} />
-                ))}
+          <div className="relative flex shrink-0 flex-col items-start gap-[40px] max-lg:w-full max-lg:gap-[31px] lg:w-[864px]">
+            {/* on mobile every row is wider than the phone (576–739 at 96px
+                tiles), so the whole grid rides in one swipeable strip */}
+            <div className="relative w-full shrink-0 no-scrollbar max-lg:-mx-[20px] max-lg:w-[calc(100%+40px)] max-lg:overflow-x-auto max-lg:px-[20px]">
+              <div className="skills-grid relative flex shrink-0 flex-col items-start max-lg:w-max max-lg:gap-[8px] lg:w-full">
+                <div className="relative flex shrink-0 items-center">
+                  {ROW_A1.map((label, i) => (
+                    <Bubble key={i} label={label} />
+                  ))}
+                </div>
+                <div className="relative flex shrink-0 items-center">
+                  {ROW_A2.map((label, i) => (
+                    <Bubble key={i} label={label} />
+                  ))}
+                </div>
+                <div className="relative flex h-[69px] shrink-0 items-center max-lg:h-[61px]">
+                  {ROW_B.map((label, i) => (
+                    <Bubble key={i} label={label} size="h-full" radius="rounded-[40px]" showPills={false} />
+                  ))}
+                </div>
+                <div className="relative flex shrink-0 items-center">
+                  {ROW_C.map((label, i) => (
+                    <Bubble key={i} label={label} />
+                  ))}
+                </div>
               </div>
             </div>
-            <p className="footer-fade font-jakarta relative w-full shrink-0 text-[20px] font-medium leading-[24px] tracking-[0.8px] text-grey [word-break:break-word]">
+            <p className="footer-fade font-jakarta relative w-full shrink-0 text-[20px] font-medium leading-[24px] tracking-[0.8px] text-grey max-lg:text-[16px] max-lg:tracking-[0.64px] [word-break:break-word]">
               {"I believe UX is not about making interfaces look better. It's about helping people achieve their goals with less effort, less confusion, and greater confidence. Every project is an opportunity to understand human behavior, challenge assumptions, and create meaningful product experiences."}
             </p>
           </div>
@@ -314,7 +346,7 @@ export default function Footer({ compact = false }) {
       </div>
 
       {/* ===== CAL.COM WIDGET: floating bridge across the section boundary ===== */}
-      {calWidget(CAL_TOP)}
+      {calWidget("var(--footer-cal-top)")}
     </div>
   );
 }

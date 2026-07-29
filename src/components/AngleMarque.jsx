@@ -20,6 +20,7 @@ const imgRectangle33 = "/assets/3a153bdae32318c674896aafac82bf3f43f4beae.png";
 const imgLines = "/assets/85b87272f248dfb176bc9e8a787e0d23664737e5.svg";
 
 const FIELD_H = 1937;
+const M_SECTION_H = 630; // Figma mobile frame 623:574
 
 // x/y/w/h straight from the Figma frame (1728 × 1937); speed = parallax factor
 const IMAGES = [
@@ -42,31 +43,87 @@ const IMAGES = [
   { src: imgRectangle33, x: 864, y: 1271, w: 410, h: 303, speed: 1.25 },
 ];
 
+// mobile field — Figma 623:602 + 623:594, laid out on the 390 frame (the same
+// artwork at ⅓ scale, re-scattered around the quote). x may be negative: the
+// field is 592 wide and bleeds past both edges.
+const M_IMAGES = [
+  { src: imgRectangle27, x: -101, y: 31, w: 55, h: 78, speed: 1.0 },
+  { src: imgRectangle35, x: 416, y: 31, w: 54, h: 78, speed: 1.1 },
+  { src: imgRectangle28, x: -101, y: 130, w: 55, h: 92, speed: 1.25 },
+  { src: imgRectangle36, x: 417, y: 143, w: 54, h: 92, speed: 0.95 },
+  { src: imgRectangle29, x: -101, y: 269, w: 55, h: 93, speed: 1.05 },
+  { src: imgRectangle37, x: 436, y: 269, w: 55, h: 93, speed: 1.3 },
+  { src: imgRectangle30, x: 17, y: 200, w: 69, h: 93, speed: 1.15 },
+  { src: imgRectangle32, x: 283, y: 57, w: 69, h: 95, speed: 0.9 },
+  { src: imgRectangle34, x: 153, y: 96, w: 69, h: 93, speed: 1.2 },
+  { src: imgRectangle34, x: 71, y: 460, w: 70, h: 93, speed: 1.0 },
+  { src: imgRectangle34, x: -95, y: 507, w: 69, h: 93, speed: 1.15 },
+  { src: imgRectangle34, x: 373, y: 466, w: 69, h: 94, speed: 1.05 },
+  { src: imgRectangle38, x: 338, y: 303, w: 69, h: 94, speed: 0.95 },
+  { src: imgRectangle31, x: -2, y: 65, w: 109, h: 81, speed: 1.2 },
+  { src: imgRectangle31, x: -80, y: 397, w: 109, h: 79, speed: 0.9 },
+  { src: imgRectangle33, x: 185, y: 427, w: 136, h: 99, speed: 1.25 },
+];
+const M_DRIFT = 90; // ± travel of a speed-1.0 image across the section
+
 export default function AngleMarque() {
   const sectionRef = useRef(null);
 
   useGSAP(
     () => {
-      const travel = () => FIELD_H - window.innerHeight;
+      const mm = gsap.matchMedia();
 
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top top",
-          end: () => `+=${FIELD_H}`,
-          pin: true,
-          scrub: 1,
-          invalidateOnRefresh: true,
-        },
+      // desktop only: pin the quote and stream the image field past it
+      mm.add("(min-width: 1024px)", () => {
+        const travel = () => FIELD_H - window.innerHeight;
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top top",
+            end: () => `+=${FIELD_H}`,
+            pin: true,
+            scrub: 1,
+            invalidateOnRefresh: true,
+          },
+        });
+
+        // quote stays fixed while every image travels up past it,
+        // each at its own speed — gregorcollienne.com hero behaviour
+        gsap.utils.toArray(".marque-img").forEach((el) => {
+          const speed = parseFloat(el.dataset.speed);
+          tl.to(el, { y: () => -travel() * speed, ease: "none" }, 0);
+        });
+        tl.to(".marque-lines", { y: () => -travel(), ease: "none" }, 0);
       });
 
-      // quote stays fixed while every image travels up past it,
-      // each at its own speed — gregorcollienne.com hero behaviour
-      gsap.utils.toArray(".marque-img").forEach((el) => {
-        const speed = parseFloat(el.dataset.speed);
-        tl.to(el, { y: () => -travel() * speed, ease: "none" }, 0);
+      /* mobile: nothing is pinned (the field is shorter than the viewport, so
+         there is nothing to stream past a pinned quote). Instead the same
+         per-image speeds drift the field against natural scroll, so the shots
+         still slide over the quote at different rates. */
+      mm.add("(max-width: 1023px)", () => {
+        gsap.from(".marque-quote", {
+          opacity: 0,
+          y: 32,
+          duration: 0.9,
+          ease: "power3.out",
+          scrollTrigger: { trigger: sectionRef.current, start: "top 78%" },
+        });
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: 1,
+            invalidateOnRefresh: true,
+          },
+        });
+        gsap.utils.toArray(".marque-img-m").forEach((el) => {
+          const speed = parseFloat(el.dataset.speed);
+          tl.fromTo(el, { y: M_DRIFT * speed }, { y: -M_DRIFT * speed, ease: "none" }, 0);
+        });
       });
-      tl.to(".marque-lines", { y: () => -travel(), ease: "none" }, 0);
     },
     { scope: sectionRef }
   );
@@ -74,11 +131,14 @@ export default function AngleMarque() {
   return (
     <section
       ref={sectionRef}
-      className="relative h-screen overflow-hidden border-t border-solid border-[#f16767] bg-[#ffe6e6]"
+      className="relative overflow-hidden border-t border-solid border-[#f16767] bg-[#ffe6e6] max-lg:h-[630px] lg:h-screen"
       data-name="Angle marque"
     >
-      {/* scrolling image field */}
-      <div className="absolute left-1/2 top-0 z-20 h-(--field-h) w-[1728px] -translate-x-1/2" style={{ "--field-h": `${FIELD_H}px` }}>
+      {/* scrolling image field — desktop */}
+      <div
+        className="absolute left-1/2 top-0 z-20 h-(--field-h) w-[1728px] -translate-x-1/2 max-lg:hidden"
+        style={{ "--field-h": `${FIELD_H}px` }}
+      >
         <div className="marque-lines absolute left-1/2 top-[-2px] h-[1938px] w-[1440px] -translate-x-1/2">
           <img alt="" className="absolute inset-0 block size-full max-w-none" src={imgLines} />
         </div>
@@ -94,12 +154,29 @@ export default function AngleMarque() {
         ))}
       </div>
 
-      {/* pinned quote */}
-      <div className="absolute left-1/2 top-1/2 z-10 flex w-[781px] -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-[22px] text-center [word-break:break-word]">
-        <p className="font-serif-display text-ink relative w-full shrink-0 text-[72px] not-italic leading-[72px] tracking-[2.88px]">
+      {/* scrolling image field — mobile (drifts, over the quote, as on desktop) */}
+      <div
+        className="pointer-events-none absolute left-1/2 top-0 z-20 h-(--m-section-h) w-[390px] -translate-x-1/2 lg:hidden"
+        style={{ "--m-section-h": `${M_SECTION_H}px` }}
+      >
+        {M_IMAGES.map((img, i) => (
+          <div
+            key={i}
+            className="marque-img-m absolute"
+            data-speed={img.speed}
+            style={{ left: img.x, top: img.y, width: img.w, height: img.h }}
+          >
+            <img alt="" className="absolute inset-0 size-full max-w-none object-cover" src={img.src} />
+          </div>
+        ))}
+      </div>
+
+      {/* the quote — pinned on desktop, dead-centre of the 630px band on mobile */}
+      <div className="marque-quote absolute left-1/2 top-1/2 z-10 mx-auto flex w-full max-w-[781px] -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-[22px] text-center gutter [word-break:break-word] max-lg:max-w-[323px] max-lg:gap-[16px] lg:px-0">
+        <p className="font-serif-display text-ink text-h2 relative w-full shrink-0 not-italic tracking-[2.88px] max-lg:text-[32px] max-lg:leading-[40px] max-lg:tracking-[1.28px]">
           Be an amateur, that’s all any of us are: We didn’t live long enough to be anything else.
         </p>
-        <p className="font-jakarta relative w-full shrink-0 text-[20px] font-medium leading-[24px] tracking-[0.8px] text-grey">
+        <p className="font-jakarta relative w-full shrink-0 text-[20px] font-medium leading-[24px] tracking-[0.8px] text-grey max-lg:text-[12px] max-lg:leading-[20px] max-lg:tracking-[0.48px]">
           -Sir Charles Spencer Chaplin
         </p>
       </div>
