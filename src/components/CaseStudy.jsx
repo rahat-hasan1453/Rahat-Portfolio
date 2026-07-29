@@ -14,16 +14,17 @@ const imgVector1 = "/assets/d6b9f02c4491ac4a2168656adfefa6ca940f6b7d.svg";
 const imgLines = "/assets/08c740b47b066a09ddc1385b453b9a2d1b0875a9.svg"; // same grid as the Hero
 
 const CARDS = [
-  { img: imgRectangle8, title: "RiQS Praxis Monitor/ Web Application", tags: ["UX Audit", "Improve UX", "User Journey"] },
-  { img: imgRectangle14, title: "RiQS Praxis Monitor/ Web Application", tags: ["Revamp Design", "Improve UX", "Fine tune User Journey"] },
-  { img: imgRectangle6, title: "RiQS Praxis Monitor/ Web Application", tags: ["Revamp Design", "Improve UX", "Fine tune User Journey"], crop: true },
-  { img: imgRectangle15, title: "RiQS Praxis Monitor/ Web Application", tags: ["Revamp Design", "Improve UX", "Fine tune User Journey"] },
+  { slug: "riqs-praxis-monitor", img: imgRectangle8, title: "RiQS Praxis Monitor/ Web Application", tags: ["UX Audit", "Improve UX", "User Journey"] },
+  { slug: "fittrack-pro", img: imgRectangle14, title: "RiQS Praxis Monitor/ Web Application", tags: ["Revamp Design", "Improve UX", "Fine tune User Journey"] },
+  { slug: "nutriguide", img: imgRectangle6, title: "RiQS Praxis Monitor/ Web Application", tags: ["Revamp Design", "Improve UX", "Fine tune User Journey"], crop: true },
+  { slug: "sleepsync", img: imgRectangle15, title: "RiQS Praxis Monitor/ Web Application", tags: ["Revamp Design", "Improve UX", "Fine tune User Journey"] },
 ];
 
-/* layout constants (px) — feed both the JSX and the scroll maths */
-const GUTTER = 144; // where the vertical rail lines sit
-const INSET = 20; // gap between a rail line and the content (like the hero)
-const EDGE = GUTTER + INSET; // 164 — the content area starts/ends here
+/* layout constants (px) — feed both the JSX and the scroll maths.
+   Content lives inside the centred 1440 grid box (same box the rail lines are
+   drawn on) and keeps a 20px gap from the rails, exactly like the hero. */
+const BOX_W = 1440; // the centred grid box the rails sit on
+const INSET = 20; // gap between a rail line and the content
 const CARD_W = 720;
 const IMG_H = 405; // 720 × 9/16 = perfect 16:9
 const GAP = 32;
@@ -55,8 +56,18 @@ function TagDivider() {
 }
 
 function HCard({ data }) {
+  const open = () => {
+    window.location.hash = `case-study/${data.slug}`;
+  };
   return (
-    <div className="hcard relative flex shrink-0 flex-col gap-[16px]" style={{ width: CARD_W, willChange: "transform" }}>
+    <div
+      role="link"
+      tabIndex={0}
+      onClick={open}
+      onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), open())}
+      className="hcard group/card relative flex shrink-0 cursor-pointer flex-col gap-[16px]"
+      style={{ width: CARD_W, willChange: "transform" }}
+    >
       <div className="relative w-full shrink-0 overflow-hidden rounded-[8px]" style={{ height: IMG_H }}>
         {data.crop ? (
           <img alt="" className="pointer-events-none absolute left-0 top-[-8%] h-[121%] w-full max-w-none" src={data.img} />
@@ -106,6 +117,7 @@ function HCard({ data }) {
 export default function CaseStudy() {
   const sectionRef = useRef(null);
   const stageRef = useRef(null);
+  const boxRef = useRef(null);
   const headlineRef = useRef(null);
   const trackRef = useRef(null);
   const indentRef = useRef(null);
@@ -114,17 +126,18 @@ export default function CaseStudy() {
   useGSAP(
     () => {
       const stage = stageRef.current;
+      const box = boxRef.current;
       const headline = headlineRef.current;
       const track = trackRef.current;
 
       // FLIP — offsetLeft/Top/Width/Height are transform-independent, so the
       // centred+large intro is recomputed correctly on every refresh/resize.
-      const introX = () => stage.offsetWidth / 2 - (headline.offsetWidth * INTRO_SCALE) / 2 - headline.offsetLeft;
-      const introY = () => stage.offsetHeight / 2 - (headline.offsetHeight * INTRO_SCALE) / 2 - headline.offsetTop;
+      // Measured against the 1440 box (the headline's offsetParent).
+      const introX = () => box.offsetWidth / 2 - (headline.offsetWidth * INTRO_SCALE) / 2 - headline.offsetLeft;
+      const introY = () => box.offsetHeight / 2 - (headline.offsetHeight * INTRO_SCALE) / 2 - headline.offsetTop;
 
-      // rail travels only inside the content area (between the inset lines).
-      // use the stage width (excludes the scrollbar) so it matches the clip box.
-      const areaW = () => stage.offsetWidth - EDGE * 2;
+      // rail travels only inside the content area (between the inset lines)
+      const areaW = () => box.offsetWidth - INSET * 2;
       const startX = () => areaW(); // track parked just past the right line
       const endX = () => -(track.scrollWidth - areaW()); // last card's right edge → right line
 
@@ -200,8 +213,11 @@ export default function CaseStudy() {
           <img alt="" className="absolute inset-0 block size-full max-w-none" src={imgLines} />
         </div>
 
+        {/* centred 1440 box — the same box the rails are drawn on, so content
+            keeps a true 20px gap from the lines at every viewport width */}
+        <div ref={boxRef} className="absolute left-1/2 top-0 h-full -translate-x-1/2" style={{ width: BOX_W }}>
         {/* headline — driven by the timeline (NOT position: sticky) */}
-        <div ref={headlineRef} className="absolute z-20" style={{ left: EDGE, top: HEADLINE_TOP, willChange: "transform" }}>
+        <div ref={headlineRef} className="absolute z-20" style={{ left: INSET, top: HEADLINE_TOP, willChange: "transform" }}>
           <div className="font-serif-display flex flex-col items-start not-italic tracking-[2.88px] text-[72px] leading-[76px] text-white [word-break:break-word]">
             <p className="whitespace-nowrap">
               <span>{"A "}</span>
@@ -216,12 +232,13 @@ export default function CaseStudy() {
         </div>
 
         {/* content-area clip — nothing crosses the inset lines */}
-        <div className="absolute z-10 overflow-hidden" style={{ left: EDGE, right: EDGE, top: TRACK_TOP, bottom: 0 }}>
+        <div className="absolute z-10 overflow-hidden" style={{ left: INSET, right: INSET, top: TRACK_TOP, bottom: 0 }}>
           <div ref={trackRef} className="absolute left-0 top-0 flex" style={{ gap: GAP, willChange: "transform" }}>
             {CARDS.map((card, i) => (
               <HCard key={i} data={card} />
             ))}
           </div>
+        </div>
         </div>
       </div>
     </section>

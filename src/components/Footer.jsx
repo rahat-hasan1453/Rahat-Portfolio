@@ -41,7 +41,7 @@ const SOCIAL_LINKS = [
   { label: "behance", href: "https://www.behance.net/rahat1453" },
   { label: "dribbble", href: "https://dribbble.com/R1453" },
 ];
-const RESUME_URL = "https://drive.google.com/drive/u/1/folders/1hKz5hsgXcRb_BI7GzRs6LpTlTkAFoWGz";
+const RESUME_URL = "https://drive.google.com/file/d/1BXxqhJTWyF4Av9leQ9pD_2DPEHKQCh1c/view?usp=sharing";
 
 const ROW_A = [
   "Product\nStrategy", null, "UX Audit", null, "Web\nApplication", null,
@@ -236,19 +236,19 @@ export default function Footer({ compact = false }) {
         {bottomSection}
         {rightsBar}
 
-        {/* side rails — continue the page's grid rails (solid outer / dashed inner)
-            down to the gradient boundary so they meet it seamlessly */}
+        {/* grid lines — the page's inner rails (188 / 1250) bridge down to the
+            gradient, then the full footer grid (0/360/720/1080/1440) runs the
+            rest of the way, matching the homepage footer */}
         <div className="pointer-events-none absolute left-1/2 top-0 z-10 w-[1440px] -translate-x-1/2" style={{ height: COMPACT_TOP_SPACE }}>
-          <span className="absolute top-0 h-full w-px bg-white/40" style={{ left: 0 }} />
-          <span
-            className="absolute top-0 h-full w-px"
-            style={{ left: 188, backgroundImage: "linear-gradient(to bottom, rgba(255,255,255,0.2) 0 10px, transparent 10px 20px)", backgroundSize: "1px 20px" }}
-          />
-          <span
-            className="absolute top-0 h-full w-px"
-            style={{ left: 1250, backgroundImage: "linear-gradient(to bottom, rgba(255,255,255,0.2) 0 10px, transparent 10px 20px)", backgroundSize: "1px 20px" }}
-          />
-          <span className="absolute top-0 h-full w-px bg-white/40" style={{ left: 1439 }} />
+          <span className="absolute top-0 h-full w-px" style={{ left: 188, ...dashGrad(0.2) }} />
+          <span className="absolute top-0 h-full w-px" style={{ left: 1250, ...dashGrad(0.2) }} />
+        </div>
+        <div className="pointer-events-none absolute left-1/2 top-0 z-10 w-[1440px] -translate-x-1/2" style={{ height: COMPACT_BODY_H }}>
+          <span className="absolute inset-y-0 left-0 w-px bg-white/40" />
+          <span className="absolute inset-y-0 w-px" style={{ left: 360, ...dashGrad(0.2) }} />
+          <span className="absolute inset-y-0 w-px" style={{ left: 720, ...dashGrad(0.1) }} />
+          <span className="absolute inset-y-0 w-px" style={{ left: 1080, ...dashGrad(0.2) }} />
+          <span className="absolute inset-y-0 right-0 w-px bg-white/40" />
         </div>
 
         {calWidget(COMPACT_CAL_TOP)}

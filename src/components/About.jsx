@@ -26,7 +26,11 @@ function TickerSet() {
   return (
     <div className="flex shrink-0 items-center gap-[17.687px] pr-[17.687px]">
       {TICKER_IMAGES.map((img, i) => (
-        <div key={i} className="relative h-(--h) w-[221.085px] shrink-0 rounded-[17.687px] opacity-40" style={{ "--h": `${img.h}px` }}>
+        <div
+          key={i}
+          className="relative h-(--h) w-[221.085px] shrink-0 rounded-[17.687px] opacity-40 transition-opacity duration-500 hover:opacity-100"
+          style={{ "--h": `${img.h}px` }}
+        >
           {img.cover ? (
             <img alt="" className="pointer-events-none absolute inset-0 size-full max-w-none rounded-[17.687px] object-cover" src={img.src} />
           ) : (

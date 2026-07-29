@@ -7,8 +7,10 @@ import { useEffect, useRef } from "react";
 // very tall sections (e.g. Case Study at ~5600px) cost one screen of
 // pixels instead of a full-height buffer.
 const HEX = "0123456789ABCDEF";
-const CELL_W = 66;
-const CELL_H = 26;
+// a 6-digit code at 13px monospace measures ~47px, so these cells sit the
+// codes shoulder-to-shoulder both across and down (no visible gutters)
+const CELL_W = 50;
+const CELL_H = 15;
 const RADIUS = 280;
 
 // real 6-digit color hex codes (e.g. FFFFFF, 000000, FF0000)
@@ -73,8 +75,8 @@ export default function HexGrid() {
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
           const i = r * cols + c;
-          const x = c * CELL_W + 14;
-          const y = r * CELL_H + 18;
+          const x = c * CELL_W + 2;
+          const y = r * CELL_H + 11;
           const d = Math.hypot(x - mouse.x, y - mouse.y);
           if (d >= RADIUS) continue; // cells only light up near the cursor
           const t = 1 - d / RADIUS;

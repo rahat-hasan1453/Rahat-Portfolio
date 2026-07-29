@@ -81,6 +81,14 @@ const DASH = {
   backgroundSize: "1px 20px",
 };
 
+/* the horizontal counterpart — identical 10 on / 10 off rhythm, so the band
+   edges read as the same dashed line as the vertical rails */
+const DASH_X = {
+  backgroundImage: "linear-gradient(to right, rgba(255,255,255,0.2) 0 10px, transparent 10px 20px)",
+  backgroundSize: "20px 1px",
+  backgroundRepeat: "repeat-x",
+};
+
 /* ---- word-by-word reveal: splits text; gsap animates .w-word on enter ---- */
 function Words({ text, className = "" }) {
   return (
@@ -109,13 +117,10 @@ function Label({ children }) {
 /* ---- highlight band: gradient title + hairline + serif body (Figma 596:684) ---- */
 function Band({ title, children }) {
   return (
-    <div
-      className="reveal-up mx-auto w-[1060px] bg-white/[0.05]"
-      style={{
-        borderTop: "0.5px dashed rgba(255,255,255,0.2)",
-        borderBottom: "0.5px dashed rgba(255,255,255,0.2)",
-      }}
-    >
+    <div className="reveal-up relative mx-auto w-[1060px] bg-white/[0.05]">
+      {/* dashed top/bottom edges — same 10-on/10-off rhythm as the rails */}
+      <span className="pointer-events-none absolute inset-x-0 top-0 h-px" style={DASH_X} />
+      <span className="pointer-events-none absolute inset-x-0 bottom-0 h-px" style={DASH_X} />
       <div className="flex flex-col gap-[24px] px-[140px] py-[40px]">
         <div className="flex flex-col gap-[19px]">
           <p className="accent-gradient-text font-serif-display text-[28px] not-italic leading-[32px] tracking-[1.12px]">{title}</p>

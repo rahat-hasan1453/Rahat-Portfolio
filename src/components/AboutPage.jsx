@@ -57,6 +57,10 @@ const PROCESS = [
   { label: "Feedbacks &\nHandoff", left: 524 },
 ];
 
+/* one colour per connector — the arrow paints, then hands its colour to the
+   step it points at, so the staircase reads as a story */
+const ARROW_COLORS = ["#f16767", "#f5b544", "#4fd18b", "#5aa9f6"];
+
 /* dashed elbow connectors between the pills (Figma 423:3578) —
    drop from under pill i, then run right into pill i+1 with an arrowhead */
 const CONNECTORS = PROCESS.slice(0, -1).map((step, i) => {
@@ -74,7 +78,7 @@ const EXPERIENCE = [
   { role: "UX Engineer", meta: ["Full time", "Hybrid", "Zurich, Switzerland"], company: "Selise Digital Platform", url: "https://selisegroup.com", period: "Aug’25 - Present" },
   { role: "Associate UX Designer", meta: ["Full time", "Onsite", "Dhaka, Bangladesh"], company: "Project 2morrow Software Ltd.", url: "https://project2morrow.com", period: "May’24 - Aug’25" },
   { role: "UI Designer", meta: ["Full time", "Remote", "Toronto, Canada"], company: "Techplato.inc", url: "https://techplato.com", period: "Sep’23 - May’24" },
-  { role: "Jr. UI & Graphic Designer", meta: ["Full time", "Onsite", "Dhaka, Bangladesh"], company: "Techplato.inc", url: "https://techplato.com", period: "Jul ’22 - Sep’23" },
+  { role: "Jr. UI & Graphic Designer", meta: ["Full time", "Onsite", "Dhaka, Bangladesh"], company: "Unisoft Business Solution Ltd.", url: "https://techplato.com", period: "Jul ’22 - Sep’23" },
 ];
 
 /* hero marquee set — full Figma card sizes (node 546:5743) */
@@ -217,25 +221,38 @@ export default function AboutPage() {
         scrollTrigger: { trigger: ".stack-grid", start: "top 82%" },
       });
 
-      // process pills cascade
+      // process pills cascade in first — the steps exist before the story runs
       gsap.fromTo(".process-pill", { opacity: 0, x: -24 }, {
-        opacity: 1, x: 0, duration: 0.55, ease: "power3.out", stagger: 0.1,
+        opacity: 1, x: 0, duration: 0.5, ease: "power3.out", stagger: 0.07,
         scrollTrigger: { trigger: ".process-flow", start: "top 80%" },
       });
 
-      // dashed connectors draw in behind the pill cascade (Figma 423:3578)
-      gsap.utils.toArray(".proc-mask-path").forEach((p, i) => {
+      // ── the story: arrow 1 travels Discovery call → Userflow, and Userflow
+      //    takes that arrow's colour; then arrow 2 sets off, Wireframe takes
+      //    its colour… on down to Feedbacks & Handoff ──
+      const maskPaths = gsap.utils.toArray(".proc-mask-path");
+      const arrowHeads = gsap.utils.toArray(".proc-arrow");
+      const pills = gsap.utils.toArray(".process-pill");
+
+      maskPaths.forEach((p) => {
         const len = p.getTotalLength();
         gsap.set(p, { strokeDasharray: len, strokeDashoffset: len });
-        gsap.to(p, {
-          strokeDashoffset: 0, duration: 0.6, ease: "power1.inOut", delay: 0.3 + i * 0.12,
-          scrollTrigger: { trigger: ".process-flow", start: "top 80%" },
-        });
       });
-      gsap.fromTo(".proc-arrow", { opacity: 0 }, {
-        opacity: 1, duration: 0.3, stagger: 0.12, delay: 0.8,
+
+      const story = gsap.timeline({
+        delay: 0.45, // let the pills land first
         scrollTrigger: { trigger: ".process-flow", start: "top 80%" },
       });
+      maskPaths.forEach((p, i) => {
+        const color = ARROW_COLORS[i % ARROW_COLORS.length];
+        story
+          .to(p, { strokeDashoffset: 0, duration: 0.55, ease: "power1.inOut" })
+          .to(arrowHeads[i], { opacity: 1, duration: 0.18 }, ">-0.12")
+          // the step this arrow points at adopts its colour
+          .to(pills[i + 1], { borderColor: color, duration: 0.35, ease: "power2.out" }, "<")
+          .to(pills[i + 1], { boxShadow: `0 0 18px -4px ${color}`, duration: 0.35, ease: "power2.out" }, "<");
+      });
+
       // marching dashes, forever
       gsap.to(".proc-dash", { strokeDashoffset: -18, duration: 1.4, ease: "none", repeat: -1 });
 
@@ -366,11 +383,26 @@ export default function AboutPage() {
               </defs>
               {CONNECTORS.map((c, i) => (
                 <g key={i} mask={`url(#proc-mask-${i})`}>
-                  <path className="proc-dash" d={c.d} stroke="rgba(255,255,255,0.7)" strokeWidth="1" fill="none" strokeDasharray="4 5" />
+                  <path
+                    className="proc-dash"
+                    d={c.d}
+                    stroke={ARROW_COLORS[i % ARROW_COLORS.length]}
+                    strokeWidth="1.2"
+                    fill="none"
+                    strokeDasharray="4 5"
+                  />
                 </g>
               ))}
               {CONNECTORS.map((c, i) => (
-                <polyline key={i} className="proc-arrow" points={c.arrow} stroke="rgba(255,255,255,0.7)" strokeWidth="1" fill="none" />
+                <polyline
+                  key={i}
+                  className="proc-arrow"
+                  points={c.arrow}
+                  stroke={ARROW_COLORS[i % ARROW_COLORS.length]}
+                  strokeWidth="1.2"
+                  fill="none"
+                  opacity="0"
+                />
               ))}
             </svg>
             {PROCESS.map((step, i) => (

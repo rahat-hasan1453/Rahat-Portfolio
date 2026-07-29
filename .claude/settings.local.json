@@ -72,7 +72,10 @@
       "Bash(curl -sL -o canvas.png \"https://www.figma.com/api/mcp/asset/e7e25522-41ca-488b-bf77-136b0e8e1422\")",
       "Bash(curl -sL -o cs-hero-new.png \"https://www.figma.com/api/mcp/asset/f0f2eebd-80f0-4740-8f92-2390dc205801\")",
       "mcp__c6ddfed8-4e83-4c2b-aa7e-ddd8365b6445__download_assets",
-      "Bash(curl -sL -o about-full.png \"https://www.figma.com/api/mcp/asset/fafee346-a19f-474a-a01d-c684919c7df9\")"
+      "Bash(curl -sL -o about-full.png \"https://www.figma.com/api/mcp/asset/fafee346-a19f-474a-a01d-c684919c7df9\")",
+      "Bash(cp \"/Users/rahat/Documents/Frame 1261157874.svg\" tool-figma.svg)",
+      "Bash(cp \"/Users/rahat/Documents/Frame 1261157876.svg\" tool-framer.svg)",
+      "Bash(npx vite *)"
     ]
   }
 }

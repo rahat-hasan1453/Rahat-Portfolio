@@ -21,7 +21,7 @@ const imgBehance = "/assets/9d82d42f529b8d410122178c2f87af95a07946d8.png";
 const imgDribbble = "/assets/ecbf82107b5177abac6ac42ec522b4f9517ae736.png";
 const imgFacebook = "/assets/b20ff74680c1777cd637c251a1599cdb8723494f.png";
 const imgLinkedin = "/assets/linkedin-badge.svg";
-const RESUME_URL = "https://drive.google.com/drive/u/1/folders/1hKz5hsgXcRb_BI7GzRs6LpTlTkAFoWGz";
+const RESUME_URL = "https://drive.google.com/file/d/1BXxqhJTWyF4Av9leQ9pD_2DPEHKQCh1c/view?usp=sharing";
 
 // quantumflux.framer.ai-style expo-out ease
 const easeShuttle = [0.22, 1, 0.36, 1];
@@ -60,6 +60,21 @@ function DashedBorder({ radius = 4 }) {
         style={{ width: "calc(100% - 1px)", height: "calc(100% - 1px)" }}
       />
     </svg>
+  );
+}
+
+// nav link: a "/" slides in from the left on hover ( "/My Story" )
+const NAV_LINK =
+  "group/nav font-jakarta relative shrink-0 cursor-pointer whitespace-nowrap text-[20px] font-medium leading-[24px] tracking-[0.8px] text-[#f0ebdb] transition-colors duration-300 [word-break:break-word] hover:text-[#f16767]";
+
+function Slash() {
+  return (
+    <span
+      aria-hidden="true"
+      className="inline-block w-0 -translate-x-[6px] overflow-hidden opacity-0 transition-all duration-300 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] group-hover/nav:w-[0.62em] group-hover/nav:translate-x-0 group-hover/nav:opacity-100"
+    >
+      /
+    </span>
   );
 }
 
@@ -143,16 +158,22 @@ function TickerSet() {
 }
 
 function Brand() {
+  const goHome = () => {
+    window.location.hash = "";
+    setTimeout(() => window.__lenis?.scrollTo(0, { immediate: true }), 50);
+  };
   return (
-    <div className="relative flex shrink-0 items-center gap-[8px]">
-      {/* logo badge — hover shuttles the r. glyph out the top, back in from below; click goes home */}
-      <div
-        onClick={() => {
-          window.location.hash = "";
-          setTimeout(() => window.__lenis?.scrollTo(0, { immediate: true }), 50);
-        }}
-        className="group relative size-[36px] shrink-0 cursor-pointer overflow-hidden rounded-[8px]"
-      >
+    // the whole brand block (badge + wordmark) is the "home" hit area
+    <div
+      role="link"
+      tabIndex={0}
+      aria-label="Go to homepage"
+      onClick={goHome}
+      onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), goHome())}
+      className="group relative flex shrink-0 cursor-pointer items-center gap-[8px]"
+    >
+      {/* logo badge — hover shuttles the r. glyph out the top, back in from below */}
+      <div className="relative size-[36px] shrink-0 overflow-hidden rounded-[8px]">
         <div className="absolute inset-0 rounded-[8px] bg-gradient-to-l from-[#f16767] to-[red] backdrop-blur-[21.7px]" />
         <div className="absolute inset-[22%_20.11%_23%_21%] transition-transform duration-500 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-[250%]">
           <img alt="r." className="absolute inset-0 block size-full max-w-none" src={imgR} />
@@ -276,7 +297,9 @@ export default function Menu() {
         {/* main box — height shuttles between pill (56) and full panel */}
         <motion.div
           initial={false}
-          animate={{ height: open ? "auto" : PILL_H }}
+          animate={{ height: open ? "auto" : PILL_H, scale: 1 }}
+          /* hovering the closed pill swells the whole menu block to 1.1× */
+          whileHover={open ? undefined : { scale: 1.1 }}
           transition={boxTransition}
           className="relative w-full overflow-clip rounded-[16px] bg-[#2C2A26]"
         >
@@ -360,9 +383,10 @@ export default function Menu() {
                     window.location.hash = "about";
                     setOpen(false);
                   }}
-                  className="font-jakarta relative shrink-0 cursor-pointer whitespace-nowrap text-[20px] font-medium leading-[24px] tracking-[0.8px] text-[#f0ebdb] transition-colors duration-300 [word-break:break-word] hover:text-[#f16767]"
+                  className={NAV_LINK}
                 >
-                  About
+                  <Slash />
+                  My Story
                 </motion.button>
                 <motion.button
                   variants={rise}
@@ -370,8 +394,9 @@ export default function Menu() {
                   type="button"
                   tabIndex={open ? 0 : -1}
                   onClick={openCaseStudies}
-                  className="font-jakarta relative shrink-0 cursor-pointer whitespace-nowrap text-[20px] font-medium leading-[24px] tracking-[0.8px] text-[#f0ebdb] transition-colors duration-300 [word-break:break-word] hover:text-[#f16767]"
+                  className={NAV_LINK}
                 >
+                  <Slash />
                   Case Studies
                 </motion.button>
                 <motion.a
@@ -381,14 +406,15 @@ export default function Menu() {
                   target="_blank"
                   rel="noreferrer noopener"
                   tabIndex={open ? 0 : -1}
-                  className="group/resume relative flex shrink-0 cursor-pointer items-start gap-[8px]"
+                  className="group/nav relative flex shrink-0 cursor-pointer items-start gap-[8px]"
                 >
-                  <p className="font-jakarta relative shrink-0 whitespace-nowrap text-[20px] font-medium leading-[24px] tracking-[0.8px] text-[#f0ebdb] transition-colors duration-300 [word-break:break-word] group-hover/resume:text-[#f16767]">
+                  <p className="font-jakarta relative shrink-0 whitespace-nowrap text-[20px] font-medium leading-[24px] tracking-[0.8px] text-[#f0ebdb] transition-colors duration-300 [word-break:break-word] group-hover/nav:text-[#f16767]">
+                    <Slash />
                     Resume
                   </p>
                   <span
                     aria-hidden="true"
-                    className="relative block size-[24px] shrink-0 bg-[#f0ebdb] transition-[background-color,transform] duration-300 group-hover/resume:translate-y-[2px] group-hover/resume:bg-[#f16767]"
+                    className="relative block size-[24px] shrink-0 bg-[#f0ebdb] transition-[background-color,transform] duration-300 group-hover/nav:translate-y-[2px] group-hover/nav:bg-[#f16767]"
                     style={{
                       maskImage: `url("${imgDownload}")`,
                       WebkitMaskImage: `url("${imgDownload}")`,
