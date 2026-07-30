@@ -69,17 +69,22 @@
   --footer-top-h: 1200px;
   --footer-bottom-h: 1138px;
   --footer-cal-top: 937px;
+  /* Booking widget: Cal's inline booker on desktop, the card that opens Cal in
+     a modal on mobile (Figma 642:2113 — 350 × 422). */
   --footer-cal-h: 489px;
   --footer-compact-space: 340px;
   --footer-compact-cal-top: 77px;
 }
 @media (max-width: 1023px) {
   :root {
-    --footer-h: 2525px; /* 1531 black + 994 gradient */
-    --footer-top-h: 1531px; /* skills band 860 + footer black band 671 */
+    --footer-h: 2263px; /* 1269 black + 994 gradient */
+    /* The widget bridges the two bands: Figma has it crossing onto the gradient
+       by 41px, so the black band ends 41px above the card's bottom edge
+       (888 + 422 − 41). Change the card height and this follows it. */
+    --footer-top-h: 1269px;
     --footer-bottom-h: 994px;
-    --footer-cal-top: 888px; /* 860 + 28 */
-    --footer-cal-h: 684px;
+    --footer-cal-top: 888px; /* skills band 860 + 28 */
+    --footer-cal-h: 422px;
     --footer-compact-space: 300px;
     --footer-compact-cal-top: 60px;
   }

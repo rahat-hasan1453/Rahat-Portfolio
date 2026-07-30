@@ -3,6 +3,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import HexGrid from "./HexGrid.jsx";
+import usePressHold from "../hooks/usePressHold.js";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -22,23 +23,32 @@ const TICKER_IMAGES = [
   { src: imgRectangle4, h: 282.989, cover: true },
 ];
 
+// hover lifts a frame to full opacity; on touch a press-and-hold does the same
+function TickerFrame({ img }) {
+  const { held, bind } = usePressHold();
+  return (
+    <div
+      {...bind}
+      data-held={held || undefined}
+      className="relative h-(--h) w-[221.085px] shrink-0 rounded-[17.687px] opacity-40 transition-opacity duration-500 hover:opacity-100 data-[held=true]:opacity-100"
+      style={{ "--h": `${img.h}px` }}
+    >
+      {img.cover ? (
+        <img alt="" className="pointer-events-none absolute inset-0 size-full max-w-none rounded-[17.687px] object-cover" src={img.src} />
+      ) : (
+        <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[17.687px]">
+          <img alt="" className="absolute left-[-126.26%] top-[-0.02%] h-full w-[227.43%] max-w-none" src={img.src} />
+        </div>
+      )}
+    </div>
+  );
+}
+
 function TickerSet() {
   return (
     <div className="flex shrink-0 items-center gap-[17.687px] pr-[17.687px]">
       {TICKER_IMAGES.map((img, i) => (
-        <div
-          key={i}
-          className="relative h-(--h) w-[221.085px] shrink-0 rounded-[17.687px] opacity-40 transition-opacity duration-500 hover:opacity-100"
-          style={{ "--h": `${img.h}px` }}
-        >
-          {img.cover ? (
-            <img alt="" className="pointer-events-none absolute inset-0 size-full max-w-none rounded-[17.687px] object-cover" src={img.src} />
-          ) : (
-            <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[17.687px]">
-              <img alt="" className="absolute left-[-126.26%] top-[-0.02%] h-full w-[227.43%] max-w-none" src={img.src} />
-            </div>
-          )}
-        </div>
+        <TickerFrame key={i} img={img} />
       ))}
     </div>
   );

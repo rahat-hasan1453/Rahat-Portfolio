@@ -5,10 +5,12 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import HexGrid from "./HexGrid.jsx";
 import { getPills, CardPills } from "./SkillsGrid.jsx";
+import usePressHold from "../hooks/usePressHold.js";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 const imgImage63 = "/assets/95b86c277de98cb05b6c2d8499641f05aee027aa.png";
+const imgAvatar = "/assets/3bc4ade8f1fdaf67a5e466972e77f4465f7121f1.png";
 const imgDownload = "/assets/efb7f30e6bdeee9d2b528673382bc912677dab80.svg";
 const imgGroup47 = "/assets/189b07984ec2f3ac75a3c8f86a1240f9d77295b1.svg";
 const imgRahatHasan = "/assets/17120c46c73350f30424215b16a49e925eb37ac8.svg";
@@ -17,9 +19,13 @@ const imgRahatHasan = "/assets/17120c46c73350f30424215b16a49e925eb37ac8.svg";
 // source of truth:
 //   desktop — Figma 270:2457 (1728 × 2338): black 0–1200, gradient 1200–2338,
 //     cal 1040 × 489 at top 937 → crosses the boundary by 226px
-//   mobile  — Figma 623:603 + 624:809 (390 frame): black 0–1531 (skills band
-//     860 + 671), gradient 1531–2525, cal 350 × 684 at top 888 → crosses by 41px
+//   mobile  — Figma 623:603 + 624:809 + 642:2113 (390 frame): black 0–1269
+//     (skills band 860 + 409), gradient 1269–2263, booking card 350 × 422 at
+//     top 888 → crosses the boundary by 41px
 const RIGHTS_H = 44; // all-rights-reserved bar below the design frame
+const CAL_LINK = "rahat-akash-4sxje8/15min";
+const CAL_NS = "15min";
+const CAL_CONFIG = { layout: "month_view", theme: "dark" };
 
 // compact mode (About page): no "Building Better Experiences" section — just a
 // black bridge space, the cal widget crossing into the gradient, then the footer.
@@ -51,6 +57,15 @@ const ROW_A2 = [null, "Mobile\nApp", null, "Design\nSystem", null, "Saas\nProduc
 const ROW_B = ["Storytelling", "OOUX", "Collaboration", "Minimalism", "Empathy", "Adaptability"];
 const ROW_C = ["Problem\nSolving", null, "Cognitive\nPsychology", null, "Information\nArchitecture", null];
 
+// mobile ticker: each row drifts on its own heading and pace, so the grid reads
+// as floating rather than marching in step. dir -1 = leftward, +1 = rightward.
+const ROW_DRIFT = [
+  { dir: -1, duration: 26 },
+  { dir: 1, duration: 34 },
+  { dir: -1, duration: 21 },
+  { dir: 1, duration: 30 },
+];
+
 // Original bubble — UNCHANGED look/layout. Only addition: on hover it reveals
 // its 3 helper pills, released from the card center and shown IN FRONT.
 // showPills=false for the dense small-tile row (pills would crowd it).
@@ -60,7 +75,9 @@ const BUBBLE_TEXT =
   "font-urbanist text-[24px] leading-none max-lg:font-jakarta max-lg:text-[16px] max-lg:leading-[24px] max-lg:tracking-[0.64px]";
 
 function Bubble({ label, size = "size-[144px] max-lg:size-[96px]", radius = "rounded-[40px] max-lg:rounded-[28px]", showPills = true }) {
-  const [active, setActive] = useState(false);
+  const [hover, setHover] = useState(false);
+  const { held, bind } = usePressHold();
+  const active = hover || held;
   const pills = label && showPills ? getPills(label) : [];
 
   const lines = (label || "UX Audit").split("\n").map((line, i) => (
@@ -68,16 +85,19 @@ function Bubble({ label, size = "size-[144px] max-lg:size-[96px]", radius = "rou
   ));
   return (
     <div
-      onMouseEnter={() => setActive(true)}
-      onMouseLeave={() => setActive(false)}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      {...bind}
+      data-held={held || undefined}
       className={`footer-reveal group relative flex shrink-0 items-center justify-center border border-solid border-[#131313] bg-[#1c1c1c] px-[16px] py-[10px] ${radius} ${label ? "cursor-pointer" : ""} ${active ? "z-30" : ""} ${size}`}
     >
-      {/* hover shuttles the label out the top, back in from below */}
+      {/* hover (or press-and-hold on touch) shuttles the label out the top,
+          back in from below */}
       <div className={`relative shrink-0 overflow-hidden ${label ? "" : "opacity-0"}`}>
-        <div className={`${BUBBLE_TEXT} relative whitespace-nowrap text-center font-medium text-white transition-transform duration-500 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-[130%]`}>
+        <div className={`${BUBBLE_TEXT} relative whitespace-nowrap text-center font-medium text-white transition-transform duration-500 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-[130%] group-data-[held=true]:-translate-y-[130%]`}>
           {lines}
         </div>
-        <div className={`${BUBBLE_TEXT} absolute inset-0 translate-y-[130%] whitespace-nowrap text-center font-medium text-white transition-transform duration-500 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0`}>
+        <div className={`${BUBBLE_TEXT} absolute inset-0 translate-y-[130%] whitespace-nowrap text-center font-medium text-white transition-transform duration-500 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0 group-data-[held=true]:translate-y-0`}>
           {lines}
         </div>
       </div>
@@ -87,27 +107,159 @@ function Bubble({ label, size = "size-[144px] max-lg:size-[96px]", radius = "rou
   );
 }
 
+/* One bubble row. On mobile the contents are doubled (the copy is hidden on
+   desktop, so the desktop row stays exactly 6 × 144) and the whole row is slid
+   by half its width, which loops seamlessly. */
+function BubbleRow({ labels, index, className = "", bubble = {} }) {
+  const row = labels.map((label, i) => <Bubble key={i} label={label} {...bubble} />);
+  return (
+    <div
+      className={`bubble-row relative flex shrink-0 items-center ${className}`}
+      data-dir={ROW_DRIFT[index].dir}
+      data-duration={ROW_DRIFT[index].duration}
+      style={{ willChange: "transform" }}
+    >
+      <div className={`flex shrink-0 items-center ${className}`}>{row}</div>
+      <div aria-hidden className={`flex shrink-0 items-center lg:hidden ${className}`}>
+        {labels.map((label, i) => (
+          <Bubble key={`dup-${i}`} label={label} {...bubble} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ── Mobile booking card (Figma 642:2113, 350 × 422) ──────────────────────
+   The full Cal embed is desktop-only: dropping its three-column booker into a
+   390px column made the page feel like it had handed itself over to Cal. On
+   mobile this card stands in — the same event summary, drawn natively, so no
+   iframe loads at all until "Book a Call" is tapped and Cal opens its own
+   modal over the page. */
+const ICON = "pointer-events-none block size-[20px] shrink-0 stroke-white/60";
+
+const IconClock = () => (
+  <svg className={ICON} viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 7v5l3 2" />
+  </svg>
+);
+const IconVideo = () => (
+  <svg className={ICON} viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <rect x="2" y="6" width="13" height="12" rx="2" />
+    <path d="M15 11l6-3.5v9L15 13z" />
+  </svg>
+);
+const IconGlobe = () => (
+  <svg className={ICON} viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M3 12h18M12 3c2.5 2.7 2.5 15.3 0 18-2.5-2.7-2.5-15.3 0-18z" />
+  </svg>
+);
+// ic:round-calendar-month, straight off the Figma frame
+const IconCalendar = () => (
+  <svg className="pointer-events-none block size-[24px] shrink-0" viewBox="0 0 24 24" fill="white" aria-hidden>
+    <path d="M17 2c-.55 0-1 .45-1 1v1H8V3c0-.55-.45-1-1-1s-1 .45-1 1v1H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-1V3c0-.55-.45-1-1-1Zm2 18H5V10h14v10Zm-8-7a1 1 0 1 1 2 0 1 1 0 0 1-2 0Zm-4 0a1 1 0 1 1 2 0 1 1 0 0 1-2 0Zm8 0a1 1 0 1 1 2 0 1 1 0 0 1-2 0Zm-4 4a1 1 0 1 1 2 0 1 1 0 0 1-2 0Zm-4 0a1 1 0 1 1 2 0 1 1 0 0 1-2 0Zm8 0a1 1 0 1 1 2 0 1 1 0 0 1-2 0Z" />
+  </svg>
+);
+
+function MetaRow({ icon, children }) {
+  return (
+    <div className="flex shrink-0 items-center gap-[8px]">
+      {icon}
+      <p className="font-jakarta relative shrink-0 whitespace-nowrap text-[16px] font-medium leading-[24px] tracking-[0.64px] text-white/85 [word-break:break-word]">
+        {children}
+      </p>
+    </div>
+  );
+}
+
+function BookingCard() {
+  // Cal shows the visitor their own zone, so read it rather than hardcoding
+  const [zone, setZone] = useState("");
+  useEffect(() => {
+    try {
+      setZone(Intl.DateTimeFormat().resolvedOptions().timeZone || "");
+    } catch {
+      /* leave the row off if the browser will not say */
+    }
+  }, []);
+
+  /* #181818 is Cal's own panel fill — it lifts off the #12110d footer by the
+     same hair the design does, which is all that makes the 16px radius read */
+  return (
+    <div className="relative flex h-full w-full flex-col items-start rounded-[16px] bg-[#181818] px-[32px] pb-[22px] pt-[32px]">
+      <div className="relative size-[36px] shrink-0 overflow-hidden rounded-full">
+        <img alt="" className="absolute inset-0 size-full max-w-none object-cover" src={imgAvatar} />
+      </div>
+      <p className="font-jakarta relative mt-[16px] shrink-0 text-[14px] font-medium leading-[16px] text-grey [word-break:break-word]">
+        Rahat Akash
+      </p>
+      <p className="font-jakarta relative mt-[8px] shrink-0 text-[24px] font-semibold leading-[32px] text-white [word-break:break-word]">
+        15 min meeting
+      </p>
+      <div className="relative mt-[20px] flex shrink-0 flex-col items-start gap-[26px]">
+        <MetaRow icon={<IconClock />}>15m</MetaRow>
+        <MetaRow icon={<IconVideo />}>Cal Video</MetaRow>
+        {zone && <MetaRow icon={<IconGlobe />}>{zone}</MetaRow>}
+      </div>
+
+      {/* Cal's embed script wires any [data-cal-link] element to its modal */}
+      <button
+        type="button"
+        data-cal-namespace={CAL_NS}
+        data-cal-link={CAL_LINK}
+        data-cal-config={JSON.stringify(CAL_CONFIG)}
+        className="accent-gradient relative mx-auto mt-auto flex shrink-0 cursor-pointer items-center gap-[8px] rounded-[35px] px-[16px] py-[12px] transition-transform duration-300 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.04] active:scale-[0.97]"
+      >
+        <IconCalendar />
+        <span className="font-jakarta relative shrink-0 whitespace-nowrap text-center text-[16px] font-medium leading-[24px] tracking-[0.64px] text-white [word-break:break-word]">
+          Book a Call
+        </span>
+      </button>
+    </div>
+  );
+}
+
 function SocialPill({ children, href }) {
+  const { held, bind } = usePressHold();
   const cls =
-    "footer-reveal relative flex h-[40px] shrink-0 cursor-pointer items-center justify-center gap-[4px] rounded-[40px] border border-solid border-[rgba(105,105,105,0.2)] bg-[rgba(255,255,255,0.2)] px-[16px] py-[10px] transition-all duration-300 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[3px] hover:bg-[rgba(255,255,255,0.32)]";
+    "footer-reveal relative flex h-[40px] shrink-0 cursor-pointer items-center justify-center gap-[4px] rounded-[40px] border border-solid border-[rgba(105,105,105,0.2)] bg-[rgba(255,255,255,0.2)] px-[16px] py-[10px] transition-all duration-300 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[3px] hover:bg-[rgba(255,255,255,0.32)] data-[held=true]:-translate-y-[3px] data-[held=true]:bg-[rgba(255,255,255,0.32)]";
+  const shared = { className: cls, "data-held": held || undefined, ...bind };
   if (href) {
     return (
-      <a href={href} target="_blank" rel="noreferrer noopener" className={cls}>
+      <a href={href} target="_blank" rel="noreferrer noopener" {...shared}>
         {children}
       </a>
     );
   }
-  return <div className={cls}>{children}</div>;
+  return <div {...shared}>{children}</div>;
 }
 
 export default function Footer({ compact = false }) {
   const containerRef = useRef(null);
   const [calVisible, setCalVisible] = useState(false);
+  /* The inline embed is desktop-only, and "desktop-only" has to be a JS check:
+     hiding it with a CSS class would still mount it and pull the iframe down
+     on phones, which is exactly the weight the booking card exists to avoid.
+     compact mode is the About page, which is still a fixed 1440 desktop layout
+     at every viewport — the mobile card would be the odd one out there. */
+  const [isNarrow, setIsNarrow] = useState(() => window.matchMedia("(max-width: 1023px)").matches);
 
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 1023px)");
+    const sync = () => setIsNarrow(mq.matches);
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  const useBookingCard = isNarrow && !compact;
+
+  // Loading the API arms the modal that [data-cal-link] opens; it does NOT
+  // create an iframe, so the mobile card stays free until it is tapped.
   useEffect(() => {
     if (!calVisible) return;
     (async () => {
-      const cal = await getCalApi({ namespace: "15min" });
+      const cal = await getCalApi({ namespace: CAL_NS });
       cal("ui", { theme: "dark", hideEventTypeDetails: false, layout: "month_view" });
     })();
   }, [calVisible]);
@@ -139,6 +291,23 @@ export default function Footer({ compact = false }) {
         );
       }
 
+      /* mobile only: every bubble row runs as its own ticker. Rows are doubled
+         in the markup, so sliding one full copy width loops seamlessly. */
+      if (!compact) {
+        const mm = gsap.matchMedia();
+        mm.add("(max-width: 1023px)", () => {
+          gsap.utils.toArray(".bubble-row").forEach((row) => {
+            const dir = parseFloat(row.dataset.dir);
+            const duration = parseFloat(row.dataset.duration);
+            gsap.fromTo(
+              row,
+              { xPercent: dir < 0 ? 0 : -50 },
+              { xPercent: dir < 0 ? -50 : 0, ease: "none", duration, repeat: -1 }
+            );
+          });
+        });
+      }
+
       ScrollTrigger.create({
         trigger: ".cal-bridge",
         start: "top 80%",
@@ -149,22 +318,28 @@ export default function Footer({ compact = false }) {
     { scope: containerRef }
   );
 
-  // shared cal.com widget — floats across a section boundary
+  /* shared booking widget — floats across the section boundary. Desktop gets
+     Cal's inline three-column booker; mobile gets the card that opens Cal in a
+     modal instead (Figma 642:2113). */
   const calWidget = (top) => (
     <div
       className="cal-bridge absolute left-1/2 z-30 h-(--footer-cal-h) w-full max-w-[1040px] -translate-x-1/2 gutter lg:px-0"
       style={{ top }}
     >
-      <div className="h-full w-full overflow-hidden rounded-[8px] bg-[#101010]">
-        {calVisible && (
-          <Cal
-            namespace="15min"
-            calLink="rahat-akash-4sxje8/15min"
-            style={{ width: "100%", height: "100%", overflow: "auto" }}
-            config={{ layout: "month_view", theme: "dark" }}
-          />
-        )}
-      </div>
+      {useBookingCard ? (
+        <BookingCard />
+      ) : (
+        <div className="h-full w-full overflow-hidden rounded-[8px] bg-[#101010]">
+          {calVisible && (
+            <Cal
+              namespace={CAL_NS}
+              calLink={CAL_LINK}
+              style={{ width: "100%", height: "100%", overflow: "auto" }}
+              config={CAL_CONFIG}
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 
@@ -313,29 +488,15 @@ export default function Footer({ compact = false }) {
           </p>
           <div className="relative flex shrink-0 flex-col items-start gap-[40px] max-lg:w-full max-lg:gap-[31px] lg:w-[864px]">
             {/* on mobile every row is wider than the phone (576–739 at 96px
-                tiles), so the whole grid rides in one swipeable strip */}
-            <div className="relative w-full shrink-0 no-scrollbar max-lg:-mx-[20px] max-lg:w-[calc(100%+40px)] max-lg:overflow-x-auto max-lg:px-[20px]">
-              <div className="skills-grid relative flex shrink-0 flex-col items-start max-lg:w-max max-lg:gap-[8px] lg:w-full">
-                <div className="relative flex shrink-0 items-center">
-                  {ROW_A1.map((label, i) => (
-                    <Bubble key={i} label={label} />
-                  ))}
-                </div>
-                <div className="relative flex shrink-0 items-center">
-                  {ROW_A2.map((label, i) => (
-                    <Bubble key={i} label={label} />
-                  ))}
-                </div>
-                <div className="relative flex h-[69px] shrink-0 items-center max-lg:h-[61px]">
-                  {ROW_B.map((label, i) => (
-                    <Bubble key={i} label={label} size="h-full" radius="rounded-[40px]" showPills={false} />
-                  ))}
-                </div>
-                <div className="relative flex shrink-0 items-center">
-                  {ROW_C.map((label, i) => (
-                    <Bubble key={i} label={label} />
-                  ))}
-                </div>
+                tiles), so each row drifts as its own ticker inside a full-bleed
+                strip. overflow-x:clip (not hidden) keeps the y axis visible so a
+                held bubble's helper pills can still escape above and below. */}
+            <div className="relative w-full shrink-0 max-lg:-mx-[20px] max-lg:w-[calc(100%+40px)] max-lg:[overflow-x:clip] max-lg:[overflow-y:visible] max-lg:px-[20px]">
+              <div className="skills-grid relative flex shrink-0 flex-col items-start max-lg:w-full max-lg:gap-[8px] lg:w-full">
+                <BubbleRow labels={ROW_A1} index={0} />
+                <BubbleRow labels={ROW_A2} index={1} />
+                <BubbleRow labels={ROW_B} index={2} className="h-[69px] max-lg:h-[61px]" bubble={{ size: "h-full", radius: "rounded-[40px]", showPills: false }} />
+                <BubbleRow labels={ROW_C} index={3} />
               </div>
             </div>
             <p className="footer-fade font-jakarta relative w-full shrink-0 text-[20px] font-medium leading-[24px] tracking-[0.8px] text-grey max-lg:text-[16px] max-lg:tracking-[0.64px] [word-break:break-word]">

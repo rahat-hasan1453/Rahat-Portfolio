@@ -20,7 +20,7 @@ const imgRectangle33 = "/assets/3a153bdae32318c674896aafac82bf3f43f4beae.png";
 const imgLines = "/assets/85b87272f248dfb176bc9e8a787e0d23664737e5.svg";
 
 const FIELD_H = 1937;
-const M_SECTION_H = 630; // Figma mobile frame 623:574
+const M_FIELD_H = 630; // Figma mobile frame 623:574 — the field's own box
 
 // x/y/w/h straight from the Figma frame (1728 × 1937); speed = parallax factor
 const IMAGES = [
@@ -131,7 +131,7 @@ export default function AngleMarque() {
   return (
     <section
       ref={sectionRef}
-      className="relative overflow-hidden border-t border-solid border-[#f16767] bg-[#ffe6e6] max-lg:h-[630px] lg:h-screen"
+      className="relative overflow-hidden border-t border-solid border-[#f16767] bg-[#ffe6e6] max-lg:h-[100svh] max-lg:min-h-[630px] lg:h-screen"
       data-name="Angle marque"
     >
       {/* scrolling image field — desktop */}
@@ -154,10 +154,12 @@ export default function AngleMarque() {
         ))}
       </div>
 
-      {/* scrolling image field — mobile (drifts, over the quote, as on desktop) */}
+      {/* scrolling image field — mobile (drifts, over the quote, as on desktop).
+          The 630px Figma field is centred in the now full-height band so the
+          quote keeps sitting in the same hole between the shots. */}
       <div
-        className="pointer-events-none absolute left-1/2 top-0 z-20 h-(--m-section-h) w-[390px] -translate-x-1/2 lg:hidden"
-        style={{ "--m-section-h": `${M_SECTION_H}px` }}
+        className="pointer-events-none absolute left-1/2 top-1/2 z-20 h-(--m-field-h) w-[390px] -translate-x-1/2 -translate-y-1/2 lg:hidden"
+        style={{ "--m-field-h": `${M_FIELD_H}px` }}
       >
         {M_IMAGES.map((img, i) => (
           <div

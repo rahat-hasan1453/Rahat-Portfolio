@@ -12,7 +12,10 @@ import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 
 const EASE = [0.16, 1, 0.3, 1];
 const PANELS = 5; // vertical reveal columns
-const FONT_PX = 120; // counter font-size (drives the reel's per-digit height)
+// counter font-size — also the reel's per-digit height, so the roll maths reads
+// it rather than assuming one value
+const FONT_PX = 120;
+const FONT_PX_MOBILE = 64;
 
 // duration = time on screen before the reveal; hold = pause after; wordStep/
 // wordDur pace the quote; exitStagger/exitDur pace the panel reveal. The page
@@ -87,11 +90,21 @@ const dashFade = {
 /* rolling %-counter — a 0..100 strip inside a one-line window; the strip
    scrolls upward as the value climbs, so each number rises in from the bottom. */
 function NumberReel({ mv }) {
-  const y = useTransform(mv, (v) => -v * FONT_PX);
+  // mobile drops to 64px and sits centred on the bottom edge instead of in the
+  // corner, so the reel's per-digit step has to follow the size
+  const [fontPx, setFontPx] = useState(() => (window.matchMedia("(max-width: 1023px)").matches ? FONT_PX_MOBILE : FONT_PX));
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 1023px)");
+    const sync = () => setFontPx(mq.matches ? FONT_PX_MOBILE : FONT_PX);
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  const y = useTransform(mv, (v) => -v * fontPx);
   return (
     <div
-      className="font-serif-display absolute bottom-[40px] right-[40px] flex items-end tracking-[2.24px] [font-variant-numeric:tabular-nums]"
-      style={{ fontSize: FONT_PX, lineHeight: 1 }}
+      className="font-serif-display absolute bottom-[40px] right-[40px] flex items-end tracking-[2.24px] [font-variant-numeric:tabular-nums] max-lg:left-1/2 max-lg:right-auto max-lg:-translate-x-1/2 max-lg:tracking-[1.2px]"
+      style={{ fontSize: fontPx, lineHeight: 1 }}
     >
       <span className="relative block overflow-hidden" style={{ height: "1em", width: "1.72em" }}>
         <motion.span className="absolute right-0 top-0 flex flex-col items-end" style={{ y }}>

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import usePressHold from "../hooks/usePressHold.js";
 
 const imgR = "/assets/cbb187227f4bec065dffe6c01f5b5bdd32d0a6d7.svg";
 const imgRahat = "/assets/5301fa311a870db099fe947753b34031bfabbe73.svg";
@@ -63,18 +64,47 @@ function DashedBorder({ radius = 4 }) {
   );
 }
 
-// nav link: a "/" slides in from the left on hover ( "/My Story" )
+// nav link: a "/" slides in from the left on hover ( "/My Story" ) — and on
+// press-and-hold, since touch screens have no hover
 const NAV_LINK =
-  "group/nav font-jakarta relative shrink-0 cursor-pointer whitespace-nowrap text-[20px] font-medium leading-[24px] tracking-[0.8px] text-[#f0ebdb] transition-colors duration-300 [word-break:break-word] hover:text-[#f16767]";
+  "group/nav font-jakarta relative shrink-0 cursor-pointer whitespace-nowrap text-[20px] font-medium leading-[24px] tracking-[0.8px] text-[#f0ebdb] transition-colors duration-300 [word-break:break-word] hover:text-[#f16767] data-[held=true]:text-[#f16767]";
 
 function Slash() {
   return (
     <span
       aria-hidden="true"
-      className="inline-block w-0 -translate-x-[6px] overflow-hidden opacity-0 transition-all duration-300 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] group-hover/nav:w-[0.62em] group-hover/nav:translate-x-0 group-hover/nav:opacity-100"
+      className="inline-block w-0 -translate-x-[6px] overflow-hidden opacity-0 transition-all duration-300 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] group-hover/nav:w-[0.62em] group-hover/nav:translate-x-0 group-hover/nav:opacity-100 group-data-[held=true]/nav:w-[0.62em] group-data-[held=true]/nav:translate-x-0 group-data-[held=true]/nav:opacity-100"
     >
       /
     </span>
+  );
+}
+
+// wraps a motion element so its hover state is also reachable by holding
+function NavHold({ as: As, className, children, ...rest }) {
+  const { held, bind } = usePressHold();
+  return (
+    <As {...rest} {...bind} data-held={held || undefined} animate={{ x: held ? 4 : 0 }} className={className}>
+      {children}
+    </As>
+  );
+}
+
+// social tile: lifts and swells on hover, same on press-and-hold
+function SocialTile({ social, tabbable }) {
+  const { held, bind } = usePressHold();
+  const shared = {
+    ...bind,
+    "data-held": held || undefined,
+    className:
+      "relative size-[40px] shrink-0 cursor-pointer overflow-clip transition-transform duration-300 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[3px] hover:scale-110 data-[held=true]:-translate-y-[3px] data-[held=true]:scale-110",
+  };
+  const img = <img alt={social.label} className="pointer-events-none absolute inset-0 size-full max-w-none object-cover" src={social.src} />;
+  if (!social.href) return <div {...shared}>{img}</div>;
+  return (
+    <a href={social.href} target="_blank" rel="noreferrer noopener" aria-label={social.label} tabIndex={tabbable ? 0 : -1} {...shared}>
+      {img}
+    </a>
   );
 }
 
@@ -158,6 +188,7 @@ function TickerSet() {
 }
 
 function Brand() {
+  const brandHold = usePressHold();
   const goHome = () => {
     window.location.hash = "";
     setTimeout(() => window.__lenis?.scrollTo(0, { immediate: true }), 50);
@@ -170,15 +201,18 @@ function Brand() {
       aria-label="Go to homepage"
       onClick={goHome}
       onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), goHome())}
+      {...brandHold.bind}
+      data-held={brandHold.held || undefined}
       className="group relative flex shrink-0 cursor-pointer items-center gap-[8px]"
     >
-      {/* logo badge — hover shuttles the r. glyph out the top, back in from below */}
+      {/* logo badge — hover (or press-and-hold) shuttles the r. glyph out the
+          top, back in from below */}
       <div className="relative size-[36px] shrink-0 overflow-hidden rounded-[8px]">
         <div className="absolute inset-0 rounded-[8px] bg-gradient-to-l from-[#f16767] to-[red] backdrop-blur-[21.7px]" />
-        <div className="absolute inset-[22%_20.11%_23%_21%] transition-transform duration-500 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-[250%]">
+        <div className="absolute inset-[22%_20.11%_23%_21%] transition-transform duration-500 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-[250%] group-data-[held=true]:-translate-y-[250%]">
           <img alt="r." className="absolute inset-0 block size-full max-w-none" src={imgR} />
         </div>
-        <div className="absolute inset-[22%_20.11%_23%_21%] translate-y-[250%] transition-transform duration-500 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0">
+        <div className="absolute inset-[22%_20.11%_23%_21%] translate-y-[250%] transition-transform duration-500 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0 group-data-[held=true]:translate-y-0">
           <img alt="" className="absolute inset-0 block size-full max-w-none" src={imgR} />
         </div>
       </div>
@@ -390,7 +424,8 @@ export default function Menu() {
 
               {/* nav links */}
               <motion.div variants={panelStagger} className="relative mt-[32px] flex flex-col items-start gap-[12px]">
-                <motion.button
+                <NavHold
+                  as={motion.button}
                   variants={rise}
                   whileHover={{ x: 4 }}
                   type="button"
@@ -403,8 +438,9 @@ export default function Menu() {
                 >
                   <Slash />
                   My Story
-                </motion.button>
-                <motion.button
+                </NavHold>
+                <NavHold
+                  as={motion.button}
                   variants={rise}
                   whileHover={{ x: 4 }}
                   type="button"
@@ -414,8 +450,9 @@ export default function Menu() {
                 >
                   <Slash />
                   Case Studies
-                </motion.button>
-                <motion.a
+                </NavHold>
+                <NavHold
+                  as={motion.a}
                   variants={rise}
                   whileHover={{ x: 4 }}
                   href={RESUME_URL}
@@ -424,13 +461,13 @@ export default function Menu() {
                   tabIndex={open ? 0 : -1}
                   className="group/nav relative flex shrink-0 cursor-pointer items-start gap-[8px]"
                 >
-                  <p className="font-jakarta relative shrink-0 whitespace-nowrap text-[20px] font-medium leading-[24px] tracking-[0.8px] text-[#f0ebdb] transition-colors duration-300 [word-break:break-word] group-hover/nav:text-[#f16767]">
+                  <p className="font-jakarta relative shrink-0 whitespace-nowrap text-[20px] font-medium leading-[24px] tracking-[0.8px] text-[#f0ebdb] transition-colors duration-300 [word-break:break-word] group-hover/nav:text-[#f16767] group-data-[held=true]/nav:text-[#f16767]">
                     <Slash />
                     Resume
                   </p>
                   <span
                     aria-hidden="true"
-                    className="relative block size-[24px] shrink-0 bg-[#f0ebdb] transition-[background-color,transform] duration-300 group-hover/nav:translate-y-[2px] group-hover/nav:bg-[#f16767]"
+                    className="relative block size-[24px] shrink-0 bg-[#f0ebdb] transition-[background-color,transform] duration-300 group-hover/nav:translate-y-[2px] group-hover/nav:bg-[#f16767] group-data-[held=true]/nav:translate-y-[2px] group-data-[held=true]/nav:bg-[#f16767]"
                     style={{
                       maskImage: `url("${imgDownload}")`,
                       WebkitMaskImage: `url("${imgDownload}")`,
@@ -440,33 +477,14 @@ export default function Menu() {
                       WebkitMaskRepeat: "no-repeat",
                     }}
                   />
-                </motion.a>
+                </NavHold>
               </motion.div>
 
               {/* socials */}
               <motion.div variants={rise} className="relative mt-[20px] flex h-[40px] w-full items-center justify-center gap-[39px]">
-                {SOCIALS.map((s) =>
-                  s.href ? (
-                    <a
-                      key={s.label}
-                      href={s.href}
-                      target="_blank"
-                      rel="noreferrer noopener"
-                      aria-label={s.label}
-                      tabIndex={open ? 0 : -1}
-                      className="relative size-[40px] shrink-0 cursor-pointer overflow-clip transition-transform duration-300 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[3px] hover:scale-110"
-                    >
-                      <img alt={s.label} className="pointer-events-none absolute inset-0 size-full max-w-none object-cover" src={s.src} />
-                    </a>
-                  ) : (
-                    <div
-                      key={s.label}
-                      className="relative size-[40px] shrink-0 cursor-pointer overflow-clip transition-transform duration-300 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[3px] hover:scale-110"
-                    >
-                      <img alt={s.label} className="pointer-events-none absolute inset-0 size-full max-w-none object-cover" src={s.src} />
-                    </div>
-                  )
-                )}
+                {SOCIALS.map((s) => (
+                  <SocialTile key={s.label} social={s} tabbable={open} />
+                ))}
               </motion.div>
             </motion.div>
           </div>

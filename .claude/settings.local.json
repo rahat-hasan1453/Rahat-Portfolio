@@ -96,7 +96,11 @@
       "Bash(perl -0pi -e 's|<LogoCard index=\\\\{\\\\d\\\\}>|<LogoCard>|g' src/components/Logos.jsx)",
       "Bash(perl -0pi -e 's|^\\(                \\)\\(<LogoCard>|</LogoCard>|<div|</div>|<p|</p>|<img|                      |                        |                    |  \\)|$1  $2|gm' src/components/Logos.jsx)",
       "Bash(awk 'NR>=70 && NR<=127 {print \" \" $0; next} {print}' src/components/Logos.jsx)",
-      "Bash(mv /tmp/logos.tmp src/components/Logos.jsx)"
+      "Bash(mv /tmp/logos.tmp src/components/Logos.jsx)",
+      "Bash(perl -0pi -e 's|\\(\\\\n                \\\\}\\\\}\\\\n                  />\\\\n                \\)</motion\\\\.a>|$1</NavHold>|s' src/components/Menu.jsx)",
+      "Bash(curl -sL -o cal-card.png \"https://www.figma.com/api/mcp/asset/b2414de7-9594-40e0-875e-fe68118761f2\")",
+      "Bash(curl -sL -o cal-icon.svg \"https://www.figma.com/api/mcp/asset/e0ad0186-25c7-4541-9a87-497dc5608a40\")",
+      "Bash(sips -g pixelWidth -g pixelHeight cal-card.png)"
     ]
   }
 }

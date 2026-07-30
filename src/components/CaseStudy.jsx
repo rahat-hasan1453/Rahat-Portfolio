@@ -32,10 +32,12 @@ const TRACK_TOP = 372;
 const HEADLINE_TOP = 96;
 const INTRO_SCALE = 1.3; // intro headline size (rest = 1)
 const SECTION_GAP = 128; // gap to the next section
-/* mobile (Figma 622:323 + 623:443): the intro headline is centred inside this
-   band, then settles into its rest slot 48px below it — same FLIP, at scale 1.
-   The band is the box's mobile padding-top (M_INTRO_BAND + 48 = 476). */
-const M_INTRO_BAND = 428;
+/* mobile: the intro headline owns a FULL viewport (100svh) on its own, centred
+   with lines 2-3 indented under "Portfolio"; scrolling on flies it to the
+   top-left rest slot M_HEADLINE_REST below the band, at scale 1. The band is
+   the box's mobile padding-top minus that rest offset, read off the live layout
+   so CSS svh and JS innerHeight can never disagree. */
+const M_HEADLINE_REST = 48;
 
 function Chip({ children, rounded = "rounded-[20px]" }) {
   return (
@@ -143,39 +145,47 @@ export default function CaseStudy() {
       const aWidth = () => portfolioRef.current.offsetLeft;
 
       /* ── below 1024: no pin and no side-scroll (side-scroll fights thumb
-            scroll), but the headline keeps the desktop FLIP — it starts centred
-            inside the 428px intro band with lines 2-3 indented under
-            "Portfolio", then settles into its top-left rest slot at scale 1.
-            Because the travel exactly cancels the page scroll, the headline
-            appears to hold still on screen while it resolves. Cards then rise
-            in one by one as they enter. */
+            scroll), but the headline keeps the desktop FLIP. It owns a full
+            viewport band: at the top of the band it sits dead-centre with lines
+            2-3 indented under "Portfolio", and over exactly one viewport of
+            scroll it drifts up-left to its 48px top-left rest slot while the
+            first card rises into frame behind it.
+
+            The band height IS the scroll distance, which is what makes the
+            travel read: on screen the headline moves at (1 − bandH/scroll) of
+            page speed, so it visibly climbs instead of scrolling away. That
+            only holds if the tween is LINEAR — any ease steeper than the
+            average rate would push it back down mid-flight. */
       mm.add("(max-width: 1023px)", () => {
         gsap.set(trackRef.current, { clearProps: "all" });
         const indent = indentRef.current;
 
         // visual block during the intro is headline + the "A " indent
+        const bandH = () => headline.offsetTop - M_HEADLINE_REST;
         const introX = () => box.offsetWidth / 2 - (headline.offsetWidth + aWidth()) / 2 - headline.offsetLeft;
-        const introY = () => M_INTRO_BAND / 2 - headline.offsetHeight / 2 - headline.offsetTop;
+        const introY = () => bandH() / 2 - headline.offsetHeight / 2 - headline.offsetTop;
 
         gsap.set(headline, { transformOrigin: "top left" });
         const flipTl = gsap.timeline({
           scrollTrigger: {
             trigger: stage,
             start: "top top",
-            end: () => "+=" + Math.abs(introY()),
-            scrub: 1,
+            end: () => "+=" + bandH(),
+            scrub: true,
             invalidateOnRefresh: true,
           },
         });
-        flipTl.fromTo(headline, { x: introX, y: introY }, { x: 0, y: 0, ease: "power3.out" }, 0);
-        flipTl.fromTo(indent, { x: aWidth }, { x: 0, ease: "power3.out" }, 0);
+        flipTl.fromTo(headline, { x: introX, y: introY }, { x: 0, y: 0, ease: "none", duration: 1 }, 0);
+        // the indent closes early, so the block is already aligned on arrival
+        flipTl.fromTo(indent, { x: aWidth }, { x: 0, ease: "power2.out", duration: 0.6 }, 0);
 
         gsap.utils.toArray(".hcard").forEach((card) => {
           gsap.from(card, {
-            opacity: 0,
-            y: 48,
-            duration: 0.8,
-            ease: "power3.out",
+            autoAlpha: 0,
+            scale: 0.8,
+            yPercent: 8,
+            duration: 0.9,
+            ease: "power2.out",
             scrollTrigger: { trigger: card, start: "top 88%" },
           });
         });
@@ -269,11 +279,11 @@ export default function CaseStudy() {
 
         {/* centred 1440 box — the same box the rails are drawn on, so content
             keeps a true 20px gap from the lines at every viewport width.
-            On mobile the 476px top padding is the intro band the headline
-            flies out of (428) plus its rest offset (48). */}
+            On mobile the top padding is the full-viewport intro band the
+            headline flies out of, plus its 48px rest offset. */}
         <div
           ref={boxRef}
-          className="mx-auto w-full max-w-[1440px] gutter max-lg:relative max-lg:pt-[476px] lg:absolute lg:left-1/2 lg:top-0 lg:h-full lg:-translate-x-1/2 lg:px-0"
+          className="mx-auto w-full max-w-[1440px] gutter max-lg:relative max-lg:pt-[calc(100svh+48px)] lg:absolute lg:left-1/2 lg:top-0 lg:h-full lg:-translate-x-1/2 lg:px-0"
         >
           {/* headline — timeline-driven FLIP on both breakpoints. w-fit on mobile
               so the FLIP measures the real text width, not the whole column. */}

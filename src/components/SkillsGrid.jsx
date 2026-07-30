@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import usePressHold from "../hooks/usePressHold.js";
 
 /* =========================================================================
    Interactive services / skills grid.
@@ -162,14 +163,18 @@ function Pill({ pill, active, index }) {
 }
 
 export function SkillsCard({ card, height = "h-[128px]" }) {
-  const [active, setActive] = useState(false);
+  const [focused, setFocused] = useState(false);
+  // touch has no hover, so a press-and-hold releases the pills instead
+  const { held, bind } = usePressHold();
+  const active = focused || held;
 
   return (
     <div
-      onMouseEnter={() => setActive(true)}
-      onMouseLeave={() => setActive(false)}
-      onFocus={() => setActive(true)}
-      onBlur={() => setActive(false)}
+      onMouseEnter={() => setFocused(true)}
+      onMouseLeave={() => setFocused(false)}
+      onFocus={() => setFocused(true)}
+      onBlur={() => setFocused(false)}
+      {...bind}
       tabIndex={0}
       className={`skills-card relative ${height} outline-none ${active ? "z-30" : "z-10"}`}
     >

@@ -5,6 +5,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import HexGrid from "./HexGrid.jsx";
 import HeroDotPortrait from "./HeroDotPortrait.jsx";
+import usePressHold from "../hooks/usePressHold.js";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -112,6 +113,7 @@ const SOCIAL_CARDS = [
 
 function SocialCardRotator() {
   const [idx, setIdx] = useState(0);
+  const { held, bind } = usePressHold();
 
   useEffect(() => {
     const id = setInterval(() => setIdx((i) => (i + 1) % SOCIAL_CARDS.length), 4000);
@@ -134,7 +136,9 @@ function SocialCardRotator() {
         role="link"
         aria-label={`Visit my ${name} profile`}
         data-name="Social Connent"
-        className="absolute left-0 top-0 h-[195.149px] w-[171.253px] cursor-pointer overflow-hidden rounded-[20px] transition-transform duration-300 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.1] max-lg:origin-top-left max-lg:scale-[0.45608] max-lg:rounded-[8.772px] max-lg:hover:scale-[0.45608]"
+        {...bind}
+        data-held={held || undefined}
+        className="absolute left-0 top-0 h-[195.149px] w-[171.253px] cursor-pointer overflow-hidden rounded-[20px] transition-transform duration-300 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.1] data-[held=true]:scale-[1.1] max-lg:origin-top-left max-lg:scale-[0.45608] max-lg:rounded-[8.772px] max-lg:hover:scale-[0.45608] max-lg:data-[held=true]:scale-[0.50169]"
       >
         <AnimatePresence initial={false}>
           <motion.div
