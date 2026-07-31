@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -49,6 +49,21 @@ const FLOATS = [
   { src: "/assets/cs-shot-21.png", x: 830, y: 60, w: 118, h: 112 },
 ];
 const ART_H = 990; // Figma artboard height the y values are designed on
+
+/* mobile hero (Figma 642:3600, 390 × 1036) — nine of the same shots, at 0.638
+   of their desktop size, re-scattered around the centred title. */
+const M_ART_H = 1036;
+const M_FLOATS = [
+  { src: "/assets/cs-shot-1.png", x: 15, y: 226, w: 99.5, h: 93.8 },
+  { src: "/assets/cs-shot-4.png", x: 256, y: 193, w: 99.5, h: 93.8 },
+  { src: "/assets/cs-shot-2.png", x: 203, y: 330, w: 75.3, h: 71.4 },
+  { src: "/assets/cs-shot-3.png", x: 104, y: 388, w: 75.3, h: 71.4 },
+  { src: "/assets/cs-shot-5.png", x: 298, y: 444, w: 102.7, h: 96.3 },
+  { src: "/assets/cs-shot-9.png", x: -10, y: 509, w: 86.1, h: 80.4 },
+  { src: "/assets/cs-shot-6.png", x: 298, y: 672, w: 75.3, h: 70.8 },
+  { src: "/assets/cs-shot-7.png", x: -7, y: 735, w: 102.7, h: 96.3 },
+  { src: "/assets/cs-shot-8.png", x: 187, y: 793, w: 102.7, h: 96.3 },
+];
 
 const CASES = [
   {
@@ -110,10 +125,10 @@ function Rails() {
 }
 
 /* ---- meta pills (reuses the connected-chip pattern) ---- */
-function Chip({ children, rounded = "rounded-[20px]", filled = true }) {
+function Chip({ children, rounded = "rounded-[20px]", filled = true, mobileSm = true }) {
   return (
     <div className={`relative flex h-[31px] shrink-0 items-center justify-center p-[10px] ${filled ? "bg-[rgba(128,128,128,0.2)]" : ""} ${rounded}`}>
-      <p className="font-jakarta relative shrink-0 whitespace-nowrap text-[16px] font-medium leading-[24px] tracking-[0.64px] text-white [word-break:break-word]">
+      <p className={`font-jakarta relative shrink-0 whitespace-nowrap text-[16px] font-medium leading-[24px] tracking-[0.64px] text-white [word-break:break-word] ${mobileSm ? "max-lg:text-[12px] max-lg:tracking-[0.48px]" : ""}`}>
         {children}
       </p>
     </div>
@@ -132,18 +147,21 @@ function TagDivider() {
   );
 }
 
+/* mobile (Figma 653:3980) reverses the stack — tags first, client/year last —
+   and left-aligns it, matching the homepage card */
 function Meta({ data }) {
   return (
-    <div className="flex shrink-0 flex-col items-end gap-[8px]">
+    <div className="flex shrink-0 flex-col items-end gap-[8px] max-lg:w-full max-lg:items-start">
       {/* logo + year */}
-      <div className="flex shrink-0 items-center gap-[20px]">
+      <div className="flex shrink-0 items-center gap-[20px] max-lg:order-3">
         <div className="relative h-[18px] w-[84px] shrink-0">
           <img alt="RiQS" className="absolute inset-0 block size-full max-w-none" src={imgLogo} />
         </div>
-        <Chip filled={false}>2025/26</Chip>
+        <Chip filled={false} mobileSm={false}>2025/26</Chip>
       </div>
-      {/* three connected tag pills */}
-      <div className="flex shrink-0 items-center">
+      {/* three connected tag pills — this page's tags run long, and the joined
+          group can't wrap without breaking the pill, so on a phone it swipes */}
+      <div className="flex shrink-0 items-center no-scrollbar max-lg:order-1 max-lg:max-w-full max-lg:overflow-x-auto">
         <Chip rounded="rounded-l-[20px]">{data.tags[0]}</Chip>
         <TagDivider />
         <Chip rounded="rounded-none">{data.tags[1]}</Chip>
@@ -151,7 +169,7 @@ function Meta({ data }) {
         <Chip rounded="rounded-r-[20px]">{data.tags[2]}</Chip>
       </div>
       {/* two category pills */}
-      <div className="flex shrink-0 items-start gap-[8px]">
+      <div className="flex shrink-0 items-start gap-[8px] max-lg:order-2">
         <Chip>{data.cats[0]}</Chip>
         <Chip>{data.cats[1]}</Chip>
       </div>
@@ -171,9 +189,10 @@ function Card({ data }) {
       tabIndex={0}
       onClick={open}
       onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), open())}
-      className="case-card flex w-full cursor-pointer flex-col gap-[14px]"
+      className="case-card flex w-full cursor-pointer flex-col gap-[14px] max-lg:gap-[20px]"
     >
-      <div className="group relative w-full overflow-hidden rounded-[8px] bg-[#1c1c1c]" style={{ height: 615 }}>
+      {/* mobile trades the tall 615 crop for the design's 350 × 216 banner */}
+      <div className="group relative w-full overflow-hidden rounded-[8px] bg-[#1c1c1c] max-lg:aspect-[350/216] max-lg:h-auto lg:h-[615px]">
         {/* parallax layer overfills the frame so the drift never reveals an edge */}
         <div className="case-parallax absolute inset-x-0 -top-[10%] h-[120%] will-change-transform">
           <img
@@ -185,8 +204,8 @@ function Card({ data }) {
         </div>
       </div>
 
-      <div className="flex w-full items-start justify-between">
-        <div className="flex w-[412px] shrink-0 flex-col items-start gap-[8px]">
+      <div className="flex w-full items-start justify-between max-lg:flex-col max-lg:gap-[16px]">
+        <div className="flex w-[412px] shrink-0 flex-col items-start gap-[8px] max-lg:w-full">
           <p className="font-serif-display text-[24px] not-italic leading-[24px] tracking-[0.96px] text-white [word-break:break-word]">
             {data.title}
           </p>
@@ -203,6 +222,14 @@ function Card({ data }) {
 export default function CaseStudies() {
   const rootRef = useRef(null);
   const heroRef = useRef(null);
+  const [isNarrow, setIsNarrow] = useState(() => window.matchMedia("(max-width: 1023px)").matches);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 1023px)");
+    const sync = () => setIsNarrow(mq.matches);
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
 
   useGSAP(
     () => {
@@ -307,27 +334,32 @@ export default function CaseStudies() {
   );
 
   return (
-    <div ref={rootRef} className="bg-ink relative mx-auto w-[1440px]" data-name="Case Studies Page">
-      {/* hero + card list share the four vertical rails */}
+    <div ref={rootRef} className="bg-ink relative mx-auto w-full lg:w-[1440px]" data-name="Case Studies Page">
+      {/* hero + card list share the four vertical rails (desktop only — the
+          mobile frames carry none, and a 1440 rail block would misplace them) */}
       <div className="relative">
-        <Rails />
+        <div className="max-lg:hidden">
+          <Rails />
+        </div>
 
         {/* ===================== HERO (pinned) ===================== */}
         <section ref={heroRef} className="relative h-screen max-h-[990px] min-h-[760px] overflow-hidden">
           {/* centred text block, nudged down 78px (Figma 580:6584) — sits ABOVE
               the floats so wandering shots slide behind the copy (trionn) */}
-          <div className="absolute left-1/2 z-30 w-[1062px] -translate-x-1/2 -translate-y-1/2" style={{ top: "calc(50% + 78px)" }}>
+          <div className="absolute left-1/2 z-30 w-[1062px] -translate-x-1/2 -translate-y-1/2 max-lg:w-full max-lg:gutter" style={{ top: "calc(50% + 78px)" }}>
             <div className="hero-inner">
-              <div className="flex items-end gap-[20px]">
+              {/* mobile drops the rule under the copy and indents it 54px,
+                  matching the About hero (Figma 642:3940) */}
+              <div className="flex items-end gap-[20px] max-lg:flex-col-reverse max-lg:items-start max-lg:gap-[0px]">
                 {/* short horizontal line off the left rail */}
-                <div className="mb-[10px] h-px w-[124px] shrink-0 bg-white/40" />
+                <div className="mb-[10px] h-px w-[124px] shrink-0 bg-white/40 max-lg:mb-0 max-lg:mt-[16px] max-lg:w-[49px]" />
 
-                <div className="flex flex-1 flex-col items-start gap-[20px]">
+                <div className="flex flex-1 flex-col items-start gap-[20px] max-lg:w-full max-lg:pl-[54px]">
                   <motion.h1
                     initial={{ opacity: 0, y: 40 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.9, ease: EASE, delay: 0.1 }}
-                    className="font-serif-display text-[84px] leading-[92px] tracking-[3.36px]"
+                    className="font-serif-display text-[84px] leading-[92px] tracking-[3.36px] max-lg:text-[40px] max-lg:leading-[44px] max-lg:tracking-[1.6px]"
                   >
                     <span className="accent-gradient-text -my-[10px] block py-[10px]">Case</span>
                     <span className="accent-gradient-text -my-[10px] block py-[10px]">Studies</span>
@@ -337,7 +369,7 @@ export default function CaseStudies() {
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.9, ease: EASE, delay: 0.25 }}
-                    className="font-jakarta w-[685px] text-[20px] font-medium leading-[24px] tracking-[0.8px] text-[#b3b3b3] [word-break:break-word]"
+                    className="font-jakarta w-[685px] text-[20px] font-medium leading-[24px] tracking-[0.8px] text-[#b3b3b3] [word-break:break-word] max-lg:w-full max-lg:text-[16px] max-lg:tracking-[0.64px]"
                   >
                     {"Hello, I’m Rahat — a product-minded designer with nearly 4 years of experience, currently a UX Engineer at Selise Digital Platform. I've grown into a product-focused role, taking end-to-end ownership "}
                   </motion.p>
@@ -348,11 +380,11 @@ export default function CaseStudies() {
 
           {/* floating project shots — idle drift, then converge to centre on scroll */}
           <div className="pointer-events-none absolute inset-0 z-20">
-            {FLOATS.map((f, i) => (
+            {(isNarrow ? M_FLOATS : FLOATS).map((f, i) => (
               <div
                 key={i}
                 className="cs-float absolute will-change-transform"
-                style={{ left: f.x, top: `${(f.y / ART_H) * 100}%`, width: f.w, height: f.h }}
+                style={{ left: f.x, top: `${(f.y / (isNarrow ? M_ART_H : ART_H)) * 100}%`, width: f.w, height: f.h }}
               >
                 <img
                   alt=""
@@ -366,8 +398,8 @@ export default function CaseStudies() {
         </section>
 
         {/* ===================== CASE LIST ===================== */}
-        <section className="relative z-10 pb-[200px] pt-[128px]">
-          <div className="mx-auto flex w-[1022px] flex-col gap-[100px]">
+        <section className="relative z-10 pb-[200px] pt-[128px] max-lg:pb-[48px] max-lg:pt-[48px]">
+          <div className="mx-auto flex w-[1022px] flex-col gap-[100px] max-lg:w-full max-lg:gap-[64px] max-lg:gutter">
             {CASES.map((c) => (
               <Card key={c.title} data={c} />
             ))}

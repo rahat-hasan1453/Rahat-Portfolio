@@ -241,8 +241,8 @@ export default function Footer({ compact = false }) {
   /* The inline embed is desktop-only, and "desktop-only" has to be a JS check:
      hiding it with a CSS class would still mount it and pull the iframe down
      on phones, which is exactly the weight the booking card exists to avoid.
-     compact mode is the About page, which is still a fixed 1440 desktop layout
-     at every viewport — the mobile card would be the odd one out there. */
+     Applies to compact (About / case-study pages) too — those are responsive
+     now, and their Figma frames carry the same card. */
   const [isNarrow, setIsNarrow] = useState(() => window.matchMedia("(max-width: 1023px)").matches);
 
   useEffect(() => {
@@ -252,7 +252,7 @@ export default function Footer({ compact = false }) {
     return () => mq.removeEventListener("change", sync);
   }, []);
 
-  const useBookingCard = isNarrow && !compact;
+  const useBookingCard = isNarrow;
 
   // Loading the API arms the modal that [data-cal-link] opens; it does NOT
   // create an iframe, so the mobile card stays free until it is tapped.
@@ -423,12 +423,14 @@ export default function Footer({ compact = false }) {
 
         {/* grid lines — the page's inner rails (188 / 1250) bridge down to the
             gradient, then the full footer grid (0/360/720/1080/1440) runs the
-            rest of the way, matching the homepage footer */}
-        <div className="pointer-events-none absolute left-1/2 top-0 z-10 w-[1440px] -translate-x-1/2" style={{ height: COMPACT_TOP_SPACE }}>
+            rest of the way, matching the homepage footer. Desktop only: these
+            are 1440-wide blocks, so on a phone they land at arbitrary columns,
+            and the mobile frames carry no rails anyway. */}
+        <div className="pointer-events-none absolute left-1/2 top-0 z-10 w-[1440px] -translate-x-1/2 max-lg:hidden" style={{ height: COMPACT_TOP_SPACE }}>
           <span className="absolute top-0 h-full w-px" style={{ left: 188, ...dashGrad(0.2) }} />
           <span className="absolute top-0 h-full w-px" style={{ left: 1250, ...dashGrad(0.2) }} />
         </div>
-        <div className="pointer-events-none absolute left-1/2 top-0 z-10 w-[1440px] -translate-x-1/2" style={{ height: COMPACT_BODY_H }}>
+        <div className="pointer-events-none absolute left-1/2 top-0 z-10 w-[1440px] -translate-x-1/2 max-lg:hidden" style={{ height: COMPACT_BODY_H }}>
           <span className="absolute inset-y-0 left-0 w-px bg-white/40" />
           <span className="absolute inset-y-0 w-px" style={{ left: 360, ...dashGrad(0.2) }} />
           <span className="absolute inset-y-0 w-px" style={{ left: 720, ...dashGrad(0.1) }} />

@@ -100,7 +100,9 @@
       "Bash(perl -0pi -e 's|\\(\\\\n                \\\\}\\\\}\\\\n                  />\\\\n                \\)</motion\\\\.a>|$1</NavHold>|s' src/components/Menu.jsx)",
       "Bash(curl -sL -o cal-card.png \"https://www.figma.com/api/mcp/asset/b2414de7-9594-40e0-875e-fe68118761f2\")",
       "Bash(curl -sL -o cal-icon.svg \"https://www.figma.com/api/mcp/asset/e0ad0186-25c7-4541-9a87-497dc5608a40\")",
-      "Bash(sips -g pixelWidth -g pixelHeight cal-card.png)"
+      "Bash(sips -g pixelWidth -g pixelHeight cal-card.png)",
+      "Bash(curl -sL -o ab3.png \"https://www.figma.com/api/mcp/asset/c1610329-1973-4162-b802-3909ec3d2d52\")",
+      "Bash(grep -n \"^const \\\\|^function \\\\|^export default\\\\|className=\\\\\"\\\\\\(.*\\\\\\)\\\\\"\\\\s*$\\\\|<section\\\\|<Footer\\\\|absolute left-\\\\|style={{\" src/components/CaseStudies.jsx)"
     ]
   }
 }

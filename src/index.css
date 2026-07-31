@@ -85,8 +85,10 @@
     --footer-bottom-h: 994px;
     --footer-cal-top: 888px; /* skills band 860 + 28 */
     --footer-cal-h: 422px;
-    --footer-compact-space: 300px;
-    --footer-compact-cal-top: 60px;
+    /* compact footer (About / case-study pages) — Figma 642:3541: card at 62,
+       gradient opening at 340 so the card crosses onto it by 144 */
+    --footer-compact-space: 340px;
+    --footer-compact-cal-top: 62px;
   }
 }
 
