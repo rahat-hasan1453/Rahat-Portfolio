@@ -51,6 +51,17 @@
   padding-inline: 20px;
 }
 
+/* The two inner pages are composed on a fixed 1440 canvas. Between the desktop
+   breakpoint and 1440 that canvas used to be silently clipped by the page's
+   overflow-x-clip — copy was cut off mid-word and the right rail vanished.
+   `zoom` (unlike `transform: scale`) shrinks layout as well as paint, so the
+   block still reports its real height and ScrollTrigger keeps measuring right.
+   CSS cannot divide a length by a length to get the ratio, so App publishes
+   --fit-1440 on :root and this just consumes it. */
+@utility fit-1440 {
+  zoom: var(--fit-1440, 1);
+}
+
 /* horizontal strips that are wider than a phone (logo row, skills rows) stay
    swipeable but must not show a scrollbar over the artwork */
 @utility no-scrollbar {

@@ -341,13 +341,14 @@ export default function Menu() {
         )}
       </AnimatePresence>
 
-      {/* On a phone the pill floats over live copy, which scrolled up flush
-          against it and read as a collision. This strip blurs whatever passes
-          under the top padding and fades out below the pill. Sits above the
-          page (z-95) but under the pill itself (z-100). */}
+      {/* The pill floats over live copy, which scrolled up flush against it and
+          read as a collision. This strip blurs whatever passes under the top
+          padding and fades out below the pill. Sits above the page (z-95) but
+          under the pill itself (z-100). Taller on desktop because the pill sits
+          4px lower there (top-24 vs top-20). */}
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed inset-x-0 top-0 z-[95] h-[104px] lg:hidden"
+        className="pointer-events-none fixed inset-x-0 top-0 z-[95] h-[104px] lg:h-[116px]"
         style={{
           backdropFilter: "blur(10px)",
           WebkitBackdropFilter: "blur(10px)",

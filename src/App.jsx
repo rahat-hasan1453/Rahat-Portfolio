@@ -25,6 +25,21 @@ export default function App() {
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
 
+  /* The About and Case Studies pages are composed on a fixed 1440 canvas. On
+     anything narrower the page used to clip it (copy cut off mid-word, right
+     rail gone), so publish the shrink ratio and let .fit-1440 zoom to fit.
+     Floored so body copy never drops below ~11px — under that the flow layout
+     is the better answer, which is what narrow tablets and phones get. */
+  useEffect(() => {
+    const sync = () => {
+      const w = document.documentElement.clientWidth;
+      document.documentElement.style.setProperty("--fit-1440", String(Math.min(1, Math.max(0.71, w / 1440))));
+    };
+    sync();
+    window.addEventListener("resize", sync);
+    return () => window.removeEventListener("resize", sync);
+  }, []);
+
   useEffect(() => {
     const lenis = new Lenis({
       duration: 1.2,

@@ -337,12 +337,15 @@ export default function CaseStudies() {
     <div ref={rootRef} className="bg-ink relative mx-auto w-full lg:w-[1440px]" data-name="Case Studies Page">
       {/* hero + card list share the four vertical rails (desktop only — the
           mobile frames carry none, and a 1440 rail block would misplace them) */}
-      <div className="relative">
+      <div className="relative lg:fit-1440">
         <div className="max-lg:hidden">
           <Rails />
         </div>
 
         {/* ===================== HERO (pinned) ===================== */}
+        {/* h-screen needs no zoom compensation — viewport units already resolve
+            against the zoom, so this still paints one viewport tall (capped by
+            max-h in canvas units, which is what the 1440 design intends) */}
         <section ref={heroRef} className="relative h-screen max-h-[990px] min-h-[760px] overflow-hidden">
           {/* centred text block, nudged down 78px (Figma 580:6584) — sits ABOVE
               the floats so wandering shots slide behind the copy (trionn) */}

@@ -627,7 +627,7 @@ export default function AboutPage() {
       {isNarrow ? (
         <MobileBody heroTickerRef={heroTickerRef} stripTickerRef={stripTickerRef} toolsRowRefs={toolsRowRefs} />
       ) : (
-      <div className="relative w-full overflow-hidden" style={{ height: HERO_H + 3350 }}>
+      <div className="fit-1440 relative w-full overflow-hidden" style={{ height: HERO_H + 3350 }}>
         {/* vertical grid rails — solid white/0.4 at the outer edges, dashed
             white/0.2 (10-10) at the inner gutters (Figma rail SVGs) */}
         <div className="pointer-events-none absolute inset-0 z-0">
