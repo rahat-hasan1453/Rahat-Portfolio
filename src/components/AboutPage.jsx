@@ -49,13 +49,13 @@ const ABOUT_SHORT =
 const QUOTE =
   "Hello, I’m Rahat — a product-minded designer with nearly 4 years of experience, currently a UX Engineer at Selise Digital Platform.";
 
-const PROCESS = [
-  { label: "Discovery call", left: 0 },
-  { label: "Userflow", left: 133 },
-  { label: "Wireframe", left: 266 },
-  { label: "Visual Design", left: 398 },
-  { label: "Feedbacks &\nHandoff", left: 524 },
-];
+const STEPS = ["Discovery call", "Userflow", "Wireframe", "Visual Design", "Feedbacks &\nHandoff"];
+
+/* Staircase geometry. Desktop has room to run the steps out sideways; a phone
+   does not, so the mobile variant trades stride for drop — the same five steps
+   in a much narrower, much taller box that fills half the screen. */
+const PROC_DESKTOP = { w: 880, h: 400, pillW: 200, pillH: 80, stepX: 131, stepY: 80, font: 24, radius: 40 };
+const PROC_MOBILE = { w: 350, h: 420, pillW: 176, pillH: 64, stepX: 43.5, stepY: 89, font: 15, radius: 32 };
 
 /* one colour per connector — the arrow paints, then hands its colour to the
    step it points at, so the staircase reads as a story */
@@ -63,16 +63,25 @@ const ARROW_COLORS = ["#f16767", "#f5b544", "#4fd18b", "#5aa9f6"];
 
 /* dashed elbow connectors between the pills (Figma 423:3578) —
    drop from under pill i, then run right into pill i+1 with an arrowhead */
-const CONNECTORS = PROCESS.slice(0, -1).map((step, i) => {
-  const sx = step.left + 40;
-  const y0 = i * 80 + 86;
-  const bendY = i * 80 + 120;
-  const ex = PROCESS[i + 1].left - 14;
-  return {
-    d: `M ${sx} ${y0} L ${sx} ${bendY} L ${ex} ${bendY}`,
-    arrow: `${ex - 5},${bendY - 4} ${ex},${bendY} ${ex - 5},${bendY + 4}`,
-  };
-});
+function buildProcess(g) {
+  const lefts = STEPS.map((_, i) => (i === 4 ? g.w - g.pillW : Math.round(i * g.stepX)));
+  const tops = STEPS.map((_, i) => i * g.stepY);
+  const connectors = STEPS.slice(0, -1).map((_, i) => {
+    /* the drop has to start left of where the arrow lands, or the horizontal
+       run doubles back on itself. On mobile the stride is far shorter than the
+       pill, so cap the inset against the stride, not just the pill width. */
+    const stride = lefts[i + 1] - lefts[i];
+    const sx = lefts[i] + Math.min(g.pillW * 0.2, stride * 0.35);
+    const y0 = tops[i] + g.pillH + 6;
+    const bendY = tops[i + 1] + g.pillH / 2;
+    const ex = lefts[i + 1] - 14;
+    return {
+      d: `M ${sx} ${y0} L ${sx} ${bendY} L ${ex} ${bendY}`,
+      arrow: `${ex - 5},${bendY - 4} ${ex},${bendY} ${ex - 5},${bendY + 4}`,
+    };
+  });
+  return { lefts, tops, connectors };
+}
 
 const EXPERIENCE = [
   { role: "UX Engineer", meta: ["Full time", "Hybrid", "Zurich, Switzerland"], company: "Selise Digital Platform", url: "https://selisegroup.com", period: "Aug’25 - Present" },
@@ -185,12 +194,16 @@ function SectionLabel({ top, lineW = 126, italic = false, children }) {
   );
 }
 
-function ToolTile({ icon, height = 144 }) {
+/* Desktop tiles share the 880 row via flex-1. The mobile tickers need a fixed
+   pitch instead — a flex-1 tile inside a w-max marquee track has nothing to
+   divide — so `width` switches the tile to explicit sizing. */
+function ToolTile({ icon, height = 144, width }) {
   const isLogo = typeof icon !== "string";
+  const fixed = width != null;
   return (
     <div
-      className={`stack-tile flex flex-1 items-center justify-center rounded-[40px] border border-solid border-[#131313] bg-[#1c1c1c] ${isLogo ? "aspect-square" : ""}`}
-      style={isLogo ? undefined : { height }}
+      className={`stack-tile flex items-center justify-center rounded-[40px] border border-solid border-[#131313] bg-[#1c1c1c] ${fixed ? "shrink-0" : `flex-1 ${isLogo ? "aspect-square" : ""}`}`}
+      style={fixed ? { width, height: isLogo ? width : height } : isLogo ? undefined : { height }}
     >
       {typeof icon === "string" ? (
         <span className="font-urbanist text-[24px] font-medium text-white">{icon}</span>
@@ -209,7 +222,7 @@ function HeroTickerSet() {
       {HERO_SET.map((im, i) => (
         <div
           key={i}
-          className="relative shrink-0 overflow-hidden rounded-[17.687px] bg-[#1c1c1c] opacity-40 transition-opacity duration-500 hover:opacity-100"
+          className="ticker-cell relative shrink-0 overflow-hidden rounded-[17.687px] bg-[#1c1c1c] opacity-40 transition-opacity duration-500 hover:opacity-100"
           style={{ width: im.w, height: im.h }}
         >
           <img alt="Rahat Hasan" src={im.src} className="absolute inset-0 size-full max-w-none object-cover" draggable="false" />
@@ -253,34 +266,55 @@ function ToolGrid() {
   );
 }
 
-// the process staircase with its dashed elbow connectors — 880 × 400
-function ProcessFlow() {
+/* one self-looping tool row for mobile. Contents are doubled so a ±50% slide
+   lands exactly one copy along and repeats without a seam. */
+const TILE_W = 880 / 6; // 146.67 — six icons across the desktop row
+const LABEL_W = 880 / 3; // 293.33 — three word tiles across it
+function ToolTickerRow({ items, trackRef, width, height }) {
+  const copy = (key) => (
+    <div key={key} className="flex shrink-0 items-center">
+      {items.map((ic, i) => (
+        <ToolTile key={i} icon={ic} width={width} height={height} />
+      ))}
+    </div>
+  );
   return (
-    <div className="process-flow relative" style={{ width: 880, height: 400 }}>
-      <svg className="pointer-events-none absolute inset-0" width="880" height="400" viewBox="0 0 880 400" fill="none" aria-hidden="true">
+    <div ref={trackRef} className="flex w-max" style={{ willChange: "transform" }}>
+      {copy("a")}
+      {copy("b")}
+    </div>
+  );
+}
+
+// the process staircase with its dashed elbow connectors
+function ProcessFlow({ geo = PROC_DESKTOP }) {
+  const { lefts, tops, connectors } = buildProcess(geo);
+  return (
+    <div className="process-flow relative" style={{ width: geo.w, height: geo.h }}>
+      <svg className="pointer-events-none absolute inset-0" width={geo.w} height={geo.h} viewBox={`0 0 ${geo.w} ${geo.h}`} fill="none" aria-hidden="true">
         <defs>
-          {CONNECTORS.map((c, i) => (
+          {connectors.map((c, i) => (
             <mask key={i} id={`proc-mask-${i}`}>
               <path className="proc-mask-path" d={c.d} stroke="#fff" strokeWidth="6" fill="none" />
             </mask>
           ))}
         </defs>
-        {CONNECTORS.map((c, i) => (
+        {connectors.map((c, i) => (
           <g key={i} mask={`url(#proc-mask-${i})`}>
             <path className="proc-dash" d={c.d} stroke={ARROW_COLORS[i % ARROW_COLORS.length]} strokeWidth="1.2" fill="none" strokeDasharray="4 5" />
           </g>
         ))}
-        {CONNECTORS.map((c, i) => (
+        {connectors.map((c, i) => (
           <polyline key={i} className="proc-arrow" points={c.arrow} stroke={ARROW_COLORS[i % ARROW_COLORS.length]} strokeWidth="1.2" fill="none" opacity="0" />
         ))}
       </svg>
-      {PROCESS.map((step, i) => (
+      {STEPS.map((label, i) => (
         <div
           key={i}
-          className="process-pill absolute flex h-[80px] w-[200px] items-center justify-center rounded-[40px] border border-solid border-[#131313] bg-[#1c1c1c] px-[16px]"
-          style={{ left: step.left, top: i * 80 }}
+          className="process-pill absolute flex items-center justify-center border border-solid border-[#131313] bg-[#1c1c1c] px-[16px]"
+          style={{ left: lefts[i], top: tops[i], width: geo.pillW, height: geo.pillH, borderRadius: geo.radius }}
         >
-          <span className="font-urbanist whitespace-pre-line text-center text-[24px] font-medium leading-none text-white">{step.label}</span>
+          <span className="font-urbanist whitespace-pre-line text-center font-medium leading-none text-white" style={{ fontSize: geo.font }}>{label}</span>
         </div>
       ))}
     </div>
@@ -294,7 +328,7 @@ function ImageStrip({ tile = false }) {
   return (
     <div className="flex shrink-0" style={{ height: 168, paddingRight: tile ? 20 : 0 }}>
       {STRIP.map((src, i) => (
-        <div key={i} className="relative shrink-0 overflow-hidden rounded-[17.687px] bg-[#1c1c1c]" style={{ width: i === 3 ? 119 : 132, marginRight: i === 3 ? 0 : 20, height: 168 }}>
+        <div key={i} className={`${tile ? "ticker-cell" : ""} relative shrink-0 overflow-hidden rounded-[17.687px] bg-[#1c1c1c]`} style={{ width: i === 3 ? 119 : 132, marginRight: i === 3 ? 0 : 20, height: 168 }}>
           <img alt="" src={src} className="absolute inset-0 size-full max-w-none object-cover" />
         </div>
       ))}
@@ -305,7 +339,7 @@ function ImageStrip({ tile = false }) {
 /* ── mobile layout (Figma 642:3594) ───────────────────────────────────────
    A plain flowing column. Every animation hook the desktop tree uses is on
    the same class names here, so the single useGSAP block below drives both. */
-function MobileBody({ heroTickerRef, stripTickerRef }) {
+function MobileBody({ heroTickerRef, stripTickerRef, toolsRowRefs }) {
   const copyIndent = "ml-[54px] w-[calc(100%-54px)]";
   return (
     <div className="relative w-full overflow-hidden">
@@ -354,20 +388,17 @@ function MobileBody({ heroTickerRef, stripTickerRef }) {
           </Scaled>
         </div>
 
-        {/* Warm image with the serif quote riding over its right side and
-            running on below it. The Figma sizes that column at 176 × 320 — ten
-            lines — which only works at 20px: EightiesComeback runs wide, and at
-            the desktop 28 it spilled to thirteen lines and overshot the frame
-            into the next section. */}
+        {/* Warm portrait, quote underneath. Overlaying the copy on the photo
+            (as the 1440 layout does, where there is room beside it) left it
+            fighting the image for contrast on a phone — stacking gives the
+            quote the full column and the portrait its full frame. */}
         <div className="gutter mt-[80px]">
-          <div className="relative" style={{ height: 422 }}>
-            <div className="reveal-up absolute left-0 top-0 w-full overflow-hidden rounded-[17.687px] bg-[#1c1c1c]" style={{ height: 288 }}>
-              <img alt="" src={imgR5} className="absolute inset-0 size-full max-w-none object-cover" />
-            </div>
-            <p className="reveal-up font-serif-display absolute text-[20px] leading-[32px] tracking-[0.8px] text-[#b3b3b3]" style={{ left: 174, top: 102, width: 176 }}>
-              {QUOTE}
-            </p>
+          <div className="reveal-up relative w-full overflow-hidden rounded-[17.687px] bg-[#1c1c1c]" style={{ height: 320 }}>
+            <img alt="" src={imgR5} className="absolute inset-0 size-full max-w-none object-cover" />
           </div>
+          <p className="reveal-up font-serif-display mt-[24px] text-[24px] leading-[32px] tracking-[0.96px] text-[#b3b3b3]">
+            {QUOTE}
+          </p>
         </div>
       </section>
 
@@ -378,21 +409,26 @@ function MobileBody({ heroTickerRef, stripTickerRef }) {
           <Body className={`reveal-up mt-[20px] ${copyIndent}`}>{copyWithLink(ABOUT_SHORT)}</Body>
         </div>
 
-        {/* tool grid runs wider than the phone — swipe it */}
-        <div className="no-scrollbar mt-[40px] w-full overflow-x-auto">
-          <div className="pl-[20px] pr-[20px]">
-            <Scaled w={880} h={396.33} scale={M.tools}>
-              <ToolGrid />
-            </Scaled>
+        {/* Tool grid runs wider than the phone, so each row tickers on its own —
+            outer rows drift right, the word row counter-drifts left. The scale
+            sits on the wrapper, never on a marquee track: GSAP clears `scale`
+            on anything it drives, which would wipe a Tailwind scale utility. */}
+        <div className="relative mt-[40px] w-full overflow-hidden" style={{ height: 396.33 * M.tools }}>
+          <div className="absolute left-0 top-0 origin-top-left" style={{ transform: `scale(${M.tools})` }}>
+            <div className="stack-grid flex flex-col">
+              <ToolTickerRow items={TOOLS_ROW_1} trackRef={toolsRowRefs[0]} width={TILE_W} />
+              <ToolTickerRow items={TOOL_LABELS} trackRef={toolsRowRefs[1]} width={LABEL_W} height={103} />
+              <ToolTickerRow items={TOOLS_ROW_2} trackRef={toolsRowRefs[2]} width={TILE_W} />
+            </div>
           </div>
         </div>
 
         <div className="gutter mt-[60px]">
           <Body className="reveal-up">{copyWithLink(ABOUT_SHORT)}</Body>
+          {/* the staircase gets its own taller geometry here, not a shrunk
+              copy of the desktop one — see PROC_MOBILE */}
           <div className="mt-[40px]">
-            <Scaled w={880} h={400} scale={M.process}>
-              <ProcessFlow />
-            </Scaled>
+            <ProcessFlow geo={PROC_MOBILE} />
           </div>
         </div>
 
@@ -419,8 +455,10 @@ function MobileBody({ heroTickerRef, stripTickerRef }) {
             {EXPERIENCE.map((job, i) => (
               <div key={i} className="exp-row w-full">
                 {i > 0 && <div className="my-[20px] h-px w-full bg-white/10" />}
-                <div className="flex w-full flex-col gap-[16px]">
-                  <p className="font-serif-display text-[16px] leading-[24px] tracking-[0.64px] text-white">{job.role}</p>
+                {/* Figma 642:3489 sets 16 under the role, then 4 between the
+                    meta / company / period lines — they read as one block */}
+                <div className="flex w-full flex-col gap-[4px]">
+                  <p className="mb-[12px] font-serif-display text-[16px] leading-[24px] tracking-[0.64px] text-white">{job.role}</p>
                   <div className="flex flex-wrap items-center gap-[8px]">
                     {job.meta.map((m, j) => (
                       <span key={j} className="flex items-center gap-[8px]">
@@ -447,6 +485,8 @@ export default function AboutPage() {
   const rootRef = useRef(null);
   const heroTickerRef = useRef(null);
   const stripTickerRef = useRef(null);
+  // three tool rows, each on its own track so they can run opposite ways
+  const toolsRowRefs = [useRef(null), useRef(null), useRef(null)];
   const [isNarrow, setIsNarrow] = useState(() => window.matchMedia("(max-width: 1023px)").matches);
 
   useEffect(() => {
@@ -461,9 +501,40 @@ export default function AboutPage() {
       // hero portrait marquee — continuous ticker
       gsap.to(heroTickerRef.current, { xPercent: -50, ease: "none", duration: 36, repeat: -1 });
 
-      // mobile only: the 4-up strip runs wider than the phone, so it tickers too
+      // mobile only: the strip and the tool grid both run wider than the phone
       if (stripTickerRef.current) {
         gsap.to(stripTickerRef.current, { xPercent: -50, ease: "none", duration: 22, repeat: -1 });
+      }
+      /* tool rows: outer two travel left→right, the word row counter-travels
+         right→left. A track is two copies wide, so -50% and 0 paint the same
+         thing — sliding between them loops invisibly whichever way it runs. */
+      [1, -1, 1].forEach((dir, i) => {
+        const track = toolsRowRefs[i].current;
+        if (!track) return;
+        gsap.fromTo(
+          track,
+          { xPercent: dir > 0 ? -50 : 0 },
+          { xPercent: dir > 0 ? 0 : -50, ease: "none", duration: 26 + i * 5, repeat: -1 }
+        );
+      });
+
+      /* Centre focus: whichever ticker cell is crossing the middle of the
+         screen burns up to full, the rest sit back at the resting 40%. Driven
+         off gsap's ticker so it stays in step with the marquee tweens. */
+      const cells = gsap.utils.toArray(".ticker-cell");
+      let focus;
+      if (cells.length) {
+        focus = () => {
+          const mid = window.innerWidth / 2;
+          cells.forEach((cell) => {
+            const r = cell.getBoundingClientRect();
+            if (!r.width) return;
+            // 1 at dead centre, 0 once a full card away
+            const t = Math.max(0, 1 - Math.abs(r.left + r.width / 2 - mid) / r.width);
+            cell.style.opacity = String(0.4 + 0.6 * t * t);
+          });
+        };
+        gsap.ticker.add(focus);
       }
 
       // hero layers appear on mount (above the fold), after the heading
@@ -538,8 +609,15 @@ export default function AboutPage() {
         opacity: 1, y: 0, duration: 0.7, ease: "power3.out", stagger: 0.12,
         scrollTrigger: { trigger: ".exp-list", start: "top 84%" },
       });
+
+      // gsap.context reverts its own tweens, but the ticker callback is ours
+      return () => {
+        if (focus) gsap.ticker.remove(focus);
+      };
     },
-    { scope: rootRef }
+    // the two layouts are separate trees, so crossing the breakpoint has to
+    // tear the whole set down and rebuild it against the tree that is now up
+    { scope: rootRef, dependencies: [isNarrow], revertOnUpdate: true }
   );
 
   return (
@@ -547,7 +625,7 @@ export default function AboutPage() {
       {/* one tree at a time — the two layouts share class names and SVG mask
           ids, so rendering both (even hidden) would double every GSAP target */}
       {isNarrow ? (
-        <MobileBody heroTickerRef={heroTickerRef} stripTickerRef={stripTickerRef} />
+        <MobileBody heroTickerRef={heroTickerRef} stripTickerRef={stripTickerRef} toolsRowRefs={toolsRowRefs} />
       ) : (
       <div className="relative w-full overflow-hidden" style={{ height: HERO_H + 3350 }}>
         {/* vertical grid rails — solid white/0.4 at the outer edges, dashed
