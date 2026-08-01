@@ -62,6 +62,14 @@
   zoom: var(--fit-1440, 1);
 }
 
+/* Case-study detail image frames carry their height as an inline number, so the
+   phone height rides along as --h-mobile and wins inside this query. */
+@media (max-width: 1023px) {
+  .detail-frame {
+    height: var(--h-mobile, auto) !important;
+  }
+}
+
 /* horizontal strips that are wider than a phone (logo row, skills rows) stay
    swipeable but must not show a scrollbar over the artwork */
 @utility no-scrollbar {

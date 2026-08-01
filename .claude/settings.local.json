@@ -102,7 +102,8 @@
       "Bash(curl -sL -o cal-icon.svg \"https://www.figma.com/api/mcp/asset/e0ad0186-25c7-4541-9a87-497dc5608a40\")",
       "Bash(sips -g pixelWidth -g pixelHeight cal-card.png)",
       "Bash(curl -sL -o ab3.png \"https://www.figma.com/api/mcp/asset/c1610329-1973-4162-b802-3909ec3d2d52\")",
-      "Bash(grep -n \"^const \\\\|^function \\\\|^export default\\\\|className=\\\\\"\\\\\\(.*\\\\\\)\\\\\"\\\\s*$\\\\|<section\\\\|<Footer\\\\|absolute left-\\\\|style={{\" src/components/CaseStudies.jsx)"
+      "Bash(grep -n \"^const \\\\|^function \\\\|^export default\\\\|className=\\\\\"\\\\\\(.*\\\\\\)\\\\\"\\\\s*$\\\\|<section\\\\|<Footer\\\\|absolute left-\\\\|style={{\" src/components/CaseStudies.jsx)",
+      "Bash(python3 -)"
     ]
   }
 }
