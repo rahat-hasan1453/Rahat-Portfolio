@@ -310,7 +310,7 @@ export default function CaseStudy() {
           <div className="z-10 max-lg:relative max-lg:mt-[48px] lg:absolute lg:bottom-0 lg:left-[20px] lg:right-[20px] lg:top-[372px] lg:overflow-hidden">
             <div
               ref={trackRef}
-              className="max-lg:flex max-lg:flex-col max-lg:gap-[64px] lg:absolute lg:left-0 lg:top-0 lg:flex"
+              className="max-lg:flex max-lg:flex-col max-lg:gap-[64px] lg:absolute lg:left-0 lg:top-0 lg:flex lg:gap-[20px]"
               style={{ willChange: "transform" }}
             >
               {CARDS.map((card, i) => (

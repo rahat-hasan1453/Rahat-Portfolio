@@ -51,6 +51,14 @@
   padding-inline: 20px;
 }
 
+/* Each .bubble-row carries will-change/transform for its drift, which makes it
+   a stacking context — so a raised card inside one can never paint above a
+   LATER row. Lift the whole row while it holds the active bubble, otherwise a
+   helper pill hanging below the card is buried by the row underneath. */
+.bubble-row:has(.bubble-active) {
+  z-index: 60;
+}
+
 /* The two inner pages are composed on a fixed 1440 canvas. Between the desktop
    breakpoint and 1440 that canvas used to be silently clipped by the page's
    overflow-x-clip — copy was cut off mid-word and the right rail vanished.

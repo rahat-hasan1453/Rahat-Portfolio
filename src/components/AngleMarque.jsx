@@ -17,6 +17,12 @@ const imgRectangle34 = "/assets/4583dd520e0a8771b47d3b7187a1b151c258995c.png";
 const imgRectangle38 = "/assets/7650c3b8ff96600e8c34feec39558dbc7adb9018.png";
 const imgRectangle31 = "/assets/0cd21a053806287e63d372fd804878164d4dce04.png";
 const imgRectangle33 = "/assets/3a153bdae32318c674896aafac82bf3f43f4beae.png";
+/* five more project shots so no image repeats in the field */
+const imgExtra1 = "/assets/cs-shot-3.png";
+const imgExtra2 = "/assets/cs-shot-6.png";
+const imgExtra3 = "/assets/cs-shot-9.png";
+const imgExtra4 = "/assets/cs-shot-12.png";
+const imgExtra5 = "/assets/cs-shot-18.png";
 const imgLines = "/assets/85b87272f248dfb176bc9e8a787e0d23664737e5.svg";
 
 const FIELD_H = 1937;
@@ -33,14 +39,14 @@ const IMAGES = [
   { src: imgRectangle30, x: 358, y: 588, w: 209, h: 281, speed: 1.15 },
   { src: imgRectangle32, x: 1159, y: 161, w: 209, h: 281, speed: 0.9 },
   { src: imgRectangle34, x: 689, y: 921, w: 209, h: 281, speed: 1.2 },
-  { src: imgRectangle34, x: 522, y: 1373, w: 209, h: 281, speed: 1.0 },
-  { src: imgRectangle34, x: 21, y: 1514, w: 209, h: 281, speed: 1.15 },
-  { src: imgRectangle34, x: 1428, y: 1393, w: 209, h: 281, speed: 1.05 },
+  { src: imgExtra1, x: 522, y: 1373, w: 209, h: 281, speed: 1.0 },
+  { src: imgExtra2, x: 21, y: 1514, w: 209, h: 281, speed: 1.15 },
+  { src: imgExtra3, x: 1428, y: 1393, w: 209, h: 281, speed: 1.05 },
   { src: imgRectangle38, x: 1323, y: 900, w: 209, h: 281, speed: 0.95 },
   { src: imgRectangle31, x: 298, y: 180, w: 329, h: 243, speed: 1.2 },
-  { src: imgRectangle31, x: 65, y: 1181, w: 329, h: 243, speed: 0.9 },
+  { src: imgExtra4, x: 65, y: 1181, w: 329, h: 243, speed: 0.9 },
   { src: imgRectangle33, x: 1099, y: 604, w: 329, h: 243, speed: 1.1 },
-  { src: imgRectangle33, x: 864, y: 1271, w: 410, h: 303, speed: 1.25 },
+  { src: imgExtra5, x: 864, y: 1271, w: 410, h: 303, speed: 1.25 },
 ];
 
 // mobile field — Figma 623:602 + 623:594, laid out on the 390 frame (the same

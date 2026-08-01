@@ -376,6 +376,10 @@ export default function CaseStudyDetail() {
       </div>
 
       {/* ===================== FOOTER — same as homepage ===================== */}
+      {/* dashed rule closing the page off from the footer — same 10-on/10-off
+          rhythm as the rails */}
+      <span className="pointer-events-none block h-px w-full" style={DASH_X} />
+
       <Footer />
     </div>
   );

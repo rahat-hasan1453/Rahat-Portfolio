@@ -89,7 +89,7 @@ function Bubble({ label, size = "size-[144px] max-lg:size-[96px]", radius = "rou
       onMouseLeave={() => setHover(false)}
       {...bind}
       data-held={held || undefined}
-      className={`footer-reveal group relative flex shrink-0 items-center justify-center border border-solid border-[#131313] bg-[#1c1c1c] px-[16px] py-[10px] ${radius} ${label ? "cursor-pointer" : ""} ${active ? "z-30" : ""} ${size}`}
+      className={`footer-reveal group relative flex shrink-0 items-center justify-center border border-solid border-[#131313] bg-[#1c1c1c] px-[16px] py-[10px] ${radius} ${label ? "cursor-pointer" : ""} ${active ? (pills.length ? "bubble-active z-50" : "z-50") : "z-0"} ${size}`}
     >
       {/* hover (or press-and-hold on touch) shuttles the label out the top,
           back in from below */}
@@ -426,11 +426,11 @@ export default function Footer({ compact = false }) {
             rest of the way, matching the homepage footer. Desktop only: these
             are 1440-wide blocks, so on a phone they land at arbitrary columns,
             and the mobile frames carry no rails anyway. */}
-        <div className="pointer-events-none absolute left-1/2 top-0 z-10 w-[1440px] -translate-x-1/2 max-lg:hidden" style={{ height: COMPACT_TOP_SPACE }}>
+        <div className="pointer-events-none absolute left-1/2 top-0 z-10 w-full max-w-[1440px] -translate-x-1/2 max-lg:hidden" style={{ height: COMPACT_TOP_SPACE }}>
           <span className="absolute top-0 h-full w-px" style={{ left: 188, ...dashGrad(0.2) }} />
           <span className="absolute top-0 h-full w-px" style={{ left: 1250, ...dashGrad(0.2) }} />
         </div>
-        <div className="pointer-events-none absolute left-1/2 top-0 z-10 w-[1440px] -translate-x-1/2 max-lg:hidden" style={{ height: COMPACT_BODY_H }}>
+        <div className="pointer-events-none absolute left-1/2 top-0 z-10 w-full max-w-[1440px] -translate-x-1/2 max-lg:hidden" style={{ height: COMPACT_BODY_H }}>
           <span className="absolute inset-y-0 left-0 w-px bg-white/40" />
           <span className="absolute inset-y-0 w-px" style={{ left: 360, ...dashGrad(0.2) }} />
           <span className="absolute inset-y-0 w-px" style={{ left: 720, ...dashGrad(0.1) }} />
@@ -468,7 +468,7 @@ export default function Footer({ compact = false }) {
           Desktop: solid outer 0/1440 + dashed 360/720/1080 — matches the Hero grid.
           The mobile frames carry no rails. ===== */}
       <div
-        className="pointer-events-none absolute left-1/2 top-0 z-10 w-[1440px] -translate-x-1/2 max-lg:hidden"
+        className="pointer-events-none absolute left-1/2 top-0 z-10 w-full max-w-[1440px] -translate-x-1/2 max-lg:hidden"
         style={{ height: "var(--footer-h)" }}
       >
         <span className="absolute inset-y-0 left-0 w-px bg-white/40" />

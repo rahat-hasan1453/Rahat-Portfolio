@@ -64,7 +64,9 @@ const ARROW_COLORS = ["#f16767", "#f5b544", "#4fd18b", "#5aa9f6"];
 /* dashed elbow connectors between the pills (Figma 423:3578) —
    drop from under pill i, then run right into pill i+1 with an arrowhead */
 function buildProcess(g) {
-  const lefts = STEPS.map((_, i) => (i === 4 ? g.w - g.pillW : Math.round(i * g.stepX)));
+  /* every step strides the same distance — the last one used to be pinned to
+     the right edge, which stretched the final connector out of rhythm */
+  const lefts = STEPS.map((_, i) => Math.round(i * g.stepX));
   const tops = STEPS.map((_, i) => i * g.stepY);
   const connectors = STEPS.slice(0, -1).map((_, i) => {
     /* the drop has to start left of where the arrow lands, or the horizontal
@@ -311,7 +313,11 @@ function ProcessFlow({ geo = PROC_DESKTOP }) {
       {STEPS.map((label, i) => (
         <div
           key={i}
-          className="process-pill absolute flex items-center justify-center border border-solid border-[#131313] bg-[#1c1c1c] px-[16px]"
+          /* the first step is the only one no arrow points at, so it carries a
+             white stroke of its own instead of inheriting a connector colour */
+          className={`process-pill absolute flex items-center justify-center border border-solid bg-[#1c1c1c] px-[16px] ${
+            i === 0 ? "border-white" : "border-[#131313]"
+          }`}
           style={{ left: lefts[i], top: tops[i], width: geo.pillW, height: geo.pillH, borderRadius: geo.radius }}
         >
           <span className="font-urbanist whitespace-pre-line text-center font-medium leading-none text-white" style={{ fontSize: geo.font }}>{label}</span>

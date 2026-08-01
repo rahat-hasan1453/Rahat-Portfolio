@@ -113,6 +113,13 @@ const DASH = {
   backgroundImage: "linear-gradient(to bottom, rgba(255,255,255,0.2) 0 10px, transparent 10px 20px)",
   backgroundSize: "1px 20px",
 };
+
+/* the horizontal counterpart — identical 10-on/10-off rhythm to the rails */
+const DASH_X = {
+  backgroundImage: "linear-gradient(to right, rgba(255,255,255,0.2) 0 10px, transparent 10px 20px)",
+  backgroundSize: "20px 1px",
+  backgroundRepeat: "repeat-x",
+};
 function Rails() {
   return (
     <div className="pointer-events-none absolute inset-0 z-0">
@@ -409,6 +416,10 @@ export default function CaseStudies() {
           </div>
         </section>
       </div>
+
+      {/* dashed rule closing the page off from the footer — same 10-on/10-off
+          rhythm as the rails */}
+      <span className="pointer-events-none block h-px w-full" style={DASH_X} />
 
       {/* ===================== FOOTER (shared) ===================== */}
       <Footer />
