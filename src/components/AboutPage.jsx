@@ -43,7 +43,7 @@ const TOOL_LABELS = ["Whiteboard", "Pen/ Paper", "Sticky Notes"];
 const easeShuttle = [0.22, 1, 0.36, 1];
 
 const ABOUT_FULL =
-  "designing Hello, I’m Rahat — a product-minded designer with nearly 4 years of experience, currently a UX Engineer at Selise Digital Platform. I've grown into a product-focused role, taking end-to-end ownership — from discovery to delivery — collaborating with international stakeholders to turn business goals into meaningful digital experiences.";
+  "When I joined Selise, I saw an opportunity to bring structure and efficiency to the design process. I built a comprehensive design system, boosting team efficiency and ensuring consistency across mobile, tablet, and web.\n\nLeading the product design end to end, I shaped the user journeys behind how the product works today. Beyond design, I drive stakeholder alignment and design demos — turning business needs into design decisions and taking full ownership of the outcome.\n\nOn the path to joining, I faced the hardest interview I've ever sat in. A whiteboard challenge: design a better user journey for a financial app. No laptop, no Figma, no component library to hide behind. Just a pen and a sheet of paper, thinking out loud in real time. So I drew — screen by screen, arrows crossing over each other, the paper getting messier as the logic got cleaner. Then I turned it around and walked the team through every decision. Strip away the tools and only one thing is left: can you think clearly about people? That question got me the job, and it's still the one I answer every day.\n\nIt's also why the team matters so much here. Selise has one of the largest and strongest UX teams in Bangladesh, and that changes what a workday feels like — a critique becomes an education, a hallway conversation reframes a whole problem. I've never gone home knowing exactly what I knew that morning.";
 const ABOUT_SHORT =
   "Hello, I’m Rahat — a product-minded designer with nearly 4 years of experience, currently a UX Engineer at Selise Digital Platform. I've grown into a product-focused role, taking end-to-end ownership — from discovery to delivery —";
 const QUOTE =
@@ -58,6 +58,9 @@ const STORY_INTRO = [
   "Design did — I was the kid who made our football club’s logo, jersey and flag, without ever opening a design tool and any design knowledge. In college that became oil paintings of every Marvel character I could name.",
   "Then a magazine cover I’d designed landed on the right desk, and someone called with a job offer. That was the door into UX. Everything after it was deliberate: tutorials at night, podcasts from designers further along than me, enough practice to be ready when a real chance came. It came at Selise Digital Platform, where I work today as a UX Engineer.",
 ];
+
+const DESIGNING_SELISE =
+  "When I joined Selise as a UX Engineer in 2021, I was one of three people on a new team. We were tasked with building the design culture from the ground up — no established workflows, no design system, just three people and a whiteboard.\n\nEvery whiteboard session was intense. We’d spend hours debating whether a button should be 44px or 48px, not because we were perfectionist assholes (okay, maybe a little), but because we knew every pixel choice would compound across thousands of screens our customers would use daily. We had to be right, because reversing a bad decision later would be exponentially more expensive in momentum and time.\n\nI learned more in those whiteboard sessions than I had in years: how to defend a design decision with data, how to fold feedback into an idea without losing its soul, how to think about scale. We built a system that could grow with the company, trained the engineers to think like designers, and turned design into a first-class citizen at Selise. By the time I left, we’d shipped product to thousands of users and proven that design rigor wasn’t a luxury — it was a compounding advantage.";
 
 const STEPS = ["Discovery call", "Userflow", "Wireframe", "Visual Design", "Handoff"];
 
@@ -399,7 +402,7 @@ function MobileBody({ heroTickerRef, stripTickerRef, toolsRowRefs }) {
       <section className="relative w-full pt-[80px]">
         <div className="gutter">
           <MobileLabel>Designing @Selise</MobileLabel>
-          <Body className={`reveal-up mt-[20px] ${copyIndent}`}>{copyWithLink(ABOUT_FULL + ABOUT_FULL)}</Body>
+          <Body className={`reveal-up mt-[20px] ${copyIndent}`}>{copyWithLink(DESIGNING_SELISE)}</Body>
         </div>
 
         <div className="mt-[24px] flex w-full justify-center">
