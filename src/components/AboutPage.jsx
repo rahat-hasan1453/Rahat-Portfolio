@@ -43,13 +43,23 @@ const TOOL_LABELS = ["Whiteboard", "Pen/ Paper", "Sticky Notes"];
 const easeShuttle = [0.22, 1, 0.36, 1];
 
 const ABOUT_FULL =
-  "Hello, I’m Rahat — a product-minded designer with nearly 4 years of experience, currently a UX Engineer at Selise Digital Platform. I've grown into a product-focused role, taking end-to-end ownership — from discovery to delivery — collaborating with international stakeholders to turn business goals into meaningful digital experiences.";
+  "designing Hello, I’m Rahat — a product-minded designer with nearly 4 years of experience, currently a UX Engineer at Selise Digital Platform. I've grown into a product-focused role, taking end-to-end ownership — from discovery to delivery — collaborating with international stakeholders to turn business goals into meaningful digital experiences.";
 const ABOUT_SHORT =
   "Hello, I’m Rahat — a product-minded designer with nearly 4 years of experience, currently a UX Engineer at Selise Digital Platform. I've grown into a product-focused role, taking end-to-end ownership — from discovery to delivery —";
 const QUOTE =
-  "Hello, I’m Rahat — a product-minded designer with nearly 4 years of experience, currently a UX Engineer at Selise Digital Platform.";
+  "I designed a football jersey before I knew what a design tool was. The craft was never the software.";
 
-const STEPS = ["Discovery call", "Userflow", "Wireframe", "Visual Design", "Feedbacks &\nHandoff"];
+/* ── HERO COPY — edit the story here ───────────────────────────────────────
+   Each string is its own paragraph. Add or remove entries freely; the hero
+   renders whatever this array holds. "Selise Digital Platform" is auto-linked
+   wherever it appears (see copyWithLink below).                            */
+const STORY_INTRO = [
+  "I studied Computer Science and gave code an honest run, and it never quite caught.",
+  "Design did — I was the kid who made our football club’s logo, jersey and flag, without ever opening a design tool and any design knowledge. In college that became oil paintings of every Marvel character I could name.",
+  "Then a magazine cover I’d designed landed on the right desk, and someone called with a job offer. That was the door into UX. Everything after it was deliberate: tutorials at night, podcasts from designers further along than me, enough practice to be ready when a real chance came. It came at Selise Digital Platform, where I work today as a UX Engineer.",
+];
+
+const STEPS = ["Discovery call", "Userflow", "Wireframe", "Visual Design", "Handoff"];
 
 /* Staircase geometry. Desktop has room to run the steps out sideways; a phone
    does not, so the mobile variant trades stride for drop — the same five steps
@@ -362,7 +372,11 @@ function MobileBody({ heroTickerRef, stripTickerRef, toolsRowRefs }) {
         </motion.h1>
 
         <div className="gutter mt-[40px]">
-          <Body className={`hero-appear ${copyIndent}`}>{copyWithLink(ABOUT_FULL + ABOUT_FULL)}</Body>
+          <div className={`hero-appear flex flex-col gap-[14px] ${copyIndent}`}>
+            {STORY_INTRO.map((para, i) => (
+              <Body key={i}>{copyWithLink(para)}</Body>
+            ))}
+          </div>
           <div className="hero-appear mt-[16px] h-px w-[49px] bg-white/40" />
         </div>
 
@@ -664,9 +678,16 @@ export default function AboutPage() {
                   <span className="accent-gradient-text -mx-[20px] -my-[14px] block px-[20px] py-[14px]">to Design</span>
                 </motion.h1>
 
-                <p className="hero-appear font-jakarta w-full text-[20px] font-medium leading-[24px] tracking-[0.8px] text-[#B3B3B3] [word-break:break-word]">
-                  {copyWithLink(ABOUT_FULL + ABOUT_FULL)}
-                </p>
+                <div className="hero-appear flex w-full flex-col gap-[16px]">
+                  {STORY_INTRO.map((para, i) => (
+                    <p
+                      key={i}
+                      className="font-jakarta w-full text-[20px] font-medium leading-[24px] tracking-[0.8px] text-[#B3B3B3] [word-break:break-word]"
+                    >
+                      {copyWithLink(para)}
+                    </p>
+                  ))}
+                </div>
               </div>
             </div>
 
