@@ -103,7 +103,11 @@
       "Bash(sips -g pixelWidth -g pixelHeight cal-card.png)",
       "Bash(curl -sL -o ab3.png \"https://www.figma.com/api/mcp/asset/c1610329-1973-4162-b802-3909ec3d2d52\")",
       "Bash(grep -n \"^const \\\\|^function \\\\|^export default\\\\|className=\\\\\"\\\\\\(.*\\\\\\)\\\\\"\\\\s*$\\\\|<section\\\\|<Footer\\\\|absolute left-\\\\|style={{\" src/components/CaseStudies.jsx)",
-      "Bash(python3 -)"
+      "Bash(python3 -)",
+      "Bash(ls -lt ~/Downloads 2>/dev/null | head -15; echo \"=== Desktop ===\"; ls -lt ~/Desktop 2>/dev/null | head -15)",
+      "Bash(find /private/tmp/claude-501 ~/Pictures ~/Documents -type f \\\\\\( -iname \"*.jpg\" -o -iname \"*.jpeg\" -o -iname \"*.png\" -o -iname \"*.heic\" \\\\\\) -newermt \"2026-08-01\" 2>/dev/null | grep -vi \"node_modules\\\\|/assets/\\\\|/dist/\" | head -20)",
+      "Bash(curl -sL -o figma-820-6453.png \"https://www.figma.com/api/mcp/asset/b2924edd-f3e1-4fbd-874c-35c6c5f72e08\")",
+      "Bash(curl -sL -o about-whiteboard-sketch.tmp \"https://www.figma.com/api/mcp/asset/06d894bd-95aa-4383-992a-4ad127f08959\")"
     ]
   }
 }

@@ -19,7 +19,12 @@ const imgR7 = "/assets/839d3a518763fdbf968a2a08c4073a1284670dcf.png"; // spark
 const imgR6 = "/assets/decfb971c6d641c9ccb852271bc0b630c000cdc2.png"; // tall profile
 const imgR5 = "/assets/29f89100346cab8bda091f83307e2d146c404f15.png"; // warm cinematic
 const imgR4 = "/assets/1343981533bfec0aaa59a2166abbcce5317934ec.png"; // white-bg smile
-const imgSmile = "/assets/358ef12f7872aa78ea6da1caedac7cd388e21bdf.png";
+
+/* "Designing @Selise" media (Figma 820:6453) — two counter-tilted team photos
+   and the notebook page from the whiteboard interview the copy describes */
+const imgTeamTable = "/assets/Group-planning-2048x1536.webp"; // hackathon, sticky notes
+const imgTeamWall = "/assets/gathering-solutions-1024x768.webp"; // affinity mapping
+const imgSketch = "/assets/about-whiteboard-sketch.png"; // the hand-drawn fund-transfer flow
 
 /* tool logos (downloaded from Figma) — all rendered inside a uniform 48×48 box */
 const TOOLS_ROW_1 = [
@@ -42,12 +47,16 @@ const TOOL_LABELS = ["Whiteboard", "Pen/ Paper", "Sticky Notes"];
 
 const easeShuttle = [0.22, 1, 0.36, 1];
 
-const ABOUT_FULL =
-  "When I joined Selise, I saw an opportunity to bring structure and efficiency to the design process. I built a comprehensive design system, ensuring consistency across mobile, tablet, and web.\n\nLeading the product design end to end, I shaped the user journeys behind how the product works today. Beyond design, I drive stakeholder alignment and design demos, taking full ownership of the outcome.\n\nGetting here meant the hardest interview I've ever sat in — a whiteboard challenge with no laptop, no Figma, just a pen and paper. I drew the journey by hand and walked the team through every decision. Strip away the tools and one thing is left: can you think clearly about people?\n\nI still answer that question every day, alongside one of the largest and strongest UX teams in Bangladesh.";
-const ABOUT_SHORT =
-  "Hello, I’m Rahat — a product-minded designer with nearly 4 years of experience, currently a UX Engineer at Selise Digital Platform. I've grown into a product-focused role, taking end-to-end ownership — from discovery to delivery —";
+/* intro above the tool grid, desktop and mobile */
+const STACKS_TOOLS =
+  "To bring ideas to life, I rely on tools that stay out of the way. Some help me think through a problem, others help me ship the answer.";
+
+/* intro above the process staircase — picks up mid-sentence from the steps it introduces */
+const STACKS_PROCESS =
+  "...from discovery to delivery. The order looks linear, but the work isn’t — every step is a chance to catch what the last one missed.";
+
 const QUOTE =
-  "I designed a football jersey before I knew what a design tool was. The craft was never the software.";
+  "A whiteboard challenge with nothing but pen and paper. No laptop, no Figma, no component library to lean on";
 
 /* ── HERO COPY — edit the story here ───────────────────────────────────────
    Each string is its own paragraph. Add or remove entries freely; the hero
@@ -60,7 +69,7 @@ const STORY_INTRO = [
 ];
 
 const DESIGNING_SELISE =
-  "When I joined Selise as a UX Engineer in 2021, I was one of three people on a new team. We were tasked with building the design culture from the ground up — no established workflows, no design system, just three people and a whiteboard.\n\nEvery whiteboard session was intense. We’d spend hours debating whether a button should be 44px or 48px, not because we were perfectionist assholes (okay, maybe a little), but because we knew every pixel choice would compound across thousands of screens our customers would use daily. We had to be right, because reversing a bad decision later would be exponentially more expensive in momentum and time.\n\nI learned more in those whiteboard sessions than I had in years: how to defend a design decision with data, how to fold feedback into an idea without losing its soul, how to think about scale. We built a system that could grow with the company, trained the engineers to think like designers, and turned design into a first-class citizen at Selise. By the time I left, we’d shipped product to thousands of users and proven that design rigor wasn’t a luxury — it was a compounding advantage.";
+  "When I joined Selise, I saw an opportunity to bring structure and efficiency to the design process. I built a comprehensive design system, ensuring consistency across mobile, tablet, and web. Leading the product design end to end, I shaped the user journeys behind how the product works today. Beyond design, I drive stakeholder alignment and design demos, taking full ownership of the outcome. Getting here meant the hardest interview I’ve ever sat in — a whiteboard challenge with no laptop, no Figma, just a pen and paper. I drew the journey by hand and walked the team through every decision. Strip away the tools and one thing is left: can you think clearly about people? I still answer that question every day, alongside one of the largest and strongest UX teams in Bangladesh.";
 
 const STEPS = ["Discovery call", "Userflow", "Wireframe", "Visual Design", "Handoff"];
 
@@ -117,6 +126,16 @@ const HERO_SET = [
    Sections below are offset from it so the tuned inter-section gaps stay put. */
 const HERO_H = 1140;
 
+/* Desktop section heights, stacked under the hero. Chained rather than written
+   out as running totals — growing one section now pushes the rest down instead
+   of letting them overlap it. */
+const SEC_SELISE_H = 1284;
+const SEC_STACKS_H = 1342; // ends just under the process staircase (938 + 400)
+const SEC_EXP_H = 640;
+const SEC_STACKS_TOP = HERO_H + SEC_SELISE_H;
+const SEC_EXP_TOP = SEC_STACKS_TOP + SEC_STACKS_H;
+const PAGE_H = SEC_EXP_TOP + SEC_EXP_H;
+
 /* ── mobile (Figma 642:3594, 390 frame) ────────────────────────────────────
    Every composed block in the mobile design is the 1440 block at a fixed
    ratio — measured off the Figma frames, they come out exact. So the mobile
@@ -124,10 +143,10 @@ const HERO_H = 1140;
    it: one source of truth, and every GSAP selector below keeps working as-is. */
 const M = {
   heroTicker: 222 / 392, // 0.566 — portrait marquee
-  imagePair: 298 / 354, // 0.842 — the two-up beside "Designing @Selise"
+  imagePair: 0.75, // tilted pair, 428.2 → 321 wide: fits a 375 frame with air either side
+  sketch: 0.75, // notebook card, 363.3 → 272 wide
   tools: 584 / 880, // 0.664 — tool grid (runs wider than the phone)
   process: 0.4, // the staircase, shrunk until it fits the gutter
-  strip: 145 / 168, // 0.863 — the 4-up image strip (runs wider, so it tickers)
 };
 
 /* a mobile block: the desktop markup at `scale`, in a box the scaled size.
@@ -250,17 +269,53 @@ function HeroTickerSet() {
 /* ── blocks shared by both layouts ────────────────────────────────────────
    Each is drawn at its desktop size; the mobile tree wraps them in <Scaled>. */
 
-// the two-up beside "Designing @Selise" (Figma 402:1645/1646) — 354 × 298
+/* The two tilted team photos beside "Designing @Selise" (Figma 820:6469) —
+   428.2 × 425.5. Each card counter-rotates 15°, and the rotation has to sit on
+   an inner div: GSAP drives the [data-parallax] element and clears `rotate` on
+   anything it touches, which would flatten a Tailwind rotate utility there.
+   The listed box sizes are the rotated bounding boxes, e.g. a 275 × 266 card at
+   15° measures 275·cos15 + 266·sin15 = 334.5 wide. */
+const PAIR_BOX = { w: 428.2, h: 425.514 };
+
+function TiltCard({ src, alt, w, h, tilt }) {
+  return (
+    <div
+      className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[24px] bg-[#1c1c1c] ${tilt}`}
+      style={{ width: w, height: h }}
+    >
+      <img alt={alt} src={src} className="absolute inset-0 size-full max-w-none object-cover" />
+    </div>
+  );
+}
+
 function ImagePair() {
   return (
     <>
-      <div data-parallax="-40" className="absolute overflow-hidden rounded-[17.687px] bg-[#1c1c1c] opacity-40 transition-opacity duration-500 hover:opacity-100" style={{ left: 0, top: 0, width: 168, height: 298 }}>
-        <img alt="Rahat Hasan" src={imgR6} className="absolute inset-0 size-full max-w-none object-cover" />
+      <div data-parallax="-40" className="absolute" style={{ left: 0, top: 0, width: 334.475, height: 328.112 }}>
+        <TiltCard src={imgTeamTable} alt="Hackathon working session at Selise — the team mapping ideas on sticky notes" w={275} h={266} tilt="rotate-15" />
       </div>
-      <div data-parallax="30" className="absolute overflow-hidden rounded-[17.687px] bg-[#1c1c1c] opacity-40 transition-opacity duration-500 hover:opacity-100" style={{ left: 186, top: 41, width: 168, height: 216 }}>
-        <img alt="Rahat Hasan" src={imgSmile} className="absolute inset-0 size-full max-w-none object-cover" />
+      <div data-parallax="30" className="absolute" style={{ left: 194.27, top: 191.59, width: 233.926, height: 233.926 }}>
+        <TiltCard src={imgTeamWall} alt="The Selise team clustering notes on the wall during an affinity mapping session" w={191} h={191} tilt="-rotate-15" />
       </div>
     </>
+  );
+}
+
+/* The notebook page from the whiteboard interview (Figma 820:6473) — a 282 ×
+   351.3 card at -15°, so the bounding box is 363.3 × 412.3. The inner offsets
+   are Figma's crop, not object-cover: the designer pushed the page left and
+   scaled it up so the drawn flow fills the card and the desk edge falls away. */
+const SKETCH_BOX = { w: 363.314, h: 412.317 };
+
+function SketchCard() {
+  return (
+    <div className="absolute left-1/2 top-1/2 h-[351.3px] w-[282px] -translate-x-1/2 -translate-y-1/2 -rotate-15 overflow-hidden rounded-[24px] bg-[#1c1c1c]">
+      <img
+        alt="A notebook page of hand-drawn wireframes — the fund-transfer flow from the whiteboard interview"
+        src={imgSketch}
+        className="absolute left-[-4.79%] top-0 h-[109.31%] w-[111.91%] max-w-none"
+      />
+    </div>
   );
 }
 
@@ -340,25 +395,10 @@ function ProcessFlow({ geo = PROC_DESKTOP }) {
   );
 }
 
-/* 4-up image strip — 575 × 168. `tile` adds the trailing gap so two copies
-   butt at an even pitch and a −50% slide loops without a seam. */
-const STRIP = [imgR5, imgR6, imgR5, imgSmile];
-function ImageStrip({ tile = false }) {
-  return (
-    <div className="flex shrink-0" style={{ height: 168, paddingRight: tile ? 20 : 0 }}>
-      {STRIP.map((src, i) => (
-        <div key={i} className={`${tile ? "ticker-cell" : ""} relative shrink-0 overflow-hidden rounded-[17.687px] bg-[#1c1c1c]`} style={{ width: i === 3 ? 119 : 132, marginRight: i === 3 ? 0 : 20, height: 168 }}>
-          <img alt="" src={src} className="absolute inset-0 size-full max-w-none object-cover" />
-        </div>
-      ))}
-    </div>
-  );
-}
-
 /* ── mobile layout (Figma 642:3594) ───────────────────────────────────────
    A plain flowing column. Every animation hook the desktop tree uses is on
    the same class names here, so the single useGSAP block below drives both. */
-function MobileBody({ heroTickerRef, stripTickerRef, toolsRowRefs }) {
+function MobileBody({ heroTickerRef, toolsRowRefs }) {
   const copyIndent = "ml-[54px] w-[calc(100%-54px)]";
   return (
     <div className="relative w-full overflow-hidden">
@@ -406,30 +446,31 @@ function MobileBody({ heroTickerRef, stripTickerRef, toolsRowRefs }) {
         </div>
 
         <div className="mt-[24px] flex w-full justify-center">
-          <Scaled w={354} h={298} scale={M.imagePair} className="reveal-up">
+          <Scaled w={PAIR_BOX.w} h={PAIR_BOX.h} scale={M.imagePair} className="reveal-up">
             <ImagePair />
           </Scaled>
         </div>
 
-        {/* Warm portrait, quote underneath. Overlaying the copy on the photo
-            (as the 1440 layout does, where there is room beside it) left it
-            fighting the image for contrast on a phone — stacking gives the
-            quote the full column and the portrait its full frame. */}
-        <div className="gutter mt-[80px]">
-          <div className="reveal-up relative w-full overflow-hidden rounded-[17.687px] bg-[#1c1c1c]" style={{ height: 320 }}>
-            <img alt="" src={imgR5} className="absolute inset-0 size-full max-w-none object-cover" />
-          </div>
-          <p className="reveal-up font-serif-display mt-[24px] text-[24px] leading-[32px] tracking-[0.96px] text-[#b3b3b3]">
+        {/* The 1440 layout sets the notebook and its line side by side; a phone
+            has no room for that, so they stack — sketch centred, quote given
+            the full column underneath. */}
+        <div className="mt-[48px] flex w-full justify-center">
+          <Scaled w={SKETCH_BOX.w} h={SKETCH_BOX.h} scale={M.sketch} className="reveal-up">
+            <SketchCard />
+          </Scaled>
+        </div>
+        <div className="gutter mt-[32px]">
+          <p className="reveal-up font-serif-display text-[24px] leading-[32px] tracking-[0.96px] text-[#b3b3b3]">
             {QUOTE}
           </p>
         </div>
       </section>
 
       {/* ===================== WORK STACKS ===================== */}
-      <section className="relative w-full pt-[96px]">
+      <section className="relative w-full pt-[64px]">
         <div className="gutter">
           <MobileLabel italic>Work stacks</MobileLabel>
-          <Body className={`reveal-up mt-[20px] ${copyIndent}`}>{copyWithLink(ABOUT_SHORT)}</Body>
+          <Body className={`reveal-up mt-[20px] ${copyIndent}`}>{copyWithLink(STACKS_TOOLS)}</Body>
         </div>
 
         {/* Tool grid runs wider than the phone, so each row tickers on its own —
@@ -447,24 +488,11 @@ function MobileBody({ heroTickerRef, stripTickerRef, toolsRowRefs }) {
         </div>
 
         <div className="gutter mt-[60px]">
-          <Body className="reveal-up">{copyWithLink(ABOUT_SHORT)}</Body>
+          <Body className="reveal-up">{copyWithLink(STACKS_PROCESS)}</Body>
           {/* the staircase gets its own taller geometry here, not a shrunk
               copy of the desktop one — see PROC_MOBILE */}
           <div className="mt-[40px]">
             <ProcessFlow geo={PROC_MOBILE} />
-          </div>
-        </div>
-
-        <div className="gutter mt-[60px]">
-          <Body className="reveal-up">{copyWithLink(ABOUT_SHORT)}</Body>
-        </div>
-        {/* the 4-up strip is wider than the phone, so it tickers */}
-        <div className="relative mt-[28px] w-full overflow-hidden" style={{ height: 168 * M.strip }}>
-          <div className="absolute left-0 top-0 origin-top-left" style={{ transform: `scale(${M.strip})` }}>
-            <div ref={stripTickerRef} className="flex w-max">
-              <ImageStrip tile />
-              <ImageStrip tile />
-            </div>
           </div>
         </div>
       </section>
@@ -507,7 +535,6 @@ function MobileBody({ heroTickerRef, stripTickerRef, toolsRowRefs }) {
 export default function AboutPage() {
   const rootRef = useRef(null);
   const heroTickerRef = useRef(null);
-  const stripTickerRef = useRef(null);
   // three tool rows, each on its own track so they can run opposite ways
   const toolsRowRefs = [useRef(null), useRef(null), useRef(null)];
   const [isNarrow, setIsNarrow] = useState(() => window.matchMedia("(max-width: 1023px)").matches);
@@ -524,10 +551,6 @@ export default function AboutPage() {
       // hero portrait marquee — continuous ticker
       gsap.to(heroTickerRef.current, { xPercent: -50, ease: "none", duration: 36, repeat: -1 });
 
-      // mobile only: the strip and the tool grid both run wider than the phone
-      if (stripTickerRef.current) {
-        gsap.to(stripTickerRef.current, { xPercent: -50, ease: "none", duration: 22, repeat: -1 });
-      }
       /* tool rows: outer two travel left→right, the word row counter-travels
          right→left. A track is two copies wide, so -50% and 0 paint the same
          thing — sliding between them loops invisibly whichever way it runs. */
@@ -648,9 +671,9 @@ export default function AboutPage() {
       {/* one tree at a time — the two layouts share class names and SVG mask
           ids, so rendering both (even hidden) would double every GSAP target */}
       {isNarrow ? (
-        <MobileBody heroTickerRef={heroTickerRef} stripTickerRef={stripTickerRef} toolsRowRefs={toolsRowRefs} />
+        <MobileBody heroTickerRef={heroTickerRef} toolsRowRefs={toolsRowRefs} />
       ) : (
-      <div className="fit-1440 relative w-full overflow-hidden" style={{ height: HERO_H + 3350 }}>
+      <div className="fit-1440 relative w-full overflow-hidden" style={{ height: PAGE_H }}>
         {/* vertical grid rails — solid white/0.4 at the outer edges, dashed
             white/0.2 (10-10) at the inner gutters (Figma rail SVGs) */}
         <div className="pointer-events-none absolute inset-0 z-0">
@@ -715,52 +738,49 @@ export default function AboutPage() {
         </section>
 
         {/* ===================== DESIGNING @SELISE ===================== */}
-        <section className="absolute left-0 z-10 h-[990px] w-full" style={{ top: HERO_H }}>
+        {/* Figma 820:6453. Its content frame sits at inner x 190, and every
+            offset below is that frame's own geometry re-based onto the label's
+            top (156), which is what sets this section's gap from the hero. */}
+        <section className="absolute left-0 z-10 w-full" style={{ top: HERO_H, height: SEC_SELISE_H }}>
           <SectionLabel top={156}>Designing @Selise</SectionLabel>
 
-          <Body className="reveal-up absolute" style={{ left: 330, top: 237, width: 473 }}>
-            {copyWithLink(ABOUT_FULL + ABOUT_FULL)}
+          <Body className="reveal-up absolute" style={{ left: 307, top: 237, width: 473 }}>
+            {copyWithLink(DESIGNING_SELISE)}
           </Body>
 
-          {/* right image pair — 40% opacity per Figma 402:1645/1646 */}
-          <div className="reveal-up absolute" style={{ left: 896, top: 323, width: 354, height: 298 }}>
+          {/* tilted team photos, full opacity (Figma 820:6469) */}
+          <div className="reveal-up absolute" style={{ left: 821.8, top: 237, width: PAIR_BOX.w, height: PAIR_BOX.h }}>
             <ImagePair />
           </div>
 
-          {/* warm image + serif quote — EightiesComeback Medium 28/32, grey (Figma 402:1627) */}
-          <div className="reveal-up absolute overflow-hidden rounded-[17.687px] bg-[#1c1c1c]" style={{ left: 381, top: 685, width: 234, height: 288 }}>
-            <img alt="" src={imgR5} className="absolute inset-0 size-full max-w-none object-cover" />
+          {/* the interview notebook, and the line it earns (Figma 820:6472) */}
+          <div className="reveal-up absolute" style={{ left: 405.34, top: 726.5, width: SKETCH_BOX.w, height: SKETCH_BOX.h }}>
+            <SketchCard />
           </div>
-          <p className="reveal-up font-serif-display absolute text-[28px] leading-[32px] tracking-[1.12px] text-[#808080]" style={{ left: 555, top: 749, width: 504 }}>
+          <p className="reveal-up font-serif-display absolute text-[28px] leading-[32px] tracking-[1.12px] text-[#b3b3b3]" style={{ left: 781.66, top: 914.8, width: 253 }}>
             {QUOTE}
           </p>
         </section>
 
         {/* ===================== WORK STACKS ===================== */}
-        <section className="absolute left-0 z-10 h-[1720px] w-full" style={{ top: HERO_H + 990 }}>
+        <section className="absolute left-0 z-10 w-full" style={{ top: SEC_STACKS_TOP, height: SEC_STACKS_H }}>
           <SectionLabel top={140} lineW={146} italic>Work stacks</SectionLabel>
 
           {/* block 1 — copy + tool grid */}
-          <Body className="reveal-up absolute" style={{ left: 350, top: 223, width: 880 }}>{copyWithLink(ABOUT_SHORT)}</Body>
+          <Body className="reveal-up absolute" style={{ left: 350, top: 223, width: 880 }}>{copyWithLink(STACKS_TOOLS)}</Body>
           <div className="absolute" style={{ left: 350, top: 343 }}>
             <ToolGrid />
           </div>
 
           {/* block 2 — copy + process staircase (pills 200 × 80, Urbanist 24, Figma 402:2294) */}
-          <Body className="reveal-up absolute" style={{ left: 350, top: 818, width: 880 }}>{copyWithLink(ABOUT_SHORT)}</Body>
+          <Body className="reveal-up absolute" style={{ left: 350, top: 818, width: 880 }}>{copyWithLink(STACKS_PROCESS)}</Body>
           <div className="absolute" style={{ left: 350, top: 938 }}>
             <ProcessFlow />
-          </div>
-
-          {/* block 3 — right-aligned copy + 4-image strip */}
-          <Body className="reveal-up absolute" style={{ left: 583, top: 1422, width: 647 }}>{copyWithLink(ABOUT_SHORT)}</Body>
-          <div className="reveal-up absolute" style={{ left: 583, top: 1548 }}>
-            <ImageStrip />
           </div>
         </section>
 
         {/* ===================== WORK EXPERIENCE ===================== */}
-        <section className="absolute left-0 z-10 h-[640px] w-full" style={{ top: HERO_H + 2710 }}>
+        <section className="absolute left-0 z-10 w-full" style={{ top: SEC_EXP_TOP, height: SEC_EXP_H }}>
           <SectionLabel top={156} italic>Work Experience</SectionLabel>
           <div className="exp-list absolute" style={{ left: 330, top: 237, width: 880 }}>
             {EXPERIENCE.map((job, i) => (
