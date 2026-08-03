@@ -194,8 +194,10 @@ export default function Hero() {
       className="bg-ink relative min-h-[640px] overflow-hidden max-lg:h-[100svh] max-lg:min-h-[720px] lg:h-screen lg:max-h-[1099px] lg:min-h-[820px]"
       data-name="Hero Section"
     >
-      {/* mouse-reactive hex-code background (fin.com style, accent red) */}
-      <HexGrid />
+      {/* mouse-reactive hex-code background (fin.com style, accent red).
+          Masked by the dot portrait: the codes light up around the subject and
+          stop at its silhouette instead of crawling across the face. */}
+      <HexGrid maskSelector="[data-hex-mask]" />
 
       {/* vertical grid lines — desktop only; the mobile frame (Figma 619:95)
           carries no rails, just the dashed hairline above its bottom edge */}
@@ -220,6 +222,7 @@ export default function Hero() {
         animate={{ opacity: 1 }}
         transition={{ duration: 1.4, ease: "easeOut", delay: 0.2 }}
         className="absolute bottom-0 right-0 z-[3] h-[86%] w-[820px] max-lg:hidden"
+        data-hex-mask
       >
         <HeroDotPortrait src={imgPortrait} className="size-full" />
       </motion.div>

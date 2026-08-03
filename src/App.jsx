@@ -94,7 +94,7 @@ export default function App() {
       {isAbout ? (
         <AboutPage />
       ) : isCaseStudyDetail ? (
-        <CaseStudyDetail />
+        <CaseStudyDetail key={route} />
       ) : isCaseStudies ? (
         <CaseStudies />
       ) : (

@@ -4,6 +4,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import Footer from "./Footer.jsx";
+import { attachTickerFocus } from "../lib/tickerFocus.js";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -565,23 +566,8 @@ export default function AboutPage() {
       });
 
       /* Centre focus: whichever ticker cell is crossing the middle of the
-         screen burns up to full, the rest sit back at the resting 40%. Driven
-         off gsap's ticker so it stays in step with the marquee tweens. */
-      const cells = gsap.utils.toArray(".ticker-cell");
-      let focus;
-      if (cells.length) {
-        focus = () => {
-          const mid = window.innerWidth / 2;
-          cells.forEach((cell) => {
-            const r = cell.getBoundingClientRect();
-            if (!r.width) return;
-            // 1 at dead centre, 0 once a full card away
-            const t = Math.max(0, 1 - Math.abs(r.left + r.width / 2 - mid) / r.width);
-            cell.style.opacity = String(0.4 + 0.6 * t * t);
-          });
-        };
-        gsap.ticker.add(focus);
-      }
+         screen burns up to full, the rest sit back at the resting 40%. */
+      const detachFocus = attachTickerFocus(".ticker-cell");
 
       // hero layers appear on mount (above the fold), after the heading
       gsap.fromTo(".hero-appear", { opacity: 0, y: 30 }, {
@@ -657,9 +643,7 @@ export default function AboutPage() {
       });
 
       // gsap.context reverts its own tweens, but the ticker callback is ours
-      return () => {
-        if (focus) gsap.ticker.remove(focus);
-      };
+      return detachFocus;
     },
     // the two layouts are separate trees, so crossing the breakpoint has to
     // tear the whole set down and rebuild it against the tree that is now up

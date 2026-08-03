@@ -2,23 +2,16 @@ import { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { CASE_STUDIES } from "../data/caseStudies.js";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-const imgRectangle6 = "/assets/bf6e07a7c2c0d1b3324cf94624a8454cb84c6b0d.png";
-const imgRectangle8 = "/assets/01b079747853473476a56c1110e5349c011b0407.png";
-const imgRectangle14 = "/assets/0b19b6ba52627fe4db5c413523518e7d4390e4ae.png";
-const imgRectangle15 = "/assets/b0191a30584e4ed37ce1640236532481efa0be4e.png";
 const imgLogo2 = "/assets/0826edbc3e6fd14f58cf0e0a65d4ad80ec15da69.svg";
 const imgVector1 = "/assets/d6b9f02c4491ac4a2168656adfefa6ca940f6b7d.svg";
 const imgLines = "/assets/08c740b47b066a09ddc1385b453b9a2d1b0875a9.svg"; // same grid as the Hero
 
-const CARDS = [
-  { slug: "riqs-praxis-monitor", img: imgRectangle8, title: "RiQS Praxis Monitor/ Web Application", tags: ["UX Audit", "Improve UX", "User Journey"] },
-  { slug: "fittrack-pro", img: imgRectangle14, title: "RiQS Praxis Monitor/ Web Application", tags: ["Revamp Design", "Improve UX", "Fine tune User Journey"] },
-  { slug: "nutriguide", img: imgRectangle6, title: "RiQS Praxis Monitor/ Web Application", tags: ["Revamp Design", "Improve UX", "Fine tune User Journey"], crop: true },
-  { slug: "sleepsync", img: imgRectangle15, title: "RiQS Praxis Monitor/ Web Application", tags: ["Revamp Design", "Improve UX", "Fine tune User Journey"] },
-];
+/* the rail mirrors the Case Studies page — same three studies, same slugs */
+const CARDS = CASE_STUDIES.map((c) => ({ slug: c.slug, img: c.hero, title: c.title, tags: c.tags }));
 
 /* layout constants (px) — feed both the JSX and the scroll maths.
    Content lives inside the centred 1440 grid box (same box the rail lines are

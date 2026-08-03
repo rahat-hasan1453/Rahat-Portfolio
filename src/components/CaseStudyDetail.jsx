@@ -3,6 +3,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import Footer from "./Footer.jsx";
+import { getCaseStudy } from "../data/caseStudies.js";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -15,62 +16,10 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
    white/0.2 inner rails (x 188 / 1250) start BELOW the hero (per Figma).
    ========================================================================= */
 
-/* ══════════════════════════ EDIT PER CASE STUDY ══════════════════════════
-   Everything content-related lives in this object — swap text and image
-   paths here (or duplicate this file per study) without touching layout. */
-const STUDY = {
-  title: "NutriGuide / Web Application",
-  desc: "Discover healthy recipes and meal plans tailored to your dietary preferences with NutriGuide. Empower your eating habits with easy-to-follow guidance.",
-  year: "2025/26",
-  tags: ["Design Refresh", "Enhance Usability", "User Testing"],
-  cats: ["Nutrition", "Wellness"],
-  hero: "/assets/cs-shot-11.png",
-
-  context:
-    "Hello, I’m Rahat — a product-minded designer with nearly 4 years of experience, currently a UX Engineer at Selise Digital Platform. I've grown into a product-focused role, taking end-to-end ownership — from discovery to delivery — collaborating with international stakeholders to turn business goals into meaningful digital experiences.",
-
-  /* gallery above the Problem Statement band: one wide + a pair */
-  gallery: {
-    full: "/assets/cs-shot-5.png",
-    pair: ["/assets/cs-shot-1.png", "/assets/cs-shot-4.png"],
-  },
-
-  problem:
-    "Hello, I’m Rahat — a product-minded designer with nearly 4 years of experience, currently a UX Engineer at Selise Digital Platform. Hello, I’m Rahat — a product-minded designer with nearly 4 years of experience, currently a UX Engineer at Selise Digital Platform.",
-
-  challenges: [
-    "Hello, I’m Rahat — a product-minded designer with nearly 4 years of experience, currently a UX Engineer at Selise Digital Platform.",
-    "I've grown into a product-focused role, taking end-to-end ownership — from discovery to delivery — collaborating with international stakeholders to turn business goals into meaningful digital experiences.",
-    "Hello, I’m Rahat — a product-minded designer with nearly 4 years of experience,",
-  ],
-
-  solutions: {
-    intro:
-      "Hello, I’m Rahat — a product-minded designer with nearly 4 years of experience, currently a UX Engineer at Selise Digital Platform. Hello, I’m Rahat — a product-minded designer with nearly 4 years of experience.",
-    bullets: [
-      "Hello, I’m Rahat — a product-minded designer with nearly 4 years of experience, currently a UX Engineer at Selise Digital Platform.",
-      "Hello, I’m Rahat — a product-minded designer with nearly 4 years of experience, currently a UX Engineer at Selise Digital Platform.",
-    ],
-  },
-
-  /* Design Exploration gallery: wide → pair → wide → pair */
-  exploration: [
-    { type: "full", src: "/assets/cs-shot-7.png" },
-    { type: "pair", srcs: ["/assets/cs-shot-13.png", "/assets/cs-shot-17.png"] },
-    { type: "full", src: "/assets/cs-shot-2.png" },
-    { type: "pair", srcs: ["/assets/cs-shot-15.png", "/assets/cs-shot-16.png"] },
-  ],
-
-  conclusion: {
-    intro:
-      "Hello, I’m Rahat — a product-minded designer with nearly 4 years of experience, currently a UX Engineer at Selise Digital Platform. Hello, I’m Rahat — a product-minded designer with nearly 4 years of experience.",
-    bullets: [
-      "Hello, I’m Rahat — a product-minded designer with nearly 4 years of experience, currently a UX Engineer at Selise Digital Platform.",
-      "Hello, I’m Rahat — a product-minded designer with nearly 4 years of experience, currently a UX Engineer at Selise Digital Platform.",
-    ],
-  },
-};
-/* ═════════════════════════ END EDITABLE CONTENT ═════════════════════════ */
+/* ══════════════════════════ CONTENT ══════════════════════════
+   Copy and imagery for every study live in src/data/caseStudies.js; this
+   page renders whichever one the #case-study/<slug> route names. Layout is
+   untouched by content edits — add a study to that file and it works here. */
 
 const imgLogo = "/assets/0826edbc3e6fd14f58cf0e0a65d4ad80ec15da69.svg";
 const imgDivider = "/assets/d6b9f02c4491ac4a2168656adfefa6ca940f6b7d.svg";
@@ -174,7 +123,7 @@ function TagDivider() {
   );
 }
 
-function Meta() {
+function Meta({ study: STUDY }) {
   return (
     <div className="flex shrink-0 flex-col items-end gap-[8px] max-lg:w-full max-lg:items-start">
       <div className="flex shrink-0 items-center gap-[20px] max-lg:order-3">
@@ -214,6 +163,8 @@ function BandBullets({ items }) {
 
 export default function CaseStudyDetail() {
   const rootRef = useRef(null);
+  /* #case-study/<slug> — unknown slugs fall back to the first study */
+  const STUDY = getCaseStudy(window.location.hash.replace("#case-study/", ""));
 
   useGSAP(
     () => {
@@ -286,7 +237,7 @@ export default function CaseStudyDetail() {
                 <Words text={STUDY.desc} />
               </p>
             </div>
-            <Meta />
+            <Meta study={STUDY} />
           </div>
 
           {/* full-width hairline closing the hero */}

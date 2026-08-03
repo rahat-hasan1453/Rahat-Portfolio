@@ -20,7 +20,14 @@ function randHex() {
   return s;
 }
 
-export default function HexGrid() {
+// how often the mask silhouette is re-sampled from the masked canvas (ms) —
+// the subject barely moves, so this is cheap insurance against a resize/scroll
+const MASK_REFRESH = 500;
+// downsampled mask width; averaging at this size closes the gaps between the
+// portrait's dots, so the silhouette masks as one shape rather than a screen
+const MASK_W = 110;
+
+export default function HexGrid({ maskSelector = null }) {
   const wrapRef = useRef(null);
   const canvasRef = useRef(null);
 
@@ -56,6 +63,38 @@ export default function HexGrid() {
       cells = Array.from({ length: cols * rows }, randHex);
     };
 
+    /* ---- optional silhouette mask -------------------------------------
+       The hero's dot portrait sits in front of this grid. Codes lighting up
+       *through* the subject read as noise on top of the face, so the cells
+       that fall on it are skipped: the hex field lights up around the
+       portrait and stops at its edge. The silhouette is sampled from the
+       portrait's own canvas (downsampled, so the gaps between its dots
+       close), which keeps the mask in the shape of the subject rather than
+       punching out its whole bounding box. */
+    const maskCanvas = document.createElement("canvas");
+    const maskCtx = maskCanvas.getContext("2d", { willReadFrequently: true });
+    let maskAlpha = null; // Uint8ClampedArray of the downsampled alpha
+    let maskW = 0;
+    let maskH = 0;
+    let maskAt = 0;
+
+    const maskSource = () => (maskSelector ? document.querySelector(maskSelector)?.querySelector("canvas") : null);
+
+    const buildMask = (src) => {
+      if (!src || !src.width || !src.height) return;
+      maskW = MASK_W;
+      maskH = Math.max(1, Math.round((MASK_W * src.height) / src.width));
+      maskCanvas.width = maskW;
+      maskCanvas.height = maskH;
+      maskCtx.clearRect(0, 0, maskW, maskH);
+      try {
+        maskCtx.drawImage(src, 0, 0, maskW, maskH);
+        maskAlpha = maskCtx.getImageData(0, 0, maskW, maskH).data;
+      } catch {
+        maskAlpha = null; // tainted canvas — fall back to no mask
+      }
+    };
+
     const draw = () => {
       raf = requestAnimationFrame(draw);
       if (!visible) return;
@@ -71,6 +110,25 @@ export default function HexGrid() {
       const ty = pointer.clientY - rect.top;
       mouse.x += (tx - mouse.x) * 0.09;
       mouse.y += (ty - mouse.y) * 0.09;
+
+      // where the masked element currently sits, in this canvas's space
+      let mask = null;
+      if (maskSelector) {
+        const src = maskSource();
+        if (src) {
+          const now = performance.now();
+          if (now - maskAt > MASK_REFRESH) {
+            buildMask(src);
+            maskAt = now;
+          }
+          if (maskAlpha) {
+            const mr = src.getBoundingClientRect();
+            // a hidden (display:none) portrait measures 0 — no mask to apply
+            if (mr.width && mr.height) mask = { x: mr.left - rect.left, y: mr.top - rect.top, w: mr.width, h: mr.height };
+          }
+        }
+      }
+
       ctx.font = "13px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
@@ -79,6 +137,12 @@ export default function HexGrid() {
           const y = r * CELL_H + 11;
           const d = Math.hypot(x - mouse.x, y - mouse.y);
           if (d >= RADIUS) continue; // cells only light up near the cursor
+          // …and never on top of the masked subject
+          if (mask && x >= mask.x && x <= mask.x + mask.w && y >= mask.y && y <= mask.y + mask.h) {
+            const mx = Math.min(maskW - 1, ((x - mask.x) / mask.w * maskW) | 0);
+            const my = Math.min(maskH - 1, ((y - mask.y) / mask.h * maskH) | 0);
+            if (maskAlpha[(my * maskW + mx) * 4 + 3] > 10) continue;
+          }
           const t = 1 - d / RADIUS;
           // values shuffle while lit, decoding-style
           if (Math.random() < 0.025 * t) cells[i] = randHex();
@@ -115,7 +179,7 @@ export default function HexGrid() {
       window.removeEventListener("resize", build);
       window.removeEventListener("mousemove", onMove);
     };
-  }, []);
+  }, [maskSelector]);
 
   return (
     <div ref={wrapRef} aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-clip">

@@ -3,6 +3,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import HexGrid from "./HexGrid.jsx";
+import { attachTickerFocus } from "../lib/tickerFocus.js";
 import usePressHold from "../hooks/usePressHold.js";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -30,7 +31,7 @@ function TickerFrame({ img }) {
     <div
       {...bind}
       data-held={held || undefined}
-      className="relative h-(--h) w-[221.085px] shrink-0 rounded-[17.687px] opacity-40 transition-opacity duration-500 hover:opacity-100 data-[held=true]:opacity-100"
+      className="ticker-cell relative h-(--h) w-[221.085px] shrink-0 rounded-[17.687px] opacity-40 transition-opacity duration-500 hover:opacity-100 data-[held=true]:opacity-100"
       style={{ "--h": `${img.h}px` }}
     >
       {img.cover ? (
@@ -80,6 +81,11 @@ export default function About() {
         duration: 28,
         repeat: -1,
       });
+
+      // whichever frame is crossing the middle of the screen sits at full
+      const detach = attachTickerFocus(".ticker-cell");
+      // gsap.context reverts its own tweens; the ticker callback is ours
+      return detach;
     },
     { scope: sectionRef }
   );

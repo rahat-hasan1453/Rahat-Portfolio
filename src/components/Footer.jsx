@@ -421,16 +421,17 @@ export default function Footer({ compact = false }) {
         {bottomSection}
         {rightsBar}
 
-        {/* grid lines — the page's inner rails (188 / 1250) bridge down to the
-            gradient, then the full footer grid (0/360/720/1080/1440) runs the
-            rest of the way, matching the homepage footer. Desktop only: these
-            are 1440-wide blocks, so on a phone they land at arbitrary columns,
-            and the mobile frames carry no rails anyway. */}
-        <div className="pointer-events-none absolute left-1/2 top-0 z-10 w-full max-w-[1440px] -translate-x-1/2 max-lg:hidden" style={{ height: COMPACT_TOP_SPACE }}>
-          <span className="absolute top-0 h-full w-px" style={{ left: 188, ...dashGrad(0.2) }} />
-          <span className="absolute top-0 h-full w-px" style={{ left: 1250, ...dashGrad(0.2) }} />
-        </div>
-        <div className="pointer-events-none absolute left-1/2 top-0 z-10 w-full max-w-[1440px] -translate-x-1/2 max-lg:hidden" style={{ height: COMPACT_BODY_H }}>
+        {/* grid lines — the bridge space above the cal widget carries NO rails.
+            It used to repeat the page's inner rails at 188 / 1250, but the page
+            above is a zoom-to-fit 1440 canvas and the footer isn't, so the two
+            never lined up: the bridge read as a stray band of dashes. The full
+            footer grid (0/360/720/1080/1440) now starts below the bridge.
+            Desktop only: these are 1440-wide blocks, so on a phone they land at
+            arbitrary columns, and the mobile frames carry no rails anyway. */}
+        <div
+          className="pointer-events-none absolute left-1/2 z-10 w-full max-w-[1440px] -translate-x-1/2 max-lg:hidden"
+          style={{ top: COMPACT_TOP_SPACE, height: "var(--footer-bottom-h)" }}
+        >
           <span className="absolute inset-y-0 left-0 w-px bg-white/40" />
           <span className="absolute inset-y-0 w-px" style={{ left: 360, ...dashGrad(0.2) }} />
           <span className="absolute inset-y-0 w-px" style={{ left: 720, ...dashGrad(0.1) }} />
