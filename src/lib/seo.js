@@ -1,5 +1,3 @@
-import { CASE_STUDIES } from "../data/caseStudies.js";
-
 /* =========================================================================
    Per-route page metadata.
 
@@ -11,7 +9,7 @@ import { CASE_STUDIES } from "../data/caseStudies.js";
    everything else is derived from it.
    ========================================================================= */
 
-export const SITE_URL = "https://rahathasan.com";
+export const SITE_URL = "https://rahat-uxd.vercel.app";
 export const SITE_NAME = "Rahat Hasan";
 export const OG_IMAGE = `${SITE_URL}/assets/og-cover.jpg`;
 
@@ -41,11 +39,10 @@ export const ROUTES = {
 /** Detail pages are behind an access code, so they are deliberately not
  *  indexed — but they still carry a real title and preview card, because the
  *  links do get shared directly. */
-export const caseStudyMeta = (slug) => {
-  const study = CASE_STUDIES.find((c) => c.slug === slug);
+export const caseStudyMeta = (study) => {
   if (!study) return null;
   return {
-    path: `/case-studies/${slug}`,
+    path: `/case-studies/${study.slug}`,
     title: `${study.title} — Case Study by Rahat Hasan`,
     description: study.desc,
     image: `${SITE_URL}${study.hero}`,

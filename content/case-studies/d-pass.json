@@ -1,0 +1,52 @@
+{
+  "order": 20,
+  "slug": "d-pass",
+  "title": "D-Pass / Digital Visitor Management",
+  "desc": "Office check-in used to run on phone calls and a paper logbook. D-Pass replaces the whole chain with scheduled slots, SMS codes, and OTP authentication \u2014 75% faster, and contactless.",
+  "year": "2025/26",
+  "tags": [
+    "Process Redesign",
+    "Contactless Flow",
+    "Security UX"
+  ],
+  "cats": [
+    "Enterprise",
+    "Workplace"
+  ],
+  "pin": "",
+  "shots": [
+    "/assets/cs/d-pass/01.jpg",
+    "/assets/cs/d-pass/02.jpg",
+    "/assets/cs/d-pass/03.jpg",
+    "/assets/cs/d-pass/04.jpg",
+    "/assets/cs/d-pass/05.jpg",
+    "/assets/cs/d-pass/06.jpg",
+    "/assets/cs/d-pass/07.jpg",
+    "/assets/cs/d-pass/08.jpg"
+  ],
+  "context": "D-Pass is a smart digital visitor management solution designed to modernize and secure how organizations handle guest visits. By automating meeting scheduling, visitor authentication, and real-time notifications, it replaces outdated manual processes with a seamless, paperless system \u2014 better coordination, stronger security, and a better visitor experience through one integrated platform on both mobile and web.",
+  "problem": "The traditional visitor management process in offices is inefficient and prone to errors. Visitors call the officer to book a meeting, call again on arrival, wait while the officer notifies the guard, then fill in a paper attendance sheet by hand. The result is a disjointed experience, long wait times, and real security risk from the lack of proper authentication.",
+  "challenges": [
+    "Manual meeting scheduling: visitors had to call the respective officer to book a slot, which regularly produced miscommunication and delays.",
+    "A cumbersome arrival process: on arrival the visitor calls the officer again, who then notifies the guard \u2014 a chain of manual hand-offs with no single source of truth.",
+    "Paper-based documentation: name, company, mobile number, and time were written into an attendance sheet by hand, slow to complete and easy to get wrong.",
+    "No real authentication step, so nothing verified that the person at the desk was the person who was expected."
+  ],
+  "solutions": {
+    "intro": "D-Pass was designed as a paired mobile and web application that collapses the entire chain into one flow \u2014 contactless throughout, authenticated at the door, and with no paper anywhere in it.",
+    "bullets": [
+      "Automated scheduling: officers book meeting slots directly in D-Pass, eliminating the repeated phone calls, and a unique meeting code is sent to the visitor by SMS on confirmation.",
+      "Secure, contactless authentication: the visitor gives the meeting code to the guard, who verifies them with a one-time password sent to the visitor\u2019s phone \u2014 no physical contact and no shared surfaces.",
+      "A paperless record: visitor details are pre-filled by the officer at scheduling time, so the attendance sheet disappears entirely.",
+      "Real-time notifications tell the officer the moment their visitor is authenticated, closing the coordination gap that the phone chain used to fill."
+    ]
+  },
+  "conclusion": {
+    "intro": "Replacing the call-and-logbook chain with scheduled slots, SMS codes, and OTP verification made check-in roughly 75% faster while raising the security floor rather than trading it away.",
+    "bullets": [
+      "Check-in is contactless end to end \u2014 code on arrival, OTP to verify, no shared pen and no shared sheet.",
+      "Every visit carries an authenticated, searchable record, replacing a paper log nobody could audit.",
+      "Officers, guards, and visitors work from one coordinated platform across mobile and web instead of three disconnected manual steps."
+    ]
+  }
+}

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ACCESS_MINUTES, PIN_LENGTH, checkPin, unlockCase } from "../lib/caseAccess.js";
+import { ACCESS_MINUTES, checkPin, pinLengthFor, unlockCase } from "../lib/caseAccess.js";
+import settings from "../../content/settings.json";
 
 /* =========================================================================
    Case study access modal.
@@ -20,11 +21,13 @@ import { ACCESS_MINUTES, PIN_LENGTH, checkPin, unlockCase } from "../lib/caseAcc
 const imgR = "/assets/cbb187227f4bec065dffe6c01f5b5bdd32d0a6d7.svg";
 const imgClose = "/assets/8d3e866298728539e5e53c49774582e700852597.svg";
 
-const EMAIL = "rahat.akash1453@gmail.com";
+const EMAIL = settings.contactEmail || "rahat.akash1453@gmail.com";
 const EASE = [0.22, 1, 0.36, 1];
 
 export default function PinGate({ open, onClose, onUnlocked, title, slug }) {
-  const [digits, setDigits] = useState(Array(PIN_LENGTH).fill(""));
+  // a study may carry its own code, so the number of boxes is per study
+  const PIN_LENGTH = pinLengthFor(slug);
+  const [digits, setDigits] = useState(() => Array(PIN_LENGTH).fill(""));
   const digitsRef = useRef(digits);
   const [error, setError] = useState(false);
   const [done, setDone] = useState(false);
@@ -45,7 +48,7 @@ export default function PinGate({ open, onClose, onUnlocked, title, slug }) {
     setDone(false);
     const t = setTimeout(() => inputs.current[0]?.focus(), 260);
     return () => clearTimeout(t);
-  }, [open]);
+  }, [open, PIN_LENGTH]);
 
   // the page behind must not scroll while the modal owns the screen
   useEffect(() => {
@@ -68,7 +71,7 @@ export default function PinGate({ open, onClose, onUnlocked, title, slug }) {
   }, [open, onClose]);
 
   const submit = (code) => {
-    if (checkPin(code)) {
+    if (checkPin(code, slug)) {
       setDone(true);
       unlockCase(slug);
       // let the "you're in" beat land before the page changes under them
@@ -194,12 +197,12 @@ export default function PinGate({ open, onClose, onUnlocked, title, slug }) {
                     {title ? (
                       <>
                         <span className="text-white">{title}</span> is client work, so I keep the full write-up out of
-                        public search. Pop in the 4-digit code and this one opens right up.
+                        public search. Pop in the {PIN_LENGTH}-digit code and this one opens right up.
                       </>
                     ) : (
                       <>
-                        These are client projects, so I keep the full write-ups out of public search. Pop in the 4-digit
-                        code and they open right up.
+                        These are client projects, so I keep the full write-ups out of public search. Pop in the{" "}
+                        {PIN_LENGTH}-digit code and they open right up.
                       </>
                     )}
                   </p>

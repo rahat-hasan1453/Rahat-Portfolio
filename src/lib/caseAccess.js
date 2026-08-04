@@ -1,3 +1,6 @@
+import settings from "../../content/settings.json";
+import { CASE_STUDIES } from "../data/caseStudies.js";
+
 /* =========================================================================
    Case study access.
 
@@ -11,17 +14,27 @@
    given the code.
 
    ┌──────────────────────────────────────────────────────────────────────┐
-   │  TO CHANGE THE CODE OR HOW LONG AN UNLOCK LASTS, EDIT THE TWO LINES  │
-   │  BELOW. Nothing else in the app hardcodes either value.              │
+   │  THE CODE AND THE WINDOW ARE EDITED IN THE CMS (/admin → Settings),  │
+   │  which writes content/settings.json. A study can override the code   │
+   │  with its own "pin" field; blank means "use the shared one".         │
    └──────────────────────────────────────────────────────────────────────┘
    ========================================================================= */
 
-/** The code visitors type in. Any length works — the modal draws one box per
- *  digit and checks itself as soon as the last box is filled. */
-export const CASE_PIN = "1453";
+/** The shared code, used by any study that doesn't set its own. */
+export const CASE_PIN = String(settings.accessCode || "1453");
 
 /** How long a single study stays open before its code is asked for again. */
-export const ACCESS_MINUTES = 30;
+export const ACCESS_MINUTES = Number(settings.accessMinutes) || 30;
+
+/** The code for one study: its own if it has one, otherwise the shared code. */
+export const pinFor = (slug) => {
+  const own = CASE_STUDIES.find((c) => c.slug === slug)?.pin;
+  return own ? String(own) : CASE_PIN;
+};
+
+/** How many boxes the modal draws. Studies with their own code may use a
+ *  different length, so this is per study too. */
+export const pinLengthFor = (slug) => pinFor(slug).length;
 
 export const PIN_LENGTH = CASE_PIN.length;
 
@@ -73,4 +86,4 @@ export function onCaseAccessChange(fn) {
   return () => listeners.delete(fn);
 }
 
-export const checkPin = (value) => value === CASE_PIN;
+export const checkPin = (value, slug) => value === pinFor(slug);

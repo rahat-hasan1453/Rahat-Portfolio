@@ -93,7 +93,7 @@ export default function App() {
      and shared links */
   useEffect(() => {
     const meta = isCaseStudyDetail
-      ? caseStudyMeta(slugFromPath(route))
+      ? caseStudyMeta(getCaseStudy(slugFromPath(route)))
       : isAbout
         ? ROUTES.about
         : isCaseStudies

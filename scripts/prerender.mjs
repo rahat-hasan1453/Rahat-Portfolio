@@ -27,7 +27,8 @@ const dist = join(root, "dist");
 /* Read the routes straight from the app so the two can't drift. Both files are
    plain ESM with no JSX, so they import directly under node. */
 const { ROUTES, caseStudyMeta, SITE_URL, OG_IMAGE } = await import("../src/lib/seo.js");
-const { CASE_STUDIES } = await import("../src/data/caseStudies.js");
+const { loadCaseStudies } = await import("./lib/content.mjs");
+const CASE_STUDIES = loadCaseStudies();
 
 const shell = readFileSync(join(dist, "index.html"), "utf8");
 
@@ -56,7 +57,7 @@ const pages = [
   ROUTES.home,
   ROUTES.about,
   ROUTES.caseStudies,
-  ...CASE_STUDIES.map((c) => caseStudyMeta(c.slug)),
+  ...CASE_STUDIES.map((c) => caseStudyMeta(c)),
 ];
 
 for (const meta of pages) {
@@ -86,6 +87,9 @@ Allow: /
 
 # Case study detail pages sit behind an access code — nothing to index there
 Disallow: /case-studies/*/
+
+# the CMS is not content
+Disallow: /admin/
 
 Sitemap: ${SITE_URL}/sitemap.xml
 `

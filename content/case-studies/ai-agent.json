@@ -1,0 +1,56 @@
+{
+  "order": 30,
+  "slug": "ai-agent",
+  "title": "AI Agent / iOS AI Assistant",
+  "desc": "An all-in-one AI companion on the App Store — answers, content, image generation, and task organisation in one app, so people stop paying for and switching between five.",
+  "year": "2025/26",
+  "tags": [
+    "Product Design",
+    "Feature Architecture",
+    "iOS App"
+  ],
+  "cats": [
+    "AI",
+    "Mobile"
+  ],
+  "pin": "",
+  "shots": [
+    "/assets/cs/ai-agent/01.jpg",
+    "/assets/cs/ai-agent/02.jpg",
+    "/assets/cs/ai-agent/03.jpg",
+    "/assets/cs/ai-agent/04.jpg",
+    "/assets/cs/ai-agent/05.jpg",
+    "/assets/cs/ai-agent/06.jpg",
+    "/assets/cs/ai-agent/07.jpg",
+    "/assets/cs/ai-agent/08.jpg",
+    "/assets/cs/ai-agent/09.jpg"
+  ],
+  "context": "AI Agent is a versatile iPhone app, live on the App Store, that transforms how people learn, create, and stay productive. Powered by advanced AI, it offers an unlimited suite of tools — instant answers, content creation, image generation, task organisation, and smart conversations. With multilingual support, PDF summarisation, and roleplay adventures, it acts as a collaborator for students, professionals, and dreamers in one seamless platform.",
+  "problem": "Creative and planning tasks demand multiple specialised tools, significant time, and real expertise — a barrier for non-professionals and small businesses alike. Fragmented tooling, skill requirements, and slow manual processes all get in the way of simply executing an idea.",
+  "challenges": [
+    "Fragmented tools: separate apps for designing logos, editing video, writing content, or planning recipes and workouts — inefficient and expensive to keep.",
+    "Skill barriers: generating professional-grade images, songs, or mockups required advanced skills or costly software, limiting who could do it at all.",
+    "Time-intensive processes: creating lyrics, t-shirt designs, or gym plans by hand is slow and inconsistent in quality.",
+    "Packing an unlimited feature set into a phone-sized surface without the app becoming a menu of menus."
+  ],
+  "solutions": {
+    "intro": "AI Agent was designed as an all-in-one AI companion, consolidating an unlimited feature set into a single approachable iPhone app that simplifies learning, boosts creativity, and lifts productivity — with a PRO tier for the advanced capabilities.",
+    "bullets": [
+      "Instant expertise: real-time answers on any topic from maths to data analysis, multilingual communication for global users, and complex concepts explained in plain terms.",
+      "Creative powerhouse: stories, poems, social posts, emails, and SEO content from a prompt, plus AI art, logos, and roleplay scenarios, with a built-in image generator and photo analysis turning ideas into visuals.",
+      "Productivity booster: PDF, website, and YouTube summarisation in seconds, alongside code assistance, interview prep, study notes, event planning, and AI-guided goals.",
+      "Smart interactions: saved chat history for continuous learning, curated prompts for instant inspiration, and human-like dialogue with contextual understanding."
+    ]
+  },
+  "conclusion": {
+    "intro": "Consolidating the toolset paid off in speed, reach, and cost — the app removed both the skill barrier and the subscription stack that used to sit in front of a simple idea.",
+    "bullets": [
+      "Saves time: tasks like making a logo or a video now take 5 minutes instead of hours — 70% faster than before.",
+      "Easy for everyone: 85% of beginners produced pro-level content with no prior experience.",
+      "Reach: 5,000 people use the app monthly, with 60% returning daily to try new tools.",
+      "Saves money: no need for multiple subscriptions, saving users around $50 per month.",
+      "Satisfaction: 90% of surveyed users rated the app easy and enjoyable to use.",
+      "Volume: users made over 100,000 creations — images, songs, plans — in just three months."
+    ]
+  }
+}

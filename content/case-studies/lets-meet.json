@@ -1,0 +1,53 @@
+{
+  "order": 10,
+  "slug": "lets-meet",
+  "title": "Let’s Meet / Meeting Management Platform",
+  "desc": "A meeting platform that took 32 clicks to schedule a call. Reworking the flow and the interface cut that to 11 — a 66% drop in interaction cost.",
+  "year": "2025/26",
+  "tags": [
+    "Workflow Audit",
+    "Reduce Interaction Cost",
+    "Usability Testing"
+  ],
+  "cats": [
+    "SaaS",
+    "Productivity"
+  ],
+  "pin": "",
+  "shots": [
+    "/assets/cs/lets-meet/01.jpg",
+    "/assets/cs/lets-meet/02.jpg",
+    "/assets/cs/lets-meet/03.jpg",
+    "/assets/cs/lets-meet/04.jpg",
+    "/assets/cs/lets-meet/05.jpg",
+    "/assets/cs/lets-meet/06.jpg"
+  ],
+  "context": "Let’s Meet is a comprehensive meeting management software designed to streamline scheduling, organizing, and conducting meetings. The previous version, however, required a tedious 32 clicks to create a single meeting, and its interface was not intuitive — users routinely struggled to find the Join Button, which dragged down the whole experience.",
+  "problem": "The original meeting creation process in Let’s Meet was inefficient, requiring approximately 32 clicks, which frustrated users and slowed productivity. The interface also lacked clarity, making it difficult for users to locate essential features like the Join Button, leading to confusion and reduced engagement.",
+  "challenges": [
+    "Creating one meeting took roughly 32 clicks — enough friction that users deferred or abandoned scheduling altogether.",
+    "The Join Button had no visual priority, so the single most-used action on the platform was the hardest one to find.",
+    "Redundant steps were spread across the flow, and no one had mapped where the real cost sat before the redesign started.",
+    "Any new flow had to hold up identically across web, iOS, and Android without a separate design for each."
+  ],
+  "solutions": {
+    "intro": "The meeting creation process and the interface were redesigned together, with a single target: cut the number of clicks by roughly 66% — from 32 to 11 — and deliver a flow people could complete without thinking about it.",
+    "bullets": [
+      "Ran a workflow analysis over the existing journey to identify and remove redundant steps, bringing creation down from 32 clicks to 11 — a 65.6% reduction in interaction effort.",
+      "Rebuilt the flow around clear prompts and minimal required inputs, so the default path to a scheduled meeting is the shortest one.",
+      "Gave the Join Button high-contrast colour, a larger target, and prominent placement, making the primary action unmissable.",
+      "Refreshed the interface toward a clean, modern aesthetic focused on intuitive navigation and accessibility, folding in user feedback at each pass."
+    ]
+  },
+  "conclusion": {
+    "intro": "The redesigned flow ships at 11 clicks, and the gains showed up across efficiency, satisfaction, and retention rather than in one isolated metric.",
+    "bullets": [
+      "Meeting creation now takes 11 clicks instead of 32 — a 65.6% reduction in user effort.",
+      "Post-redesign surveys reported an 80% increase in user satisfaction, attributed to the clearer interface and the accessible Join Button.",
+      "Analytics showed a 45% increase in meeting creation and participation rates.",
+      "Usability testing revealed a 60% decrease in user errors during meeting creation.",
+      "The interface holds up across web, iOS, and Android, with 95% positive feedback on cross-device usability.",
+      "Early business data indicates a 30% increase in user retention and 25% growth in new sign-ups."
+    ]
+  }
+}
