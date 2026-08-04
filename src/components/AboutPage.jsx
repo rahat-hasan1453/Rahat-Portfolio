@@ -12,20 +12,20 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
    Figma: node 402:2588 "About" — artboard 1728, inner content 1440
    (x_inner = x_figma − 144). Sections 1–4 absolutely positioned inside a
    4250px wrapper (tightened ~160px gaps between sections); the shared
-   <Footer compact /> flows after it. Process connectors: Figma 423:3578.
+   site <Footer /> flows after it, outside the 1440 canvas. Process connectors: Figma 423:3578.
    ========================================================================= */
 
 /* portrait fills — same source photos as the home ticker */
-const imgR7 = "/assets/839d3a518763fdbf968a2a08c4073a1284670dcf.png"; // spark
-const imgR6 = "/assets/decfb971c6d641c9ccb852271bc0b630c000cdc2.png"; // tall profile
-const imgR5 = "/assets/29f89100346cab8bda091f83307e2d146c404f15.png"; // warm cinematic
-const imgR4 = "/assets/1343981533bfec0aaa59a2166abbcce5317934ec.png"; // white-bg smile
+const imgR7 = "/assets/839d3a518763fdbf968a2a08c4073a1284670dcf.jpg"; // spark
+const imgR6 = "/assets/decfb971c6d641c9ccb852271bc0b630c000cdc2.jpg"; // tall profile
+const imgR5 = "/assets/29f89100346cab8bda091f83307e2d146c404f15.jpg"; // warm cinematic
+const imgR4 = "/assets/1343981533bfec0aaa59a2166abbcce5317934ec.jpg"; // white-bg smile
 
 /* "Designing @Selise" media (Figma 820:6453) — two counter-tilted team photos
    and the notebook page from the whiteboard interview the copy describes */
 const imgTeamTable = "/assets/Group-planning-2048x1536.webp"; // hackathon, sticky notes
 const imgTeamWall = "/assets/gathering-solutions-1024x768.webp"; // affinity mapping
-const imgSketch = "/assets/about-whiteboard-sketch.png"; // the hand-drawn fund-transfer flow
+const imgSketch = "/assets/about-whiteboard-sketch.jpg"; // the hand-drawn fund-transfer flow
 
 /* tool logos (downloaded from Figma) — all rendered inside a uniform 48×48 box */
 const TOOLS_ROW_1 = [
@@ -168,7 +168,7 @@ function MobileLabel({ italic = false, children }) {
     <div className="reveal-label flex items-end gap-[8px]">
       <span className="lead-line mb-[16px] h-px w-[54px] origin-left bg-white/20" />
       {italic ? (
-        <p className="font-serif-display-it whitespace-nowrap text-[24px] italic leading-[32px] tracking-[0.96px] text-white">{children}</p>
+        <h2 className="font-serif-display-it whitespace-nowrap text-[24px] italic leading-[32px] tracking-[0.96px] text-white">{children}</h2>
       ) : (
         <p className="font-serif-display whitespace-nowrap text-[28px] leading-[32px] tracking-[1.12px] text-white">{children}</p>
       )}
@@ -180,6 +180,14 @@ function MobileLabel({ italic = false, children }) {
 const DASH = {
   backgroundImage: "linear-gradient(to bottom, rgba(255,255,255,0.2) 0 10px, transparent 10px 20px)",
   backgroundSize: "1px 20px",
+};
+
+/* the horizontal counterpart — same 10-on/10-off rhythm as the rails. Closes
+   the page off from the footer, exactly as the Case Studies pages do. */
+const DASH_X = {
+  backgroundImage: "linear-gradient(to right, rgba(255,255,255,0.2) 0 10px, transparent 10px 20px)",
+  backgroundSize: "20px 1px",
+  backgroundRepeat: "repeat-x",
 };
 
 /* "Selise Digital Platform" reads as an external link wherever it appears in copy */
@@ -221,7 +229,7 @@ function SectionLabel({ top, lineW = 126, italic = false, children }) {
     <div className="reveal-label absolute flex items-end gap-[16px]" style={{ left: 188, top }}>
       <span className="lead-line mb-[16px] h-px origin-left bg-white/20" style={{ width: lineW }} />
       {italic ? (
-        <p className="font-serif-display-it whitespace-nowrap text-[24px] italic leading-[32px] tracking-[0.96px] text-white">{children}</p>
+        <h2 className="font-serif-display-it whitespace-nowrap text-[24px] italic leading-[32px] tracking-[0.96px] text-white">{children}</h2>
       ) : (
         <p className="font-serif-display whitespace-nowrap text-[28px] leading-[32px] tracking-[1.12px] text-white">{children}</p>
       )}
@@ -257,7 +265,7 @@ function HeroTickerSet() {
       {HERO_SET.map((im, i) => (
         <div
           key={i}
-          className="ticker-cell relative shrink-0 overflow-hidden rounded-[17.687px] bg-[#1c1c1c] opacity-40 transition-opacity duration-500 hover:opacity-100"
+          className="ticker-cell relative shrink-0 overflow-hidden rounded-[17.687px] bg-[#1c1c1c] opacity-40 hover:opacity-100"
           style={{ width: im.w, height: im.h }}
         >
           <img alt="Rahat Hasan" src={im.src} className="absolute inset-0 size-full max-w-none object-cover" draggable="false" />
@@ -411,7 +419,7 @@ function MobileBody({ heroTickerRef, toolsRowRefs }) {
           transition={{ duration: 0.9, ease: easeShuttle }}
           className="font-serif-display gutter text-[40px] leading-[44px] tracking-[1.6px]"
         >
-          <span className="accent-gradient-text -mx-[10px] -my-[8px] block px-[10px] py-[8px]">Journey</span>
+          <span className="accent-gradient-text -mx-[10px] -my-[8px] block px-[10px] py-[8px]">{"Journey "}</span>
           <span className="accent-gradient-text -mx-[10px] -my-[8px] block px-[10px] py-[8px]">to Design</span>
         </motion.h1>
 
@@ -651,6 +659,7 @@ export default function AboutPage() {
   );
 
   return (
+    <>
     <div ref={rootRef} className="bg-ink relative mx-auto w-full lg:w-[1440px]" data-name="About Page">
       {/* one tree at a time — the two layouts share class names and SVG mask
           ids, so rendering both (even hidden) would double every GSAP target */}
@@ -684,7 +693,7 @@ export default function AboutPage() {
                   transition={{ duration: 0.9, ease: easeShuttle }}
                   className="font-serif-display text-[84px] leading-[92px] tracking-[3.36px]"
                 >
-                  <span className="accent-gradient-text -mx-[20px] -my-[14px] block px-[20px] py-[14px]">Journey</span>
+                  <span className="accent-gradient-text -mx-[20px] -my-[14px] block px-[20px] py-[14px]">{"Journey "}</span>
                   <span className="accent-gradient-text -mx-[20px] -my-[14px] block px-[20px] py-[14px]">to Design</span>
                 </motion.h1>
 
@@ -794,8 +803,15 @@ export default function AboutPage() {
       </div>
       )}
 
-      {/* ===================== FOOTER — shared component, compact (no expertise block) ===================== */}
-      <Footer compact />
     </div>
+
+      {/* dashed rule closing the page off from the footer */}
+      <span className="pointer-events-none block h-px w-full" style={DASH_X} />
+
+      {/* ===================== FOOTER — the one shared site footer ===========
+          Same component, same variant as every other page, and outside the
+          fixed 1440 canvas so it spans the viewport like the homepage. */}
+      <Footer />
+    </>
   );
 }

@@ -202,14 +202,14 @@ export default function Loader({ variant = "home", onDone }) {
             {words.map((w, i) => (
               <motion.span
                 key={i}
-                className="accent-gradient-text mr-[0.26em] inline-block"
+                className="accent-gradient-text inline-block"
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: data.wordDur, ease: EASE, delay: 0.08 + i * data.wordStep }}
               >
                 {w}
               </motion.span>
-            ))}
+            )).flatMap((el, i, arr) => (i < arr.length - 1 ? [el, " "] : [el]))}
           </h2>
           <motion.p
             initial={{ opacity: 0 }}

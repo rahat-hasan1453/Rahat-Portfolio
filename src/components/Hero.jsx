@@ -11,15 +11,15 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 const imgPortrait = "/assets/hero-portrait.png";
 const imgRectangle10 = "/assets/9968fb9396a3e91e66388b046266dfaa2cc3b597.png";
-const imgFrame71 = "/assets/491e854ca3659a4c78c80564001a653f9d1ae089.png";
+const imgFrame71 = "/assets/491e854ca3659a4c78c80564001a653f9d1ae089.jpg";
 const imgAvatar = "/assets/3bc4ade8f1fdaf67a5e466972e77f4465f7121f1.png";
 const imgLines = "/assets/08c740b47b066a09ddc1385b453b9a2d1b0875a9.svg";
 const imgCheckShield = "/assets/85606e1a5cc7d31c57d63b426903b94b6fdff486.svg";
 const imgSelise = "/assets/1d2fe36f23a36b8326d2f7597e1da82fe59f8153.svg";
 
-const imgDribbbleCard = "/assets/418e158f7d6fcd7cd799ffbbb2daafaddad58e6e.png";
-const imgBehContent = "/assets/a0b96388bfdceb1a49c3b7f2e58faa8cb215a550.png";
-const imgBehBanner = "/assets/a9a8c6aa64167329cc3afc1ed619b52ae6b6bf66.png";
+const imgDribbbleCard = "/assets/418e158f7d6fcd7cd799ffbbb2daafaddad58e6e.jpg";
+const imgBehContent = "/assets/a0b96388bfdceb1a49c3b7f2e58faa8cb215a550.jpg";
+const imgBehBanner = "/assets/a9a8c6aa64167329cc3afc1ed619b52ae6b6bf66.jpg";
 const imgBehAvatar = "/assets/17eee65ab5144a5372dc9f0f5f42f25a4f9343f4.png";
 
 const easeOut = [0.16, 1, 0.3, 1];
@@ -158,6 +158,7 @@ function SocialCardRotator() {
 
 export default function Hero() {
   const sectionRef = useRef(null);
+  const contentRef = useRef(null);
 
   // zarcerog.com-style headline split: as the hero scrolls away the top block
   // flies up-left fast while the accent line lags, drifting down-right —
@@ -187,6 +188,51 @@ export default function Hero() {
     },
     { scope: sectionRef }
   );
+
+  /* The hero is a fixed h-screen box with overflow:hidden, and its content is
+     absolutely positioned between top-140 and bottom-36 — so it cannot push the
+     box taller. On a laptop-height window the headline wraps to five lines and
+     the bottom row (location line + profile cards) was simply cut off.
+
+     Rather than hard-code a taller min-height, the section measures what its
+     content actually needs and grows only when it needs to. On tall screens
+     nothing changes: h-screen already exceeds the requirement.
+
+     The children are measured, NOT the container — the container is stretched
+     between top and bottom, so reading its height would grow with whatever we
+     just set and run away. */
+  useEffect(() => {
+    const section = sectionRef.current;
+    const content = contentRef.current;
+    if (!section || !content) return;
+
+    const TOP = 140; // lg:top-[140px]
+    const BOTTOM = 36; // lg:bottom-[36px]
+    const GAP = 16; // gap-[16px]
+
+    const sync = () => {
+      if (!window.matchMedia("(min-width: 1024px)").matches) {
+        section.style.minHeight = "";
+        return;
+      }
+      const kids = [...content.children];
+      const inner = kids.reduce((sum, el) => sum + el.offsetHeight, 0) + GAP * Math.max(0, kids.length - 1);
+      const needed = TOP + inner + BOTTOM;
+      const current = parseFloat(section.style.minHeight) || 0;
+      // only write when it actually moves, so the observer can't feed itself
+      if (Math.abs(current - needed) > 1) section.style.minHeight = `${needed}px`;
+    };
+
+    sync();
+    const ro = new ResizeObserver(sync);
+    content.querySelectorAll(":scope > *").forEach((el) => ro.observe(el));
+    window.addEventListener("resize", sync);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", sync);
+      section.style.minHeight = "";
+    };
+  }, []);
 
   return (
     <section
@@ -237,7 +283,7 @@ export default function Hero() {
 
       {/* main content — headline top / info row bottom on both breakpoints
           (mobile: 130 from the top, 52.67 from the bottom of the 844 frame) */}
-      <div className="relative z-[5] mx-auto flex w-full max-w-[1440px] flex-col gap-[16px] gutter max-lg:absolute max-lg:inset-x-0 max-lg:bottom-[52.67px] max-lg:top-[130px] max-lg:items-start max-lg:justify-between max-lg:gap-0 lg:absolute lg:bottom-[36px] lg:left-1/2 lg:top-[140px] lg:h-auto lg:-translate-x-1/2 lg:items-end lg:justify-between">
+      <div ref={contentRef} className="relative z-[5] mx-auto flex w-full max-w-[1440px] flex-col gap-[16px] gutter max-lg:absolute max-lg:inset-x-0 max-lg:bottom-[52.67px] max-lg:top-[130px] max-lg:items-start max-lg:justify-between max-lg:gap-0 lg:absolute lg:bottom-[36px] lg:left-1/2 lg:top-[140px] lg:h-auto lg:-translate-x-1/2 lg:items-end lg:justify-between">
         <div className="flex w-full shrink-0 flex-col items-start gap-[40px] max-lg:gap-0">
           <h1 className="font-serif-display relative w-full max-w-[790px] whitespace-pre-wrap text-white not-italic tracking-[3.36px] max-lg:tracking-[1.6px] [word-break:break-word]">
             {/* GSAP animates these wrappers so it never fights framer-motion's entry tweens */}
@@ -248,7 +294,7 @@ export default function Hero() {
                 transition={{ duration: 1, ease: easeOut, delay: 0.1 }}
                 className="text-display block max-lg:text-[40px] max-lg:leading-[44px]"
               >
-                Designing Solutions
+                {"Designing Solutions "}
               </motion.span>
               <motion.span
                 initial={{ opacity: 0, y: 60 }}

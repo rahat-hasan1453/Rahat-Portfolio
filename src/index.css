@@ -9,6 +9,54 @@
 }
 
 @font-face {
+  font-family: "Plus Jakarta Sans";
+  src: url("/fonts/plus-jakarta-sans-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  src: url("/fonts/plus-jakarta-sans-500.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  src: url("/fonts/plus-jakarta-sans-600.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Urbanist";
+  src: url("/fonts/urbanist-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Urbanist";
+  src: url("/fonts/urbanist-500.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Urbanist";
+  src: url("/fonts/urbanist-700.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
   font-family: "EightiesComeback It";
   src: url("/fonts/EightiesComeback-It-Medium.otf") format("opentype");
   font-weight: 500;
@@ -70,14 +118,6 @@
   zoom: var(--fit-1440, 1);
 }
 
-/* Case-study detail image frames carry their height as an inline number, so the
-   phone height rides along as --h-mobile and wins inside this query. */
-@media (max-width: 1023px) {
-  .detail-frame {
-    height: var(--h-mobile, auto) !important;
-  }
-}
-
 /* horizontal strips that are wider than a phone (logo row, skills rows) stay
    swipeable but must not show a scrollbar over the artwork */
 @utility no-scrollbar {
@@ -99,8 +139,6 @@
   /* Booking widget: Cal's inline booker on desktop, the card that opens Cal in
      a modal on mobile (Figma 642:2113 — 350 × 422). */
   --footer-cal-h: 489px;
-  --footer-compact-space: 340px;
-  --footer-compact-cal-top: 77px;
 }
 @media (max-width: 1023px) {
   :root {
@@ -112,10 +150,6 @@
     --footer-bottom-h: 994px;
     --footer-cal-top: 888px; /* skills band 860 + 28 */
     --footer-cal-h: 422px;
-    /* compact footer (About / case-study pages) — Figma 642:3541: card at 62,
-       gradient opening at 340 so the card crosses onto it by 144 */
-    --footer-compact-space: 340px;
-    --footer-compact-cal-top: 62px;
   }
 }
 
@@ -149,4 +183,30 @@ html.lenis body {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+/* Keyboard focus was invisible everywhere — nothing declared a focus style, so
+   tabbing through the site gave no indication of position. This shows only for
+   keyboard users (:focus-visible), never on mouse clicks, so the visual design
+   is untouched for everyone else. */
+:focus-visible {
+  outline: 2px solid #f16767;
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Respect the OS "reduce motion" setting. The site leans hard on motion —
+   pinned sections, marquees, parallax, canvas fields — and there was no way to
+   opt out. CSS animation and transition are collapsed here; framer-motion is
+   handled by <MotionConfig reducedMotion="user"> in main.jsx, and Lenis drops
+   its smooth-scroll hijack in App.jsx. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

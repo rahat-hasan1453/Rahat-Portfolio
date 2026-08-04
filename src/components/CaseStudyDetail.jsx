@@ -4,6 +4,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import Footer from "./Footer.jsx";
 import { getCaseStudy } from "../data/caseStudies.js";
+import { currentPath, slugFromPath } from "../lib/router.js";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -38,13 +39,20 @@ const DASH_X = {
   backgroundRepeat: "repeat-x",
 };
 
-/* ---- word-by-word reveal: splits text; gsap animates .w-word on enter ---- */
+/* ---- word-by-word reveal: splits text; gsap animates .w-word on enter.
+   The gap between words is a REAL space character, not a right margin. With a
+   margin the DOM held no whitespace at all — copy read as
+   "Let'sMeetisacomprehensive…" to screen readers, to find-in-page, to anyone
+   copying it, and to search engines. Rendering costs nothing; the space is
+   just the font's own, which is what the other split-text blocks use. ---- */
 function Words({ text, className = "" }) {
+  const words = text.split(" ");
   return (
     <span className={`wsplit ${className}`}>
-      {text.split(" ").map((w, i) => (
-        <span key={i} className="w-word mr-[0.25em] inline-block will-change-transform">
-          {w}
+      {words.map((w, i) => (
+        <span key={i}>
+          <span className="w-word inline-block will-change-transform">{w}</span>
+          {i < words.length - 1 ? " " : ""}
         </span>
       ))}
     </span>
@@ -56,9 +64,9 @@ function Label({ children }) {
   return (
     <div className="reveal-label flex items-end gap-[16px]">
       <span className="lead-line mb-[16px] h-px w-[126px] origin-left shrink-0 bg-white/40 max-lg:w-[48px]" style={{ marginLeft: -2 }} />
-      <p className="font-serif-display text-[28px] not-italic leading-[32px] tracking-[1.12px] text-white">
+      <h2 className="font-serif-display text-[28px] not-italic leading-[32px] tracking-[1.12px] text-white">
         <Words text={children} />
-      </p>
+      </h2>
     </div>
   );
 }
@@ -72,7 +80,7 @@ function Band({ title, children }) {
       <span className="pointer-events-none absolute inset-x-0 bottom-0 h-px" style={DASH_X} />
       <div className="flex flex-col gap-[24px] px-[140px] py-[40px] max-lg:px-[20px] max-lg:py-[32px]">
         <div className="flex flex-col gap-[19px]">
-          <p className="accent-gradient-text font-serif-display text-[28px] not-italic leading-[32px] tracking-[1.12px] max-lg:text-[24px]">{title}</p>
+          <h2 className="accent-gradient-text font-serif-display text-[28px] not-italic leading-[32px] tracking-[1.12px] max-lg:text-[24px]">{title}</h2>
           <div className="h-px w-full bg-white/20" />
         </div>
         <div className="font-serif-display text-[28px] not-italic leading-[32px] tracking-[1.12px] text-[#b3b3b3] [word-break:break-word] max-lg:text-[20px] max-lg:leading-[28px] max-lg:tracking-[0.8px]">
@@ -83,20 +91,72 @@ function Band({ title, children }) {
   );
 }
 
-/* ---- parallax image frame — the layer overfills so the drift never gaps ---- */
-/* The mobile frames are much shorter than the 1440 ones, and the height is a
-   number rather than a class, so it travels as a CSS var the stylesheet can
-   swap at the breakpoint (see .detail-frame in index.css). */
-function Frame({ src, height, mobileHeight, className = "" }) {
+/* ---- image frame ---------------------------------------------------------
+   Every frame is laid out at the picture's OWN aspect ratio. The frames used
+   to be fixed heights (681 / 521 / 410 tall in a 1020 column), which meant a
+   4:3 presentation shot lost up to half its height to the crop — the detail
+   inside these mockups is the whole point of them, so nothing is cropped now.
+   The ratio comes from the file's real pixel size, so the space is reserved
+   before the image loads and ScrollTrigger never has to re-measure.
+
+   Parallax survives at a much smaller amplitude: the layer overfills by 4%
+   and drifts ±2%, which reads as movement without eating the artwork. */
+function Frame({ shot, alt = "", className = "" }) {
   return (
     <div
       className={`detail-frame img-reveal relative overflow-hidden rounded-[8px] bg-[#1c1c1c] ${className}`}
-      style={{ height, "--h-mobile": mobileHeight ? `${mobileHeight}px` : undefined }}
+      style={{ aspectRatio: `${shot.w} / ${shot.h}` }}
     >
-      <div className="detail-parallax absolute inset-x-0 -top-[8%] h-[116%] will-change-transform">
-        <img alt="" src={src} draggable="false" className="size-full max-w-none object-cover" />
+      <div className="detail-parallax absolute inset-x-0 -top-[2%] h-[104%] will-change-transform">
+        <img alt={alt} src={shot.src} draggable="false" className="size-full max-w-none object-cover" loading="lazy" />
       </div>
     </div>
+  );
+}
+
+/* Rows are grouped by orientation rather than by a fixed full/pair rhythm.
+   Landscape shots are dense screenshots and get the full column width;
+   portraits (phone mockups) pair up, since side by side they still read and
+   a full-width portrait would tower over the page. On a phone every row is
+   full width — half of 350px is too small to read anything. */
+const PORTRAIT_MAX = 1.15;
+
+function buildRows(shots) {
+  const rows = [];
+  for (let i = 0; i < shots.length; i += 1) {
+    const shot = shots[i];
+    const next = shots[i + 1];
+    const isPortrait = (s) => s.w / s.h < PORTRAIT_MAX;
+    if (isPortrait(shot) && next && isPortrait(next)) {
+      rows.push({ type: "pair", items: [shot, next] });
+      i += 1;
+    } else {
+      rows.push({ type: "full", item: shot });
+    }
+  }
+  return rows;
+}
+
+/* Alt text: these images carry the actual argument of the case study, and they
+   were all alt="" — invisible to screen readers and to image search. A shot has
+   no caption of its own in the data, so it is described by the study it belongs
+   to and its position, which is honest and useful rather than decorative. */
+function Rows({ shots, label, offset = 0 }) {
+  const altFor = (shot, i) => shot.alt || `${label} — screen ${offset + i + 1}`;
+  let n = 0;
+  return (
+    <>
+      {buildRows(shots).map((row, i) =>
+        row.type === "full" ? (
+          <Frame key={i} shot={row.item} alt={altFor(row.item, n++)} className="w-full" />
+        ) : (
+          <div key={i} className="flex items-start gap-[16px] max-lg:flex-col">
+            <Frame shot={row.items[0]} alt={altFor(row.items[0], n++)} className="min-w-0 flex-1 max-lg:w-full" />
+            <Frame shot={row.items[1]} alt={altFor(row.items[1], n++)} className="min-w-0 flex-1 max-lg:w-full" />
+          </div>
+        )
+      )}
+    </>
   );
 }
 
@@ -163,8 +223,8 @@ function BandBullets({ items }) {
 
 export default function CaseStudyDetail() {
   const rootRef = useRef(null);
-  /* #case-study/<slug> — unknown slugs fall back to the first study */
-  const STUDY = getCaseStudy(window.location.hash.replace("#case-study/", ""));
+  /* /case-studies/<slug> — unknown slugs fall back to the first study */
+  const STUDY = getCaseStudy(slugFromPath(currentPath()));
 
   useGSAP(
     () => {
@@ -202,9 +262,9 @@ export default function CaseStudyDetail() {
       gsap.utils.toArray(".detail-parallax").forEach((layer) => {
         gsap.fromTo(
           layer,
-          { yPercent: -6 },
+          { yPercent: -2 },
           {
-            yPercent: 6,
+            yPercent: 2,
             ease: "none",
             scrollTrigger: { trigger: layer.closest(".detail-frame"), start: "top bottom", end: "bottom top", scrub: true },
           }
@@ -215,6 +275,7 @@ export default function CaseStudyDetail() {
   );
 
   return (
+    <>
     <div ref={rootRef} className="bg-ink relative mx-auto w-full lg:w-[1440px]" data-name="Case Study Details">
       <div className="relative lg:fit-1440">
         {/* outer solid rails — desktop only; the mobile frames carry none */}
@@ -225,8 +286,7 @@ export default function CaseStudyDetail() {
 
         {/* ===================== HERO (solid rails only, per Figma) ===================== */}
         <section className="relative z-10 px-[40px] pt-[130px] max-lg:px-[20px] max-lg:pt-[124px]">
-          {/* 350 × 352 on the phone (Figma 782:6136) */}
-          <Frame src={STUDY.hero} height={681} mobileHeight={352} className="w-full rounded-[9px]" />
+          <Frame shot={STUDY.shots[0]} alt={`${STUDY.title} — cover`} className="w-full rounded-[9px]" />
 
           <div className="mt-[36px] flex items-start justify-between max-lg:flex-col max-lg:gap-[16px]">
             <div className="flex w-[700px] flex-col gap-[8px] max-lg:w-full">
@@ -263,11 +323,7 @@ export default function CaseStudyDetail() {
 
           {/* ---- gallery: one wide + a pair ---- */}
           <section className="relative z-10 mx-auto flex w-[1020px] flex-col gap-[16px] pt-[120px] max-lg:w-full max-lg:gutter max-lg:pt-[48px]">
-            <Frame src={STUDY.gallery.full} height={410} mobileHeight={192} className="w-full" />
-            <div className="flex items-center gap-[16px]">
-              <Frame src={STUDY.gallery.pair[0]} height={410} mobileHeight={206} className="w-[503px] max-lg:w-1/2" />
-              <Frame src={STUDY.gallery.pair[1]} height={410} mobileHeight={206} className="w-[501px] max-lg:w-1/2" />
-            </div>
+            <Rows shots={STUDY.shots.slice(1, 4)} label={STUDY.title} offset={1} />
           </section>
 
           {/* ---- Problem Statement band ---- */}
@@ -303,16 +359,7 @@ export default function CaseStudyDetail() {
           <section className="relative z-10 mx-auto w-[1060px] pt-[130px] max-lg:w-full max-lg:gutter max-lg:pt-[48px]">
             <Label>Design Exploration</Label>
             <div className="mx-auto mt-[48px] flex w-[1020px] flex-col gap-[16px] max-lg:mt-[24px] max-lg:w-full">
-              {STUDY.exploration.map((row, i) =>
-                row.type === "full" ? (
-                  <Frame key={i} src={row.src} height={521} mobileHeight={192} className="w-full" />
-                ) : (
-                  <div key={i} className="flex items-center gap-[16px]">
-                    <Frame src={row.srcs[0]} height={410} mobileHeight={206} className="w-[503px] max-lg:w-1/2" />
-                    <Frame src={row.srcs[1]} height={410} mobileHeight={206} className="w-[501px] max-lg:w-1/2" />
-                  </div>
-                )
-              )}
+              <Rows shots={STUDY.shots.slice(4)} label={STUDY.title} offset={4} />
             </div>
           </section>
 
@@ -331,7 +378,9 @@ export default function CaseStudyDetail() {
           rhythm as the rails */}
       <span className="pointer-events-none block h-px w-full" style={DASH_X} />
 
-      <Footer />
     </div>
+
+      <Footer />
+    </>
   );
 }

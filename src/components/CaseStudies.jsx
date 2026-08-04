@@ -5,6 +5,9 @@ import { useGSAP } from "@gsap/react";
 import { motion } from "framer-motion";
 import Footer from "./Footer.jsx";
 import { CASE_STUDIES } from "../data/caseStudies.js";
+import PinGate from "./PinGate.jsx";
+import useCaseGate from "../hooks/useCaseGate.js";
+import { caseStudyPath } from "../lib/router.js";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -27,27 +30,27 @@ const EASE = [0.16, 1, 0.3, 1];
    positions (580:6530); the rest fill the gaps around the centred text.
    Images are the real project mockups (~/Documents/Mockups, resized). */
 const FLOATS = [
-  { src: "/assets/cs-shot-1.png", x: 110, y: 173, w: 156, h: 147 },
-  { src: "/assets/cs-shot-2.png", x: 520, y: 160, w: 118, h: 112 },
-  { src: "/assets/cs-shot-3.png", x: 792, y: 256, w: 118, h: 112 },
-  { src: "/assets/cs-shot-4.png", x: 1030, y: 182, w: 156, h: 147 },
-  { src: "/assets/cs-shot-5.png", x: 1345, y: 423, w: 161, h: 151 },
-  { src: "/assets/cs-shot-6.png", x: 1094, y: 746, w: 118, h: 111 },
-  { src: "/assets/cs-shot-7.png", x: 625, y: 746, w: 161, h: 151 },
-  { src: "/assets/cs-shot-8.png", x: 13, y: 781, w: 161, h: 151 },
-  { src: "/assets/cs-shot-9.png", x: -54, y: 448, w: 135, h: 126 },
-  { src: "/assets/cs-shot-10.png", x: 300, y: 48, w: 135, h: 126 },
-  { src: "/assets/cs-shot-11.png", x: 690, y: 56, w: 118, h: 112 },
-  { src: "/assets/cs-shot-12.png", x: 1240, y: 72, w: 135, h: 126 },
-  { src: "/assets/cs-shot-13.png", x: 36, y: 292, w: 118, h: 112 },
-  { src: "/assets/cs-shot-14.png", x: 1180, y: 288, w: 118, h: 112 },
-  { src: "/assets/cs-shot-15.png", x: 306, y: 766, w: 135, h: 126 },
-  { src: "/assets/cs-shot-16.png", x: 890, y: 760, w: 135, h: 126 },
-  { src: "/assets/cs-shot-17.png", x: 1330, y: 640, w: 118, h: 112 },
-  { src: "/assets/cs-shot-18.png", x: 452, y: 848, w: 118, h: 112 },
-  { src: "/assets/cs-shot-19.png", x: 168, y: 560, w: 118, h: 112 },
-  { src: "/assets/cs-shot-20.png", x: 1210, y: 500, w: 135, h: 126 },
-  { src: "/assets/cs-shot-21.png", x: 830, y: 60, w: 118, h: 112 },
+  { src: "/assets/cs-shot-1.jpg", x: 110, y: 173, w: 156, h: 147 },
+  { src: "/assets/cs-shot-2.jpg", x: 520, y: 160, w: 118, h: 112 },
+  { src: "/assets/cs-shot-3.jpg", x: 792, y: 256, w: 118, h: 112 },
+  { src: "/assets/cs-shot-4.jpg", x: 1030, y: 182, w: 156, h: 147 },
+  { src: "/assets/cs-shot-5.jpg", x: 1345, y: 423, w: 161, h: 151 },
+  { src: "/assets/cs-shot-6.jpg", x: 1094, y: 746, w: 118, h: 111 },
+  { src: "/assets/cs-shot-7.jpg", x: 625, y: 746, w: 161, h: 151 },
+  { src: "/assets/cs-shot-8.jpg", x: 13, y: 781, w: 161, h: 151 },
+  { src: "/assets/cs-shot-9.jpg", x: -54, y: 448, w: 135, h: 126 },
+  { src: "/assets/cs-shot-10.jpg", x: 300, y: 48, w: 135, h: 126 },
+  { src: "/assets/cs-shot-11.jpg", x: 690, y: 56, w: 118, h: 112 },
+  { src: "/assets/cs-shot-12.jpg", x: 1240, y: 72, w: 135, h: 126 },
+  { src: "/assets/cs-shot-13.jpg", x: 36, y: 292, w: 118, h: 112 },
+  { src: "/assets/cs-shot-14.jpg", x: 1180, y: 288, w: 118, h: 112 },
+  { src: "/assets/cs-shot-15.jpg", x: 306, y: 766, w: 135, h: 126 },
+  { src: "/assets/cs-shot-16.jpg", x: 890, y: 760, w: 135, h: 126 },
+  { src: "/assets/cs-shot-17.jpg", x: 1330, y: 640, w: 118, h: 112 },
+  { src: "/assets/cs-shot-18.jpg", x: 452, y: 848, w: 118, h: 112 },
+  { src: "/assets/cs-shot-19.jpg", x: 168, y: 560, w: 118, h: 112 },
+  { src: "/assets/cs-shot-20.jpg", x: 1210, y: 500, w: 135, h: 126 },
+  { src: "/assets/cs-shot-21.jpg", x: 830, y: 60, w: 118, h: 112 },
 ];
 const ART_H = 990; // Figma artboard height the y values are designed on
 
@@ -55,15 +58,15 @@ const ART_H = 990; // Figma artboard height the y values are designed on
    of their desktop size, re-scattered around the centred title. */
 const M_ART_H = 1036;
 const M_FLOATS = [
-  { src: "/assets/cs-shot-1.png", x: 15, y: 226, w: 99.5, h: 93.8 },
-  { src: "/assets/cs-shot-4.png", x: 256, y: 193, w: 99.5, h: 93.8 },
-  { src: "/assets/cs-shot-2.png", x: 203, y: 330, w: 75.3, h: 71.4 },
-  { src: "/assets/cs-shot-3.png", x: 104, y: 388, w: 75.3, h: 71.4 },
-  { src: "/assets/cs-shot-5.png", x: 298, y: 444, w: 102.7, h: 96.3 },
-  { src: "/assets/cs-shot-9.png", x: -10, y: 509, w: 86.1, h: 80.4 },
-  { src: "/assets/cs-shot-6.png", x: 298, y: 672, w: 75.3, h: 70.8 },
-  { src: "/assets/cs-shot-7.png", x: -7, y: 735, w: 102.7, h: 96.3 },
-  { src: "/assets/cs-shot-8.png", x: 187, y: 793, w: 102.7, h: 96.3 },
+  { src: "/assets/cs-shot-1.jpg", x: 15, y: 226, w: 99.5, h: 93.8 },
+  { src: "/assets/cs-shot-4.jpg", x: 256, y: 193, w: 99.5, h: 93.8 },
+  { src: "/assets/cs-shot-2.jpg", x: 203, y: 330, w: 75.3, h: 71.4 },
+  { src: "/assets/cs-shot-3.jpg", x: 104, y: 388, w: 75.3, h: 71.4 },
+  { src: "/assets/cs-shot-5.jpg", x: 298, y: 444, w: 102.7, h: 96.3 },
+  { src: "/assets/cs-shot-9.jpg", x: -10, y: 509, w: 86.1, h: 80.4 },
+  { src: "/assets/cs-shot-6.jpg", x: 298, y: 672, w: 75.3, h: 70.8 },
+  { src: "/assets/cs-shot-7.jpg", x: -7, y: 735, w: 102.7, h: 96.3 },
+  { src: "/assets/cs-shot-8.jpg", x: 187, y: 793, w: 102.7, h: 96.3 },
 ];
 
 /* the list cards reuse the shared study data; the card image is the study hero */
@@ -154,16 +157,16 @@ function Meta({ data }) {
 
 /* ---- one case study: parallax image + hover inner-zoom, then info row.
        Clicking opens the details page (#case-study/<slug>). ---- */
-function Card({ data }) {
-  const open = () => {
-    window.location.hash = `case-study/${data.slug}`;
-  };
+function Card({ data, onOpen }) {
+  const open = () => onOpen(data.slug, data.title);
   return (
-    <div
-      role="link"
-      tabIndex={0}
-      onClick={open}
-      onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), open())}
+    <a
+      href={caseStudyPath(data.slug)}
+      onClick={(e) => {
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        e.preventDefault();
+        open();
+      }}
       className="case-card flex w-full cursor-pointer flex-col gap-[14px] max-lg:gap-[20px]"
     >
       {/* mobile trades the tall 615 crop for the design's 350 × 216 banner */}
@@ -171,8 +174,9 @@ function Card({ data }) {
         {/* parallax layer overfills the frame so the drift never reveals an edge */}
         <div className="case-parallax absolute inset-x-0 -top-[10%] h-[120%] will-change-transform">
           <img
-            alt={data.title}
+            alt={`${data.title} — case study cover`}
             src={data.img}
+            loading="lazy"
             draggable="false"
             className="size-full max-w-none object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.08]"
           />
@@ -181,21 +185,22 @@ function Card({ data }) {
 
       <div className="flex w-full items-start justify-between max-lg:flex-col max-lg:gap-[16px]">
         <div className="flex w-[412px] shrink-0 flex-col items-start gap-[8px] max-lg:w-full">
-          <p className="font-serif-display text-[24px] not-italic leading-[24px] tracking-[0.96px] text-white [word-break:break-word]">
+          <h2 className="font-serif-display text-[24px] not-italic leading-[24px] tracking-[0.96px] text-white [word-break:break-word]">
             {data.title}
-          </p>
+          </h2>
           <p className="font-jakarta text-[16px] font-medium leading-[24px] tracking-[0.64px] text-[#b3b3b3] [word-break:break-word]">
             {data.desc}
           </p>
         </div>
         <Meta data={data} />
       </div>
-    </div>
+    </a>
   );
 }
 
 export default function CaseStudies() {
   const rootRef = useRef(null);
+  const { openCase, gateProps } = useCaseGate();
   const heroRef = useRef(null);
   const [isNarrow, setIsNarrow] = useState(() => window.matchMedia("(max-width: 1023px)").matches);
 
@@ -309,6 +314,7 @@ export default function CaseStudies() {
   );
 
   return (
+    <>
     <div ref={rootRef} className="bg-ink relative mx-auto w-full lg:w-[1440px]" data-name="Case Studies Page">
       {/* hero + card list share the four vertical rails (desktop only — the
           mobile frames carry none, and a 1440 rail block would misplace them) */}
@@ -339,7 +345,7 @@ export default function CaseStudies() {
                     transition={{ duration: 0.9, ease: EASE, delay: 0.1 }}
                     className="font-serif-display text-[84px] leading-[92px] tracking-[3.36px] max-lg:text-[40px] max-lg:leading-[44px] max-lg:tracking-[1.6px]"
                   >
-                    <span className="accent-gradient-text -my-[10px] block py-[10px]">Case</span>
+                    <span className="accent-gradient-text -my-[10px] block py-[10px]">{"Case "}</span>
                     <span className="accent-gradient-text -my-[10px] block py-[10px]">Studies</span>
                   </motion.h1>
 
@@ -379,7 +385,7 @@ export default function CaseStudies() {
         <section className="relative z-10 pb-[200px] pt-[128px] max-lg:pb-[48px] max-lg:pt-[48px]">
           <div className="mx-auto flex w-[1022px] flex-col gap-[100px] max-lg:w-full max-lg:gap-[64px] max-lg:gutter">
             {CASES.map((c) => (
-              <Card key={c.title} data={c} />
+              <Card key={c.title} data={c} onOpen={openCase} />
             ))}
           </div>
         </section>
@@ -389,8 +395,16 @@ export default function CaseStudies() {
           rhythm as the rails */}
       <span className="pointer-events-none block h-px w-full" style={DASH_X} />
 
-      {/* ===================== FOOTER (shared) ===================== */}
-      <Footer />
     </div>
+
+      {/* the code prompt — opens over whichever card was clicked */}
+      <PinGate {...gateProps} />
+
+      {/* ===================== FOOTER (shared, identical to the homepage) =====
+          It sits OUTSIDE the 1440 canvas above: that box is a fixed-width,
+          zoom-to-fit layout, and a footer inside it renders 1440 wide and gets
+          clipped on any narrower viewport. Full-width here = the homepage. */}
+      <Footer />
+    </>
   );
 }

@@ -16,7 +16,8 @@ export default function HeroDotPortrait({ src, className = "", style }) {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
 
-    let raf;
+    let raf = 0;
+    let running = false;
     let ready = false;
     let dots = []; // { gx, gy, lum } normalized grid positions
     let W = 0;
@@ -60,15 +61,35 @@ export default function HeroDotPortrait({ src, className = "", style }) {
       }
     };
 
-    const draw = () => {
+    /* Canvas keeps whatever was last painted, so once the dots have settled the
+       loop can stop entirely and the portrait simply stays on screen. It wakes
+       on the next pointer move. Previously this ran every frame, forever, on
+       both the desktop and mobile instances. */
+    const start = () => {
+      if (running) return;
+      running = true;
       raf = requestAnimationFrame(draw);
-      if (!ready || !visible) return;
+    };
+
+    const settled = () =>
+      Math.abs(mouse.tx - mouse.x) < 0.4 &&
+      Math.abs(mouse.ty - mouse.y) < 0.4 &&
+      Math.abs(mouse.target - mouse.on) < 0.005;
+
+    const draw = () => {
+      if (!ready || !visible) {
+        running = false;
+        return;
+      }
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, W, H);
 
       mouse.x += (mouse.tx - mouse.x) * 0.14;
       mouse.y += (mouse.ty - mouse.y) * 0.14;
       mouse.on += (mouse.target - mouse.on) * 0.08;
+      // paint this frame, then decide whether another one is needed
+      if (settled()) running = false;
+      else raf = requestAnimationFrame(draw);
 
       const step = W / 92;
       const baseR = Math.max(0.8, step * 0.28);
@@ -107,13 +128,16 @@ export default function HeroDotPortrait({ src, className = "", style }) {
       mouse.tx = e.clientX - rect.left;
       mouse.ty = e.clientY - rect.top;
       mouse.target = 1;
+      start();
     };
     const onLeave = () => {
       mouse.target = 0;
+      start(); // ease the dots back, then park again
     };
 
     const io = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
+      if (visible) start();
     });
     io.observe(wrap);
 
@@ -122,19 +146,24 @@ export default function HeroDotPortrait({ src, className = "", style }) {
       resize();
       buildDots(img);
       ready = true;
+      start(); // first paint
     };
     img.src = src;
 
     resize();
-    draw();
-    window.addEventListener("resize", resize);
+    start();
+    const onResize = () => {
+      resize();
+      start(); // re-paint at the new size
+    };
+    window.addEventListener("resize", onResize);
     window.addEventListener("mousemove", onMove);
     window.addEventListener("mouseout", onLeave);
 
     return () => {
       cancelAnimationFrame(raf);
       io.disconnect();
-      window.removeEventListener("resize", resize);
+      window.removeEventListener("resize", onResize);
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("mouseout", onLeave);
     };

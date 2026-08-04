@@ -13,15 +13,22 @@ export const CASE_STUDIES = [
     year: "2025/26",
     tags: ["Workflow Audit", "Reduce Interaction Cost", "Usability Testing"],
     cats: ["SaaS", "Productivity"],
-    hero: "/assets/cs/lets-meet/01.jpg",
+    /* every shot from the published Dribbble post, in order: the first is
+       the hero, the next three sit above the Problem Statement, the rest run
+       under Design Exploration. w/h are the real pixel sizes — the page lays
+       each frame out at its own ratio so nothing is cropped. */
+    shots: [
+      { src: "/assets/cs/lets-meet/01.jpg", w: 1600, h: 1324 },
+      { src: "/assets/cs/lets-meet/02.jpg", w: 1600, h: 1200 },
+      { src: "/assets/cs/lets-meet/03.jpg", w: 1600, h: 1200 },
+      { src: "/assets/cs/lets-meet/04.jpg", w: 1600, h: 1200 },
+      { src: "/assets/cs/lets-meet/05.jpg", w: 1600, h: 1200 },
+      { src: "/assets/cs/lets-meet/06.jpg", w: 1600, h: 1200 },
+    ],
 
     context:
       "Let’s Meet is a comprehensive meeting management software designed to streamline scheduling, organizing, and conducting meetings. The previous version, however, required a tedious 32 clicks to create a single meeting, and its interface was not intuitive — users routinely struggled to find the Join Button, which dragged down the whole experience.",
 
-    gallery: {
-      full: "/assets/cs/lets-meet/02.jpg",
-      pair: ["/assets/cs/lets-meet/03.jpg", "/assets/cs/lets-meet/04.jpg"],
-    },
 
     problem:
       "The original meeting creation process in Let’s Meet was inefficient, requiring approximately 32 clicks, which frustrated users and slowed productivity. The interface also lacked clarity, making it difficult for users to locate essential features like the Join Button, leading to confusion and reduced engagement.",
@@ -44,10 +51,6 @@ export const CASE_STUDIES = [
       ],
     },
 
-    exploration: [
-      { type: "full", src: "/assets/cs/lets-meet/05.jpg" },
-      { type: "full", src: "/assets/cs/lets-meet/06.jpg" },
-    ],
 
     conclusion: {
       intro:
@@ -70,15 +73,24 @@ export const CASE_STUDIES = [
     year: "2025/26",
     tags: ["Process Redesign", "Contactless Flow", "Security UX"],
     cats: ["Enterprise", "Workplace"],
-    hero: "/assets/cs/d-pass/01.jpg",
+    /* every shot from the published Dribbble post, in order: the first is
+       the hero, the next three sit above the Problem Statement, the rest run
+       under Design Exploration. w/h are the real pixel sizes — the page lays
+       each frame out at its own ratio so nothing is cropped. */
+    shots: [
+      { src: "/assets/cs/d-pass/01.jpg", w: 1600, h: 1209 },
+      { src: "/assets/cs/d-pass/02.jpg", w: 1600, h: 603 },
+      { src: "/assets/cs/d-pass/03.jpg", w: 1600, h: 1727 },
+      { src: "/assets/cs/d-pass/04.jpg", w: 1600, h: 1200 },
+      { src: "/assets/cs/d-pass/05.jpg", w: 1600, h: 1409 },
+      { src: "/assets/cs/d-pass/06.jpg", w: 1600, h: 1242 },
+      { src: "/assets/cs/d-pass/07.jpg", w: 1600, h: 2000 },
+      { src: "/assets/cs/d-pass/08.jpg", w: 1600, h: 1292 },
+    ],
 
     context:
       "D-Pass is a smart digital visitor management solution designed to modernize and secure how organizations handle guest visits. By automating meeting scheduling, visitor authentication, and real-time notifications, it replaces outdated manual processes with a seamless, paperless system — better coordination, stronger security, and a better visitor experience through one integrated platform on both mobile and web.",
 
-    gallery: {
-      full: "/assets/cs/d-pass/02.jpg",
-      pair: ["/assets/cs/d-pass/03.jpg", "/assets/cs/d-pass/04.jpg"],
-    },
 
     problem:
       "The traditional visitor management process in offices is inefficient and prone to errors. Visitors call the officer to book a meeting, call again on arrival, wait while the officer notifies the guard, then fill in a paper attendance sheet by hand. The result is a disjointed experience, long wait times, and real security risk from the lack of proper authentication.",
@@ -101,11 +113,6 @@ export const CASE_STUDIES = [
       ],
     },
 
-    exploration: [
-      { type: "full", src: "/assets/cs/d-pass/05.jpg" },
-      { type: "pair", srcs: ["/assets/cs/d-pass/06.jpg", "/assets/cs/d-pass/07.jpg"] },
-      { type: "full", src: "/assets/cs/d-pass/08.jpg" },
-    ],
 
     conclusion: {
       intro:
@@ -125,15 +132,25 @@ export const CASE_STUDIES = [
     year: "2025/26",
     tags: ["Product Design", "Feature Architecture", "iOS App"],
     cats: ["AI", "Mobile"],
-    hero: "/assets/cs/ai-agent/01.jpg",
+    /* every shot from the published Dribbble post, in order: the first is
+       the hero, the next three sit above the Problem Statement, the rest run
+       under Design Exploration. w/h are the real pixel sizes — the page lays
+       each frame out at its own ratio so nothing is cropped. */
+    shots: [
+      { src: "/assets/cs/ai-agent/01.jpg", w: 1600, h: 1200 },
+      { src: "/assets/cs/ai-agent/02.jpg", w: 1600, h: 1199 },
+      { src: "/assets/cs/ai-agent/03.jpg", w: 912, h: 1125 },
+      { src: "/assets/cs/ai-agent/04.jpg", w: 1600, h: 1993 },
+      { src: "/assets/cs/ai-agent/05.jpg", w: 1600, h: 1200 },
+      { src: "/assets/cs/ai-agent/06.jpg", w: 1600, h: 1200 },
+      { src: "/assets/cs/ai-agent/07.jpg", w: 1600, h: 1200 },
+      { src: "/assets/cs/ai-agent/08.jpg", w: 1600, h: 1200 },
+      { src: "/assets/cs/ai-agent/09.jpg", w: 1600, h: 1200 },
+    ],
 
     context:
       "AI Agent is a versatile iPhone app, live on the App Store, that transforms how people learn, create, and stay productive. Powered by advanced AI, it offers an unlimited suite of tools — instant answers, content creation, image generation, task organisation, and smart conversations. With multilingual support, PDF summarisation, and roleplay adventures, it acts as a collaborator for students, professionals, and dreamers in one seamless platform.",
 
-    gallery: {
-      full: "/assets/cs/ai-agent/02.jpg",
-      pair: ["/assets/cs/ai-agent/03.jpg", "/assets/cs/ai-agent/04.jpg"],
-    },
 
     problem:
       "Creative and planning tasks demand multiple specialised tools, significant time, and real expertise — a barrier for non-professionals and small businesses alike. Fragmented tooling, skill requirements, and slow manual processes all get in the way of simply executing an idea.",
@@ -156,11 +173,6 @@ export const CASE_STUDIES = [
       ],
     },
 
-    exploration: [
-      { type: "full", src: "/assets/cs/ai-agent/05.jpg" },
-      { type: "pair", srcs: ["/assets/cs/ai-agent/06.jpg", "/assets/cs/ai-agent/07.jpg"] },
-      { type: "pair", srcs: ["/assets/cs/ai-agent/08.jpg", "/assets/cs/ai-agent/09.jpg"] },
-    ],
 
     conclusion: {
       intro:
@@ -176,6 +188,11 @@ export const CASE_STUDIES = [
     },
   },
 ];
+
+/* the card image on the list pages and the homepage rail is the first shot */
+CASE_STUDIES.forEach((c) => {
+  c.hero = c.shots[0].src;
+});
 
 export const getCaseStudy = (slug) =>
   CASE_STUDIES.find((c) => c.slug === slug) || CASE_STUDIES[0];

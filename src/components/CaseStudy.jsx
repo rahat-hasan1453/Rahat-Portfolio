@@ -3,6 +3,9 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { CASE_STUDIES } from "../data/caseStudies.js";
+import PinGate from "./PinGate.jsx";
+import useCaseGate from "../hooks/useCaseGate.js";
+import { caseStudyPath } from "../lib/router.js";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -54,31 +57,31 @@ function TagDivider() {
   );
 }
 
-function HCard({ data }) {
-  const open = () => {
-    window.location.hash = `case-study/${data.slug}`;
-  };
+function HCard({ data, onOpen }) {
+  const open = () => onOpen(data.slug, data.title);
   return (
-    <div
-      role="link"
-      tabIndex={0}
-      onClick={open}
-      onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), open())}
+    <a
+      href={caseStudyPath(data.slug)}
+      onClick={(e) => {
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        e.preventDefault();
+        open();
+      }}
       className="hcard group/card relative flex w-full shrink-0 cursor-pointer flex-col gap-[16px] max-lg:gap-[20px] lg:w-[720px]"
       style={{ willChange: "transform" }}
     >
       <div className="relative aspect-video w-full shrink-0 overflow-hidden rounded-[8px] max-lg:aspect-[350/216] lg:aspect-auto lg:h-[405px]">
         {data.crop ? (
-          <img alt="" className="pointer-events-none absolute left-0 top-[-8%] h-[121%] w-full max-w-none" src={data.img} />
+          <img alt={`${data.title} — case study cover`} loading="lazy" className="pointer-events-none absolute left-0 top-[-8%] h-[121%] w-full max-w-none" src={data.img} />
         ) : (
-          <img alt="" className="pointer-events-none absolute inset-0 size-full max-w-none object-cover" src={data.img} />
+          <img alt={`${data.title} — case study cover`} loading="lazy" className="pointer-events-none absolute inset-0 size-full max-w-none object-cover" src={data.img} />
         )}
       </div>
       <div className="relative flex w-full shrink-0 items-start justify-between gap-[20px] max-lg:flex-col max-lg:gap-[16px]">
         <div className="relative flex flex-col items-start gap-[6px] max-lg:w-full max-lg:gap-[8px] lg:w-[320px] [word-break:break-word]">
-          <p className="font-serif-display relative shrink-0 text-[20px] not-italic leading-[24px] tracking-[0.8px] text-white max-lg:text-[24px] max-lg:tracking-[0.96px]">
+          <h3 className="font-serif-display relative shrink-0 text-[20px] not-italic leading-[24px] tracking-[0.8px] text-white max-lg:text-[24px] max-lg:tracking-[0.96px]">
             {data.title}
-          </p>
+          </h3>
           <p className="font-jakarta relative shrink-0 text-[14px] font-medium leading-[20px] tracking-[0.56px] text-grey max-lg:text-[16px] max-lg:leading-[24px] max-lg:tracking-[0.64px]">
             Monitor your daily steps effortlessly with RiQS Praxis Monitor. Stay inspired and on track as you progress toward your fitness
             milestones.
@@ -112,12 +115,13 @@ function HCard({ data }) {
           </p>
         </div>
       </div>
-    </div>
+    </a>
   );
 }
 
 export default function CaseStudy() {
   const sectionRef = useRef(null);
+  const { openCase, gateProps } = useCaseGate();
   const stageRef = useRef(null);
   const boxRef = useRef(null);
   const headlineRef = useRef(null);
@@ -307,12 +311,15 @@ export default function CaseStudy() {
               style={{ willChange: "transform" }}
             >
               {CARDS.map((card, i) => (
-                <HCard key={i} data={card} />
+                <HCard key={i} data={card} onOpen={openCase} />
               ))}
             </div>
           </div>
         </div>
       </div>
+
+      {/* the code prompt — opens over whichever card was clicked */}
+      <PinGate {...gateProps} />
     </section>
   );
 }

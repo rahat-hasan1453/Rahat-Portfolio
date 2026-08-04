@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
@@ -10,20 +10,24 @@ import Logos from "./components/Logos.jsx";
 import CaseStudy from "./components/CaseStudy.jsx";
 import AngleMarque from "./components/AngleMarque.jsx";
 import Footer from "./components/Footer.jsx";
-import CaseStudies from "./components/CaseStudies.jsx";
-import CaseStudyDetail from "./components/CaseStudyDetail.jsx";
-import AboutPage from "./components/AboutPage.jsx";
+/* Route-level code splitting: a visitor landing on the homepage no longer
+   downloads the About page, the Case Studies list and the case study template
+   before anything can paint. Each arrives when its route is first opened —
+   behind the loading screen that already runs on every navigation, so the
+   split is invisible. */
+const CaseStudies = lazy(() => import("./components/CaseStudies.jsx"));
+const CaseStudyDetail = lazy(() => import("./components/CaseStudyDetail.jsx"));
+const AboutPage = lazy(() => import("./components/AboutPage.jsx"));
+import PinGate from "./components/PinGate.jsx";
+import { isCaseUnlocked } from "./lib/caseAccess.js";
+import { getCaseStudy } from "./data/caseStudies.js";
+import { useRoute, navigate, slugFromPath } from "./lib/router.js";
+import { ROUTES, caseStudyMeta, applyMeta } from "./lib/seo.js";
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function App() {
-  const [route, setRoute] = useState(window.location.hash);
-
-  useEffect(() => {
-    const onHash = () => setRoute(window.location.hash);
-    window.addEventListener("hashchange", onHash);
-    return () => window.removeEventListener("hashchange", onHash);
-  }, []);
+  const route = useRoute();
 
   /* The About and Case Studies pages are composed on a fixed 1440 canvas. On
      anything narrower the page used to clip it (copy cut off mid-word, right
@@ -41,10 +45,12 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    // a visitor who asked for reduced motion gets the browser's own scrolling
+    const calmer = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smoothWheel: true,
+      smoothWheel: !calmer,
     });
 
     lenis.on("scroll", ScrollTrigger.update);
@@ -60,9 +66,20 @@ export default function App() {
     };
   }, []);
 
-  const isCaseStudies = route === "#case-studies";
-  const isCaseStudyDetail = route.startsWith("#case-study/");
-  const isAbout = route === "#about";
+  const isCaseStudies = route === "/case-studies";
+  const isCaseStudyDetail = route.startsWith("/case-studies/");
+
+  /* A detail page reached by link or refresh has to ask for the code too —
+     the card click is only one of the ways in. While it is locked the Case
+     Studies list renders behind the prompt, so closing it leaves the visitor
+     somewhere useful instead of on a dead end. The tick (not a subscription
+     to the unlock itself) is what re-renders us, so the prompt keeps its
+     "you're in" beat on screen before the study takes over. */
+  const [accessTick, setAccessTick] = useState(0);
+  const lockedSlug = isCaseStudyDetail ? slugFromPath(route) : "";
+  const lockedDetail = isCaseStudyDetail && !isCaseUnlocked(lockedSlug);
+  const lockedStudy = lockedDetail ? getCaseStudy(lockedSlug) : null;
+  const isAbout = route === "/about";
   const loaderVariant = isCaseStudyDetail
     ? "casestudydetail"
     : isCaseStudies
@@ -70,6 +87,20 @@ export default function App() {
       : isAbout
         ? "about"
         : "home";
+
+  /* title / description / canonical / OG follow the route — otherwise every
+     page reports itself as the homepage in search results, browser history
+     and shared links */
+  useEffect(() => {
+    const meta = isCaseStudyDetail
+      ? caseStudyMeta(slugFromPath(route))
+      : isAbout
+        ? ROUTES.about
+        : isCaseStudies
+          ? ROUTES.caseStudies
+          : ROUTES.home;
+    applyMeta(meta);
+  }, [route, isAbout, isCaseStudies, isCaseStudyDetail]);
 
   // show the route's loading screen on first load and on every navigation
   const [loading, setLoading] = useState(true);
@@ -91,22 +122,35 @@ export default function App() {
     <main className="bg-ink w-full overflow-x-clip">
       {loading && <Loader key={loadKey} variant={loaderVariant} onDone={() => setLoading(false)} />}
       <Menu />
-      {isAbout ? (
-        <AboutPage />
-      ) : isCaseStudyDetail ? (
-        <CaseStudyDetail key={route} />
-      ) : isCaseStudies ? (
-        <CaseStudies />
-      ) : (
-        <>
-          <Hero />
-          <About />
-          <Logos />
-          <CaseStudy />
-          <AngleMarque />
-          <Footer />
-        </>
-      )}
+      <Suspense fallback={null}>
+        {isAbout ? (
+          <AboutPage />
+        ) : lockedDetail ? (
+          <>
+            <CaseStudies />
+            <PinGate
+              open
+              title={lockedStudy?.title}
+              slug={lockedSlug}
+              onClose={() => navigate("/case-studies")}
+              onUnlocked={() => setAccessTick((t) => t + 1)}
+            />
+          </>
+        ) : isCaseStudyDetail ? (
+          <CaseStudyDetail key={`${route}-${accessTick}`} />
+        ) : isCaseStudies ? (
+          <CaseStudies />
+        ) : (
+          <>
+            <Hero />
+            <About />
+            <Logos />
+            <CaseStudy />
+            <AngleMarque />
+            <Footer />
+          </>
+        )}
+      </Suspense>
     </main>
   );
 }

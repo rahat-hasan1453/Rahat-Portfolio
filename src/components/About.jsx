@@ -8,10 +8,10 @@ import usePressHold from "../hooks/usePressHold.js";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-const imgRectangle7 = "/assets/839d3a518763fdbf968a2a08c4073a1284670dcf.png";
-const imgRectangle6 = "/assets/decfb971c6d641c9ccb852271bc0b630c000cdc2.png";
-const imgRectangle5 = "/assets/29f89100346cab8bda091f83307e2d146c404f15.png";
-const imgRectangle4 = "/assets/1343981533bfec0aaa59a2166abbcce5317934ec.png";
+const imgRectangle7 = "/assets/839d3a518763fdbf968a2a08c4073a1284670dcf.jpg";
+const imgRectangle6 = "/assets/decfb971c6d641c9ccb852271bc0b630c000cdc2.jpg";
+const imgRectangle5 = "/assets/29f89100346cab8bda091f83307e2d146c404f15.jpg";
+const imgRectangle4 = "/assets/1343981533bfec0aaa59a2166abbcce5317934ec.jpg";
 const imgLines = "/assets/40d20e30952fcf9fba67c9bf48e1c3c4aa24bb40.svg";
 
 const ABOUT_TEXT =
@@ -31,7 +31,7 @@ function TickerFrame({ img }) {
     <div
       {...bind}
       data-held={held || undefined}
-      className="ticker-cell relative h-(--h) w-[221.085px] shrink-0 rounded-[17.687px] opacity-40 transition-opacity duration-500 hover:opacity-100 data-[held=true]:opacity-100"
+      className="ticker-cell relative h-(--h) w-[221.085px] shrink-0 rounded-[17.687px] opacity-40 hover:opacity-100 data-[held=true]:opacity-100"
       style={{ "--h": `${img.h}px` }}
     >
       {img.cover ? (

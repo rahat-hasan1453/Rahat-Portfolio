@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import usePressHold from "../hooks/usePressHold.js";
+import { navigate, currentPath } from "../lib/router.js";
 
 const imgR = "/assets/cbb187227f4bec065dffe6c01f5b5bdd32d0a6d7.svg";
 const imgRahat = "/assets/5301fa311a870db099fe947753b34031bfabbe73.svg";
@@ -12,12 +13,12 @@ const imgDesigner = "/assets/36e5ca754e23998117ff47ea19176591e1c4b9c1.svg";
 const imgMenuIcon = "/assets/72b8b16601eac87f7c8802bae5aeefff03704aa0.svg";
 const imgClose = "/assets/8d3e866298728539e5e53c49774582e700852597.svg";
 const imgDownload = "/assets/5577a3e9db39c3347b529a08ca5548f7824636d0.svg";
-const imgTicker1 = "/assets/b0268a05f3a7b17aadbff2a77bd6a3df17ae5daa.png";
-const imgTicker2 = "/assets/b7e9e82c1a767a3f562634efe8b970b38a952d59.png";
-const imgTicker3 = "/assets/7420f9bd8ab0e7cb2faf1e8f3297c1719f49204f.png";
-const imgTickerMetro = "/assets/bf6e07a7c2c0d1b3324cf94624a8454cb84c6b0d.png";
-const imgTickerCalendar = "/assets/b815200441007cae19fe209e699ac4e8f2481020.png";
-const imgTickerVoid = "/assets/5b7d0ae6d4a1055465bb974756e8c4fa70f10d5e.png";
+const imgTicker1 = "/assets/b0268a05f3a7b17aadbff2a77bd6a3df17ae5daa.jpg";
+const imgTicker2 = "/assets/b7e9e82c1a767a3f562634efe8b970b38a952d59.jpg";
+const imgTicker3 = "/assets/7420f9bd8ab0e7cb2faf1e8f3297c1719f49204f.jpg";
+const imgTickerMetro = "/assets/bf6e07a7c2c0d1b3324cf94624a8454cb84c6b0d.jpg";
+const imgTickerCalendar = "/assets/b815200441007cae19fe209e699ac4e8f2481020.jpg";
+const imgTickerVoid = "/assets/5b7d0ae6d4a1055465bb974756e8c4fa70f10d5e.jpg";
 const imgBehance = "/assets/9d82d42f529b8d410122178c2f87af95a07946d8.png";
 const imgDribbble = "/assets/ecbf82107b5177abac6ac42ec522b4f9517ae736.png";
 const imgFacebook = "/assets/b20ff74680c1777cd637c251a1599cdb8723494f.png";
@@ -190,7 +191,7 @@ function TickerSet() {
 function Brand() {
   const brandHold = usePressHold();
   const goHome = () => {
-    window.location.hash = "";
+    navigate("/");
     setTimeout(() => window.__lenis?.scrollTo(0, { immediate: true }), 50);
   };
   return (
@@ -290,8 +291,8 @@ export default function Menu() {
       else window.scrollTo({ top: y, behavior: "smooth" });
     };
     // leave the case-studies page first, then scroll once home has mounted
-    if (window.location.hash === "#case-studies") {
-      window.location.hash = "";
+    if (currentPath() === "/case-studies") {
+      navigate("/");
       setTimeout(doScroll, 400);
     } else {
       doScroll();
@@ -300,7 +301,7 @@ export default function Menu() {
   };
 
   const openCaseStudies = () => {
-    window.location.hash = "case-studies";
+    navigate("/case-studies");
     setOpen(false);
   };
 
@@ -441,13 +442,15 @@ export default function Menu() {
               {/* nav links */}
               <motion.div variants={panelStagger} className="relative mt-[32px] flex flex-col items-start gap-[12px]">
                 <NavHold
-                  as={motion.button}
+                  as={motion.a}
                   variants={rise}
                   whileHover={{ x: 4 }}
-                  type="button"
+                  href="/about"
                   tabIndex={open ? 0 : -1}
-                  onClick={() => {
-                    window.location.hash = "about";
+                  onClick={(e) => {
+                    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+                    e.preventDefault();
+                    navigate("/about");
                     setOpen(false);
                   }}
                   className={NAV_LINK}
@@ -456,12 +459,16 @@ export default function Menu() {
                   My Story
                 </NavHold>
                 <NavHold
-                  as={motion.button}
+                  as={motion.a}
                   variants={rise}
                   whileHover={{ x: 4 }}
-                  type="button"
+                  href="/case-studies"
                   tabIndex={open ? 0 : -1}
-                  onClick={openCaseStudies}
+                  onClick={(e) => {
+                    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+                    e.preventDefault();
+                    openCaseStudies();
+                  }}
                   className={NAV_LINK}
                 >
                   <Slash />
@@ -539,7 +546,7 @@ export default function Menu() {
                       {QUOTES[quoteIdx].text.split(" ").map((word, i) => (
                         <motion.span
                           key={i}
-                          className="mr-[0.26em] inline-block"
+                          className="inline-block"
                           variants={{
                             hidden: { opacity: 0, y: 9, filter: "blur(4px)" },
                             show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.45, ease: easeShuttle } },
@@ -547,7 +554,7 @@ export default function Menu() {
                         >
                           {word}
                         </motion.span>
-                      ))}
+                      )).flatMap((el, i, arr) => (i < arr.length - 1 ? [el, " "] : [el]))}
                     </motion.p>
                     <motion.div
                       className="font-urbanist relative w-full shrink-0 whitespace-pre-wrap text-[14px] text-grey"

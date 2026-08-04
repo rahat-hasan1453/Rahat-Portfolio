@@ -5,24 +5,24 @@ import { useGSAP } from "@gsap/react";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-const imgRectangle27 = "/assets/15f31c724ab23f5c12da0e0aa9d375e1b62452d5.png";
-const imgRectangle35 = "/assets/664f92d3f7e23a196fa99748074ef3af791931cf.png";
-const imgRectangle28 = "/assets/8515c5b753a891930fd92a233fa5d521287e5175.png";
-const imgRectangle36 = "/assets/6e59ea52fdab5b7de0ac00dc00c58bb7a853273b.png";
-const imgRectangle29 = "/assets/5b7d0ae6d4a1055465bb974756e8c4fa70f10d5e.png";
-const imgRectangle37 = "/assets/c64075a2f3ad073060b379a4481568e297ec4308.png";
-const imgRectangle30 = "/assets/b815200441007cae19fe209e699ac4e8f2481020.png";
-const imgRectangle32 = "/assets/2a0b2ea5918816ebb04b763a32f036e1d794ee3c.png";
-const imgRectangle34 = "/assets/4583dd520e0a8771b47d3b7187a1b151c258995c.png";
-const imgRectangle38 = "/assets/7650c3b8ff96600e8c34feec39558dbc7adb9018.png";
-const imgRectangle31 = "/assets/0cd21a053806287e63d372fd804878164d4dce04.png";
+const imgRectangle27 = "/assets/15f31c724ab23f5c12da0e0aa9d375e1b62452d5.jpg";
+const imgRectangle35 = "/assets/664f92d3f7e23a196fa99748074ef3af791931cf.jpg";
+const imgRectangle28 = "/assets/8515c5b753a891930fd92a233fa5d521287e5175.jpg";
+const imgRectangle36 = "/assets/6e59ea52fdab5b7de0ac00dc00c58bb7a853273b.jpg";
+const imgRectangle29 = "/assets/5b7d0ae6d4a1055465bb974756e8c4fa70f10d5e.jpg";
+const imgRectangle37 = "/assets/c64075a2f3ad073060b379a4481568e297ec4308.jpg";
+const imgRectangle30 = "/assets/b815200441007cae19fe209e699ac4e8f2481020.jpg";
+const imgRectangle32 = "/assets/2a0b2ea5918816ebb04b763a32f036e1d794ee3c.jpg";
+const imgRectangle34 = "/assets/4583dd520e0a8771b47d3b7187a1b151c258995c.jpg";
+const imgRectangle38 = "/assets/7650c3b8ff96600e8c34feec39558dbc7adb9018.jpg";
+const imgRectangle31 = "/assets/0cd21a053806287e63d372fd804878164d4dce04.jpg";
 const imgRectangle33 = "/assets/3a153bdae32318c674896aafac82bf3f43f4beae.png";
 /* five more project shots so no image repeats in the field */
-const imgExtra1 = "/assets/cs-shot-3.png";
-const imgExtra2 = "/assets/cs-shot-6.png";
-const imgExtra3 = "/assets/cs-shot-9.png";
-const imgExtra4 = "/assets/cs-shot-12.png";
-const imgExtra5 = "/assets/cs-shot-18.png";
+const imgExtra1 = "/assets/cs-shot-3.jpg";
+const imgExtra2 = "/assets/cs-shot-6.jpg";
+const imgExtra3 = "/assets/cs-shot-9.jpg";
+const imgExtra4 = "/assets/cs-shot-12.jpg";
+const imgExtra5 = "/assets/cs-shot-18.jpg";
 const imgLines = "/assets/85b87272f248dfb176bc9e8a787e0d23664737e5.svg";
 
 const FIELD_H = 1937;

@@ -4,13 +4,67 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/assets/d1a3a6f1198ef62bd42de24d305ca8909be7e088.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rahat Hasan — Product Designer</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&family=Urbanist:wght@400;500;700&family=Inter:wght@400;600&display=swap"
-      rel="stylesheet"
+    <meta name="theme-color" content="#12110d" />
+
+    <!-- Fonts are self-hosted (see src/index.css). They used to come from the
+         Google Fonts CDN: a render-blocking third-party stylesheet, plus a
+         visitor-IP disclosure to Google on every page view. Inter was being
+         downloaded there too and is not used anywhere in the design. -->
+    <link rel="preload" href="/fonts/plus-jakarta-sans-500.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/urbanist-500.woff2" as="font" type="font/woff2" crossorigin />
+
+    <!-- Defaults for crawlers and for first paint. The app rewrites these per
+         route (src/lib/seo.js), and the build writes a static copy of every
+         route with its own values baked in (scripts/prerender.mjs), so link
+         previews are right even for crawlers that never run JavaScript. -->
+    <title>Rahat Hasan — Product Designer &amp; UX Engineer</title>
+    <meta
+      name="description"
+      content="Rahat Hasan — product-minded UX Engineer at Selise Digital Platform, Dhaka. Nearly 4 years designing SaaS, enterprise and mobile products end to end, from discovery to delivery."
     />
+    <link rel="canonical" href="https://rahathasan.com/" />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="Rahat Hasan" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Rahat Hasan" />
+    <meta property="og:title" content="Rahat Hasan — Product Designer &amp; UX Engineer" />
+    <meta
+      property="og:description"
+      content="Product-minded UX Engineer at Selise Digital Platform. Nearly 4 years designing SaaS, enterprise and mobile products end to end."
+    />
+    <meta property="og:url" content="https://rahathasan.com/" />
+    <meta property="og:image" content="https://rahathasan.com/assets/og-cover.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="en_US" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Rahat Hasan — Product Designer &amp; UX Engineer" />
+    <meta
+      name="twitter:description"
+      content="Product-minded UX Engineer at Selise Digital Platform. Nearly 4 years designing SaaS, enterprise and mobile products end to end."
+    />
+    <meta name="twitter:image" content="https://rahathasan.com/assets/og-cover.jpg" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Rahat Hasan",
+        "url": "https://rahathasan.com/",
+        "jobTitle": "UX Engineer",
+        "email": "mailto:rahat.akash1453@gmail.com",
+        "address": { "@type": "PostalAddress", "addressLocality": "Dhaka", "addressCountry": "BD" },
+        "worksFor": { "@type": "Organization", "name": "Selise Digital Platform", "url": "https://selisegroup.com" },
+        "knowsAbout": ["UX Design", "Product Design", "UX Research", "Design Systems", "UI Design"],
+        "sameAs": [
+          "https://www.linkedin.com/in/rahatuxd/",
+          "https://dribbble.com/R1453",
+          "https://www.behance.net/rahat1453"
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

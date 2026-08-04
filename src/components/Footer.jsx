@@ -1,5 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import Cal, { getCalApi } from "@calcom/embed-react";
+import { lazy, Suspense } from "react";
+/* Cal's embed is a large third-party bundle that is only needed when the
+   booking widget scrolls into view. Loading it lazily keeps it out of the
+   first-paint JavaScript for every visitor who never reaches the footer. */
+const Cal = lazy(() => import("@calcom/embed-react"));
+const getCalApi = (...args) => import("@calcom/embed-react").then((m) => m.getCalApi(...args));
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -9,7 +14,7 @@ import usePressHold from "../hooks/usePressHold.js";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-const imgImage63 = "/assets/95b86c277de98cb05b6c2d8499641f05aee027aa.png";
+const imgImage63 = "/assets/95b86c277de98cb05b6c2d8499641f05aee027aa.jpg";
 const imgAvatar = "/assets/3bc4ade8f1fdaf67a5e466972e77f4465f7121f1.png";
 const imgDownload = "/assets/efb7f30e6bdeee9d2b528673382bc912677dab80.svg";
 const imgGroup47 = "/assets/189b07984ec2f3ac75a3c8f86a1240f9d77295b1.svg";
@@ -26,13 +31,6 @@ const RIGHTS_H = 44; // all-rights-reserved bar below the design frame
 const CAL_LINK = "rahat-akash-4sxje8/15min";
 const CAL_NS = "15min";
 const CAL_CONFIG = { layout: "month_view", theme: "dark" };
-
-// compact mode (About page): no "Building Better Experiences" section — just a
-// black bridge space, the cal widget crossing into the gradient, then the footer.
-// Driven by CSS vars so the mobile band heights come along for the ride.
-const COMPACT_BODY_H = "calc(var(--footer-compact-space) + var(--footer-bottom-h))";
-const COMPACT_TOP_SPACE = "var(--footer-compact-space)";
-const COMPACT_CAL_TOP = "var(--footer-compact-cal-top)";
 
 // dashed vertical rail (crisp CSS, no vertical fade) at a given alpha
 const dashGrad = (a) => ({
@@ -235,13 +233,13 @@ function SocialPill({ children, href }) {
   return <div {...shared}>{children}</div>;
 }
 
-export default function Footer({ compact = false }) {
+export default function Footer() {
   const containerRef = useRef(null);
   const [calVisible, setCalVisible] = useState(false);
   /* The inline embed is desktop-only, and "desktop-only" has to be a JS check:
      hiding it with a CSS class would still mount it and pull the iframe down
      on phones, which is exactly the weight the booking card exists to avoid.
-     Applies to compact (About / case-study pages) too — those are responsive
+     Applies to every page — all of them are responsive
      now, and their Figma frames carry the same card. */
   const [isNarrow, setIsNarrow] = useState(() => window.matchMedia("(max-width: 1023px)").matches);
 
@@ -266,47 +264,43 @@ export default function Footer({ compact = false }) {
 
   useGSAP(
     () => {
-      if (!compact) {
-        gsap.fromTo(
-          ".footer-fade",
-          { opacity: 0, y: 40 },
-          {
-            opacity: 1,
-            y: 0,
-            ease: "none",
-            scrollTrigger: { trigger: ".footer-top", start: "top 95%", end: "top 70%", scrub: 0.3 },
-          }
-        );
+      gsap.fromTo(
+        ".footer-fade",
+        { opacity: 0, y: 40 },
+        {
+          opacity: 1,
+          y: 0,
+          ease: "none",
+          scrollTrigger: { trigger: ".footer-top", start: "top 95%", end: "top 70%", scrub: 0.3 },
+        }
+      );
 
-        gsap.fromTo(
-          ".footer-reveal",
-          { opacity: 0, scale: 0.6 },
-          {
-            opacity: 1,
-            scale: 1,
-            ease: "none",
-            stagger: 0.02,
-            scrollTrigger: { trigger: ".skills-grid", start: "top 95%", end: "top 55%", scrub: 0.3 },
-          }
-        );
-      }
+      gsap.fromTo(
+        ".footer-reveal",
+        { opacity: 0, scale: 0.6 },
+        {
+          opacity: 1,
+          scale: 1,
+          ease: "none",
+          stagger: 0.02,
+          scrollTrigger: { trigger: ".skills-grid", start: "top 95%", end: "top 55%", scrub: 0.3 },
+        }
+      );
 
       /* mobile only: every bubble row runs as its own ticker. Rows are doubled
          in the markup, so sliding one full copy width loops seamlessly. */
-      if (!compact) {
-        const mm = gsap.matchMedia();
-        mm.add("(max-width: 1023px)", () => {
-          gsap.utils.toArray(".bubble-row").forEach((row) => {
-            const dir = parseFloat(row.dataset.dir);
-            const duration = parseFloat(row.dataset.duration);
-            gsap.fromTo(
-              row,
-              { xPercent: dir < 0 ? 0 : -50 },
-              { xPercent: dir < 0 ? -50 : 0, ease: "none", duration, repeat: -1 }
-            );
-          });
+      const mm = gsap.matchMedia();
+      mm.add("(max-width: 1023px)", () => {
+        gsap.utils.toArray(".bubble-row").forEach((row) => {
+          const dir = parseFloat(row.dataset.dir);
+          const duration = parseFloat(row.dataset.duration);
+          gsap.fromTo(
+            row,
+            { xPercent: dir < 0 ? 0 : -50 },
+            { xPercent: dir < 0 ? -50 : 0, ease: "none", duration, repeat: -1 }
+          );
         });
-      }
+      });
 
       ScrollTrigger.create({
         trigger: ".cal-bridge",
@@ -331,12 +325,14 @@ export default function Footer({ compact = false }) {
       ) : (
         <div className="h-full w-full overflow-hidden rounded-[8px] bg-[#101010]">
           {calVisible && (
+            <Suspense fallback={null}>
             <Cal
               namespace={CAL_NS}
               calLink={CAL_LINK}
               style={{ width: "100%", height: "100%", overflow: "auto" }}
               config={CAL_CONFIG}
             />
+            </Suspense>
           )}
         </div>
       )}
@@ -350,7 +346,7 @@ export default function Footer({ compact = false }) {
           at the very bottom, the mobile frame runs it to the edge */}
       <div className="absolute left-0 top-0 w-full blur-[22.95px] max-lg:h-(--footer-bottom-h) lg:h-[1130px]">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <img alt="" className="absolute left-[-0.94%] top-[-5.18%] h-[102.93%] w-[100.94%] max-w-none" src={imgImage63} />
+          <img alt="" loading="lazy" className="absolute left-[-0.94%] top-[-5.18%] h-[102.93%] w-[100.94%] max-w-none" src={imgImage63} />
         </div>
       </div>
 
@@ -394,7 +390,7 @@ export default function Footer({ compact = false }) {
                 <img alt="r." className="absolute inset-0 block size-full max-w-none" src={imgGroup47} />
               </div>
               <div className="footer-fade relative w-full shrink-0 max-lg:aspect-[800/368] lg:h-[367.998px] lg:w-[800px]">
-                <img alt="RAHAT HASAN" className="absolute inset-0 block size-full max-w-none" src={imgRahatHasan} />
+                <img alt="Rahat Hasan" loading="lazy" className="absolute inset-0 block size-full max-w-none" src={imgRahatHasan} />
               </div>
             </div>
           </div>
@@ -412,39 +408,8 @@ export default function Footer({ compact = false }) {
     </div>
   );
 
-  // ===================== COMPACT (About page) =====================
-  if (compact) {
-    return (
-      <div ref={containerRef} className="relative bg-[#12110d]" style={{ height: `calc(${COMPACT_BODY_H} + ${RIGHTS_H}px)` }} data-name="Footer">
-        {/* black bridge space — the cal widget's upper half lives here */}
-        <div style={{ height: COMPACT_TOP_SPACE }} />
-        {bottomSection}
-        {rightsBar}
-
-        {/* grid lines — the bridge space above the cal widget carries NO rails.
-            It used to repeat the page's inner rails at 188 / 1250, but the page
-            above is a zoom-to-fit 1440 canvas and the footer isn't, so the two
-            never lined up: the bridge read as a stray band of dashes. The full
-            footer grid (0/360/720/1080/1440) now starts below the bridge.
-            Desktop only: these are 1440-wide blocks, so on a phone they land at
-            arbitrary columns, and the mobile frames carry no rails anyway. */}
-        <div
-          className="pointer-events-none absolute left-1/2 z-10 w-full max-w-[1440px] -translate-x-1/2 max-lg:hidden"
-          style={{ top: COMPACT_TOP_SPACE, height: "var(--footer-bottom-h)" }}
-        >
-          <span className="absolute inset-y-0 left-0 w-px bg-white/40" />
-          <span className="absolute inset-y-0 w-px" style={{ left: 360, ...dashGrad(0.2) }} />
-          <span className="absolute inset-y-0 w-px" style={{ left: 720, ...dashGrad(0.1) }} />
-          <span className="absolute inset-y-0 w-px" style={{ left: 1080, ...dashGrad(0.2) }} />
-          <span className="absolute inset-y-0 right-0 w-px bg-white/40" />
-        </div>
-
-        {calWidget(COMPACT_CAL_TOP)}
-      </div>
-    );
-  }
-
-  // ===================== FULL (homepage) =====================
+  // one footer, every page: hex band + "Building Better Experiences" + the
+  // gradient bottom section, with the cal widget bridging the two.
   return (
     <div
       ref={containerRef}
@@ -484,11 +449,11 @@ export default function Footer({ compact = false }) {
         <div className="relative flex w-full shrink-0 items-start justify-between max-lg:flex-col max-lg:gap-[48px]">
           {/* desktop wraps naturally in its 455px column; the mobile frame
               (623:611) breaks it explicitly onto three 40px lines */}
-          <p className="footer-fade font-serif-display text-h2 relative shrink-0 not-italic tracking-[2.88px] text-white max-lg:w-full max-lg:text-[32px] max-lg:leading-[40px] max-lg:tracking-[1.28px] lg:w-[455px] [word-break:break-word]">
+          <h2 className="footer-fade font-serif-display text-h2 relative shrink-0 not-italic tracking-[2.88px] text-white max-lg:w-full max-lg:text-[32px] max-lg:leading-[40px] max-lg:tracking-[1.28px] lg:w-[455px] [word-break:break-word]">
             <span className="max-lg:block">Building </span>
             <span className="max-lg:block">Better </span>
             <span className="max-lg:block">Experiences</span>
-          </p>
+          </h2>
           <div className="relative flex shrink-0 flex-col items-start gap-[40px] max-lg:w-full max-lg:gap-[31px] lg:w-[864px]">
             {/* on mobile every row is wider than the phone (576–739 at 96px
                 tiles), so each row drifts as its own ticker inside a full-bleed

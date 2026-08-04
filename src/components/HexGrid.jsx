@@ -23,9 +23,13 @@ function randHex() {
 // how often the mask silhouette is re-sampled from the masked canvas (ms) —
 // the subject barely moves, so this is cheap insurance against a resize/scroll
 const MASK_REFRESH = 500;
-// downsampled mask width; averaging at this size closes the gaps between the
-// portrait's dots, so the silhouette masks as one shape rather than a screen
-const MASK_W = 110;
+// downsampled mask width. The portrait is a halftone — its dots cover only a
+// fraction of the subject — so the downsample is blurred before it is read:
+// that spreads each dot into its neighbours and turns the screen of dots back
+// into one solid silhouette. Anything above MASK_MIN counts as "on the image".
+const MASK_W = 80;
+const MASK_BLUR = 3;
+const MASK_MIN = 4;
 
 export default function HexGrid({ maskSelector = null }) {
   const wrapRef = useRef(null);
@@ -35,7 +39,8 @@ export default function HexGrid({ maskSelector = null }) {
     const wrap = wrapRef.current;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-    let raf;
+    let raf = 0;
+    let running = false;
     let cells = [];
     let cols = 0;
     let rows = 0;
@@ -88,6 +93,7 @@ export default function HexGrid({ maskSelector = null }) {
       maskCanvas.height = maskH;
       maskCtx.clearRect(0, 0, maskW, maskH);
       try {
+        maskCtx.filter = `blur(${MASK_BLUR}px)`;
         maskCtx.drawImage(src, 0, 0, maskW, maskH);
         maskAlpha = maskCtx.getImageData(0, 0, maskW, maskH).data;
       } catch {
@@ -95,13 +101,30 @@ export default function HexGrid({ maskSelector = null }) {
       }
     };
 
-    const draw = () => {
+    /* The loop used to run forever, every frame, on all four instances — even
+       with nothing on screen. It now parks itself once the field has faded out
+       and restarts on the next pointer move, so an idle page is genuinely idle
+       (and a laptop on battery is not repainting four canvases for nothing). */
+    const start = () => {
+      if (running) return;
+      running = true;
       raf = requestAnimationFrame(draw);
-      if (!visible) return;
+    };
+
+    const draw = () => {
+      if (!visible) {
+        running = false;
+        return;
+      }
       // fade the entire effect with mouse activity — nothing shows at rest
       intensity += (targetIntensity - intensity) * 0.06;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, w, h);
+      if (intensity < 0.01 && targetIntensity === 0) {
+        running = false; // fully faded and nothing pending — stop until next move
+        return;
+      }
+      raf = requestAnimationFrame(draw);
       if (intensity < 0.01) return;
       // target in canvas space, re-read each frame so the glow stays
       // under the cursor while scrolling past the sticky canvas
@@ -141,7 +164,7 @@ export default function HexGrid({ maskSelector = null }) {
           if (mask && x >= mask.x && x <= mask.x + mask.w && y >= mask.y && y <= mask.y + mask.h) {
             const mx = Math.min(maskW - 1, ((x - mask.x) / mask.w * maskW) | 0);
             const my = Math.min(maskH - 1, ((y - mask.y) / mask.h * maskH) | 0);
-            if (maskAlpha[(my * maskW + mx) * 4 + 3] > 10) continue;
+            if (maskAlpha[(my * maskW + mx) * 4 + 3] > MASK_MIN) continue;
           }
           const t = 1 - d / RADIUS;
           // values shuffle while lit, decoding-style
@@ -156,20 +179,23 @@ export default function HexGrid({ maskSelector = null }) {
       pointer.clientX = e.clientX;
       pointer.clientY = e.clientY;
       targetIntensity = 1;
+      start();
       clearTimeout(idleTimer);
       idleTimer = setTimeout(() => {
         targetIntensity = 0;
+        start(); // wake up just long enough to fade back out
       }, 1500);
     };
 
     // stop drawing while the section is offscreen
     const io = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
+      if (visible && targetIntensity > 0) start();
     });
     io.observe(wrap);
 
     build();
-    draw();
+    start();
     window.addEventListener("resize", build);
     window.addEventListener("mousemove", onMove);
     return () => {
