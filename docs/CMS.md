@@ -39,6 +39,10 @@ time and returns a clear error if they are missing.
 
 **3. Redeploy**, so the functions pick up the variables.
 
+If you ever move to a custom domain, update `base_url` in
+[`public/admin/config.yml`](../public/admin/config.yml) and the OAuth app's
+callback URL to match — otherwise the login popup goes to the old address.
+
 Then open `https://YOUR-DOMAIN/admin/` and click **Login with GitHub**.
 
 **Who can get in:** GitHub only issues a token to a signed-in account, and the

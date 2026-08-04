@@ -17,8 +17,11 @@ backend:
   branch: main
   # The OAuth exchange runs as serverless functions in this same Vercel project
   # (api/auth.js and api/callback.js) — no second service, no extra domain.
-  # base_url is left unset on purpose: Decap then uses the site's own origin,
-  # so this works on the production domain AND on every Vercel preview URL.
+  #
+  # base_url MUST be set. Left out, Decap falls back to https://api.netlify.com
+  # and the login popup 404s. Together these two lines send the popup to
+  # https://rahat-uxd.vercel.app/api/auth instead.
+  base_url: https://rahat-uxd.vercel.app
   auth_endpoint: api/auth
 
 # Drafts are committed to a branch and opened as a PR instead of going live.
