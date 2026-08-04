@@ -1,0 +1,160 @@
+# =============================================================================
+# CMS configuration (Decap). Edits here commit JSON to /content in the repo,
+# the host rebuilds, and the live site updates.
+#
+# BEFORE THIS WORKS you need to authorise the CMS against GitHub once — see
+# docs/CMS.md. Nothing else in this file needs changing.
+# =============================================================================
+
+# On localhost the CMS talks to a small proxy (`npm run cms`) and writes the
+# files on disk directly — no GitHub, no OAuth, works offline. Anywhere else it
+# falls back to the github backend below.
+local_backend: true
+
+backend:
+  name: github
+  repo: rahat-hasan1453/Rahat-Portfolio
+  branch: main
+  # The OAuth exchange runs as serverless functions in this same Vercel project
+  # (api/auth.js and api/callback.js) — no second service, no extra domain.
+  # base_url is left unset on purpose: Decap then uses the site's own origin,
+  # so this works on the production domain AND on every Vercel preview URL.
+  auth_endpoint: api/auth
+
+# Drafts are committed to a branch and opened as a PR instead of going live.
+# Turn this on if you ever want to preview before publishing.
+publish_mode: simple
+
+media_folder: public/assets/cs
+public_folder: /assets/cs
+
+site_url: https://rahat-uxd.vercel.app
+logo_url: https://rahat-uxd.vercel.app/assets/cbb187227f4bec065dffe6c01f5b5bdd32d0a6d7.svg
+
+collections:
+  # ---------------------------------------------------------------- studies --
+  - name: case_studies
+    label: Case Studies
+    label_singular: Case Study
+    folder: content/case-studies
+    create: true
+    delete: true
+    extension: json
+    format: json
+    slug: "{{fields.slug}}"
+    summary: "{{title}}"
+    sortable_fields: [order, title]
+    fields:
+      - {
+          name: order,
+          label: Order,
+          widget: number,
+          value_type: int,
+          default: 100,
+          hint: "Lower numbers come first on the Case Studies page and the homepage rail.",
+        }
+      - {
+          name: slug,
+          label: URL slug,
+          widget: string,
+          pattern: ["^[a-z0-9]+(-[a-z0-9]+)*$", "Lowercase letters, numbers and dashes only"],
+          hint: "Becomes the address: /case-studies/your-slug. Don't change it once the link is shared.",
+        }
+      - { name: title, label: Title, widget: string, hint: "Shown as the page heading, e.g. 'D-Pass / Digital Visitor Management'." }
+      - {
+          name: desc,
+          label: Short description,
+          widget: text,
+          hint: "One or two sentences. Used on the cards, and as the Google/link-preview description.",
+        }
+      - { name: year, label: Year, widget: string, default: "2025/26" }
+
+      - {
+          name: tags,
+          label: Tags,
+          widget: list,
+          min: 3,
+          max: 3,
+          hint: "Exactly three — they render as one joined pill group.",
+          field: { name: tag, label: Tag, widget: string },
+        }
+      - {
+          name: cats,
+          label: Categories,
+          widget: list,
+          min: 2,
+          max: 2,
+          hint: "Exactly two.",
+          field: { name: cat, label: Category, widget: string },
+        }
+
+      - {
+          name: pin,
+          label: Access code for this study,
+          widget: string,
+          required: false,
+          default: "",
+          hint: "Leave blank to use the shared code from Settings. Set a value to give this study its own.",
+        }
+
+      - {
+          name: shots,
+          label: Images,
+          widget: list,
+          hint: "In order. The first is the cover and the page hero; the next three sit above the Problem Statement; the rest go under Design Exploration. Sizes are measured automatically — landscape images get a full-width row, portraits pair up.",
+          field: { name: image, label: Image, widget: image },
+        }
+
+      - { name: context, label: Context, widget: text }
+      - { name: problem, label: Problem statement, widget: text }
+      - {
+          name: challenges,
+          label: Challenges,
+          widget: list,
+          field: { name: item, label: Challenge, widget: text },
+        }
+
+      - name: solutions
+        label: Solutions
+        widget: object
+        fields:
+          - { name: intro, label: Intro, widget: text }
+          - { name: bullets, label: Bullets, widget: list, field: { name: item, label: Bullet, widget: text } }
+
+      - name: conclusion
+        label: Conclusion
+        widget: object
+        fields:
+          - { name: intro, label: Intro, widget: text }
+          - { name: bullets, label: Bullets, widget: list, field: { name: item, label: Bullet, widget: text } }
+
+  # --------------------------------------------------------------- settings --
+  - name: settings
+    label: Settings
+    files:
+      - name: access
+        label: Access & contact
+        file: content/settings.json
+        fields:
+          - {
+              name: accessCode,
+              label: Shared access code,
+              widget: string,
+              pattern: ["^[0-9]{4,8}$", "4 to 8 digits"],
+              hint: "Used by every case study that doesn't set its own code. Digits only.",
+            }
+          - {
+              name: accessMinutes,
+              label: How long an unlock lasts (minutes),
+              widget: number,
+              value_type: int,
+              min: 1,
+              max: 1440,
+              hint: "After this, that study asks for the code again. Each study is timed separately.",
+            }
+          - {
+              name: contactEmail,
+              label: Contact email,
+              widget: string,
+              hint: "Shown in the access prompt so someone without a code can ask for one.",
+            }
