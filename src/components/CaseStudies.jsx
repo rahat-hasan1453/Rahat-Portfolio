@@ -355,7 +355,7 @@ export default function CaseStudies() {
                     transition={{ duration: 0.9, ease: EASE, delay: 0.25 }}
                     className="font-jakarta w-[685px] text-[20px] font-medium leading-[24px] tracking-[0.8px] text-[#b3b3b3] [word-break:break-word] max-lg:w-full max-lg:text-[16px] max-lg:tracking-[0.64px]"
                   >
-                    {"Hello, I’m Rahat — a product-minded designer with nearly 4 years of experience, currently a UX Engineer at Selise Digital Platform. I've grown into a product-focused role, taking end-to-end ownership "}
+                    {"32 clicks cut to 11. Office check-in made contactless. An AI assistant on the App Store. Three problems worth solving — and how each one actually got solved. Full write-ups open with a short access code."}
                   </motion.p>
                 </div>
               </div>

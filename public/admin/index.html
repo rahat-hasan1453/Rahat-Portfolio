@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex, nofollow" />
     <title>Content — Rahat Hasan</title>
+    <!--
+      Point Decap at the config by absolute path. Without this it resolves
+      "config.yml" relative to the current URL, so /admin (no trailing slash)
+      asks for /config.yml, gets the SPA's index.html back, and dies with a
+      YAML syntax error. Neither the dev server nor Vercel redirects /admin
+      to /admin/, so both URLs have to work.
+    -->
+    <link href="/admin/config.yml" type="text/yaml" rel="cms-config-url" />
   </head>
   <body>
     <!--
