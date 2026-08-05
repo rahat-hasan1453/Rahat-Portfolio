@@ -379,10 +379,6 @@ export default function Footer() {
                   </SocialPill>
                 </div>
               </div>
-              <div className="footer-fade font-urbanist relative flex w-[302px] shrink-0 flex-col items-start gap-[16px] text-[24px] font-medium text-white [word-break:break-word]">
-                <p className="leading-[24px]">+880 1777280571</p>
-                <p className="leading-[24px]">rahat.akash1453@gmail.com</p>
-              </div>
             </div>
             {/* right column */}
             <div className="relative flex shrink-0 flex-col items-end gap-[100px] max-lg:w-full max-lg:gap-[43.68px] lg:w-[800.403px]">
