@@ -225,6 +225,10 @@ export default function PinGate({ open, onClose, onUnlocked, title, slug }) {
                         onKeyDown={(e) => onKeyDown(i, e)}
                         onPaste={onPaste}
                         onFocus={(e) => e.target.select()}
+                        /* masked so the code isn't readable over a shoulder or
+                           in a screen share. inputMode keeps the numeric keypad
+                           on mobile, which type=password alone would not. */
+                        type="password"
                         inputMode="numeric"
                         autoComplete="one-time-code"
                         aria-label={`Digit ${i + 1}`}
