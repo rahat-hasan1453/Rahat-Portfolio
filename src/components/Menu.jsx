@@ -345,16 +345,25 @@ export default function Menu() {
       {/* The pill floats over live copy, which scrolled up flush against it and
           read as a collision. This strip blurs whatever passes under the top
           padding and fades out below the pill. Sits above the page (z-95) but
-          under the pill itself (z-100). Taller on desktop because the pill sits
-          4px lower there (top-24 vs top-20). */}
+          under the pill itself (z-100).
+          The mask and the backdrop-filter MUST stay on this one element. Moving
+          the mask to a wrapper makes that wrapper a Backdrop Root, which isolates
+          this element's backdrop so the blur samples nothing and silently stops
+          working. The flicker that split was meant to fix is instead handled by
+          pinning this element to its own GPU layer below — via transform, not
+          via will-change on a filter/mask property, which would re-introduce the
+          same backdrop-root problem. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed inset-x-0 top-0 z-[95] h-[104px] lg:h-[116px]"
+        className="pointer-events-none fixed inset-x-0 top-0 z-[95] h-[104px]"
         style={{
           backdropFilter: "blur(10px)",
           WebkitBackdropFilter: "blur(10px)",
           maskImage: "linear-gradient(to bottom, #000 0 68%, transparent)",
           WebkitMaskImage: "linear-gradient(to bottom, #000 0 68%, transparent)",
+          transform: "translateZ(0)",
+          willChange: "transform",
+          backfaceVisibility: "hidden",
         }}
       />
 
